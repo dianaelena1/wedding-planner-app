@@ -1,4 +1,4 @@
-import { WeddingDocument, WeddingGuest, WeddingTask, WeddingVendor } from '../models/wedding.models';
+import { WeddingDocument, WeddingGuest, WeddingTask, WeddingVendor } from '../models/wedding-data.model';
 
 export const WEDDING_VENDORS: WeddingVendor[] = [
   {

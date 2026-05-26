@@ -1,7 +1,0 @@
-node_modules/
-dist/
-.angular/
-.vscode/
-.env
-firebase-debug.log
-.firebaserc

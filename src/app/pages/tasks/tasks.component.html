@@ -1,0 +1,24 @@
+<section>
+  <div class="page-title">
+    <div class="eyebrow">To do</div>
+    <h2>Task-uri</h2>
+    <p>Lucruri de rezolvat pana la nunta.</p>
+  </div>
+
+  <div class="tasks-board">
+    @for (task of tasks; track task.id) {
+      <article class="card task-card">
+        <div>
+          <span class="badge">{{ task.priority }}</span>
+          <h3>{{ task.title }}</h3>
+          <p class="muted">{{ task.category }}</p>
+          @if (task.notes) {
+            <p>{{ task.notes }}</p>
+          }
+        </div>
+
+        <span class="status">{{ task.status }}</span>
+      </article>
+    }
+  </div>
+</section>
