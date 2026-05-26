@@ -111,8 +111,7 @@ export class DashboardComponent {
     },
     {
       time: '00:00',
-      title: 'Final photo booth',
-      details: 'K Boom Photo Booth'
+      title: 'Final'
     }
   ];
 

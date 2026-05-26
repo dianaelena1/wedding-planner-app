@@ -1267,40 +1267,32 @@ export const WEDDING_TASKS: WeddingTask[] = [
     "title": "Confirma suma finala la Bamboo Flower",
     "category": "Flori",
     "status": "todo",
-    "priority": "high",
+    "priority": "very high",
     "notes": "Contractul are avans 500 lei si rest de stabilit; Excelul are total 4725 lei. Confirma suma finala si ce include exact."
-  },
-  {
-    "id": "task-002",
-    "title": "Confirma TVA si restul la Wild Garden",
-    "category": "Sala",
-    "status": "todo",
-    "priority": "high",
-    "notes": "Excel: 3500 EUR total, 1000 EUR + TVA avans, 2500 EUR + TVA rest. Trebuie confirmat daca mai sunt plati inainte de nunta."
   },
   {
     "id": "task-003",
     "title": "Completeaza pretul meniurilor",
     "category": "Sala",
     "status": "todo",
-    "priority": "high",
+    "priority": "very high",
     "notes": "In Excel meniurile sunt necompletate."
   },
   {
-    "id": "task-004",
-    "title": "Completeaza preturile la bauturi",
-    "category": "Bauturi",
+    "id": "task-009",
+    "title": "Decide staroste / coordonator",
+    "category": "Aditional",
     "status": "todo",
-    "priority": "medium",
-    "notes": "Momentan doar whisky are pret. Restul au cantitati, dar preturi 0/necompletate."
+    "priority": "very high",
+    "notes": "Excel contine Staroste? Coordonator? fara pret."
   },
   {
-    "id": "task-005",
-    "title": "Confirma moneda pentru Video Denis MSG",
-    "category": "Video",
-    "status": "todo",
-    "priority": "medium",
-    "notes": "In Excel apare 1000, dar moneda nu e clara."
+    "id": "task-008",
+    "title": "Curata lista de invitati si completeaza statusurile",
+    "category": "Invitati",
+    "status": "in-progress",
+    "priority": "very high",
+    "notes": "Lista importata din Excel are multe statusuri goale. Completeaza vine/nu vine/poate si numarul de persoane."
   },
   {
     "id": "task-006",
@@ -1313,37 +1305,13 @@ export const WEDDING_TASKS: WeddingTask[] = [
   },
   {
     "id": "task-007",
-    "title": "Verifica plata The Cake Man dupa eveniment",
+    "title": "Verifica plata The Mr. Cake dupa eveniment",
     "category": "Tort & Candy Bar",
     "dueDate": "2026-09-08",
     "status": "todo",
     "priority": "high",
     "notes": "Rest 6855 RON in maximum 3 zile dupa eveniment."
   },
-  {
-    "id": "task-008",
-    "title": "Curata lista de invitati si completeaza statusurile",
-    "category": "Invitati",
-    "status": "in-progress",
-    "priority": "high",
-    "notes": "Lista importata din Excel are multe statusuri goale. Completeaza vine/nu vine/poate si numarul de persoane."
-  },
-  {
-    "id": "task-009",
-    "title": "Decide staroste / coordonator",
-    "category": "Aditional",
-    "status": "todo",
-    "priority": "medium",
-    "notes": "Excel contine Staroste? Coordonator? fara pret."
-  },
-  {
-    "id": "task-010",
-    "title": "Finalizeaza modelul de invitatie",
-    "category": "Invitatii",
-    "status": "in-progress",
-    "priority": "medium",
-    "notes": "Ai doua variante vizuale salvate ca referinta."
-  }
 ];
 
 export const WEDDING_DRINKS: WeddingDrinkItem[] = [

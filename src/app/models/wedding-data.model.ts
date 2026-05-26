@@ -51,7 +51,8 @@ export type WeddingTaskStatus =
 export type WeddingTaskPriority =
     | 'low'
     | 'medium'
-    | 'high';
+    | 'high'
+    | 'very high';
 
 export interface WeddingVendor {
   id: string;
