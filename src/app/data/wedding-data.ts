@@ -76,7 +76,7 @@ export const WEDDING_VENDORS: WeddingVendor[] = [
     "id": "dj-antenna",
     "name": "DJ Antenna",
     "category": "Muzica",
-    "totalPrice": 2000,
+    "totalPrice": 2500,
     "currency": "EUR",
     "advancePaid": 1000,
     "remainingPayment": 1000,

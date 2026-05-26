@@ -8,18 +8,17 @@
       </div>
     </div>
 
-    <nav>
-      <a routerLink="/dashboard" routerLinkActive="active">Dashboard</a>
-      <a routerLink="/vendors" routerLinkActive="active">Furnizori</a>
-      <a routerLink="/payments" routerLinkActive="active">Plati</a>
-      <a routerLink="/documents" routerLinkActive="active">Documente</a>
-      <a routerLink="/guests" routerLinkActive="active">Invitati</a>
-      <a routerLink="/tasks" routerLinkActive="active">Task-uri</a>
-      <a routerLink="/cazari" routerLinkActive="active">Cazari</a>
-        <a routerLink="/pregatiri" routerLinkActive="active">Pregatiri</a>
-        <a routerLink="/verighete" routerLinkActive="active">Verighete</a>
-        <a routerLink="/tasks" routerLinkActive="active">Task-uri</a>
-    </nav>
+      <nav>
+          <a routerLink="/dashboard" routerLinkActive="active">Dashboard</a>
+          <a routerLink="/vendors" routerLinkActive="active">Furnizori</a>
+          <a routerLink="/payments" routerLinkActive="active">Plati</a>
+          <a routerLink="/documents" routerLinkActive="active">Documente</a>
+          <a routerLink="/guests" routerLinkActive="active">Invitati</a>
+          <a routerLink="/cazari" routerLinkActive="active">Cazari</a>
+          <a routerLink="/pregatiri" routerLinkActive="active">Pregatiri</a>
+          <a routerLink="/verighete" routerLinkActive="active">Verighete</a>
+          <a routerLink="/tasks" routerLinkActive="active">Task-uri</a>
+      </nav>
 
     <div class="auth-card">
       @if (user$ | async; as user) {

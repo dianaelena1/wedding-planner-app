@@ -8,6 +8,7 @@ import { GuestsComponent } from './pages/guests/guests.component';
 import { TasksComponent } from './pages/tasks/tasks.component';
 import { PreparationsComponent } from './pages/preparations/preparations.component';
 import { RingsComponent } from './pages/rings/rings.component';
+import { AccommodationsComponent } from './pages/accommodations/accommodations.component';
 
 export const routes: Routes = [
   { path: 'dashboard', component: DashboardComponent },
@@ -15,9 +16,10 @@ export const routes: Routes = [
   { path: 'payments', component: PaymentsComponent },
   { path: 'documents', component: DocumentsComponent },
   { path: 'guests', component: GuestsComponent },
-  { path: 'tasks', component: TasksComponent },
-  { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
-  { path: '**', redirectTo: 'dashboard' },
+  { path: 'cazari', component: AccommodationsComponent },
   { path: 'pregatiri', component: PreparationsComponent },
   { path: 'verighete', component: RingsComponent },
+  { path: 'tasks', component: TasksComponent },
+  { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
+  { path: '**', redirectTo: 'dashboard' }
 ];

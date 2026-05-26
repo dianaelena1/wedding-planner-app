@@ -1,72 +1,149 @@
-<section>
-  <div class="page-title">
-    <div class="eyebrow">Diana & Dan</div>
-    <h2>Dashboard nunta</h2>
-    <p>Imagine de ansamblu din Excel si din contractele incarcate.</p>
-  </div>
+<section class="dashboard-page">
+    <section class="hero-card">
+        <div class="hero-content">
+            <p class="eyebrow">Diana & Dan</p>
+            <h1>Wedding Planner</h1>
+            <p class="hero-subtitle">
+                05 Septembrie 2026 · Biserica Sfintii Arhangheli Mihail si Gavril · Wild Garden
+            </p>
 
-  <div class="grid grid-4">
-    <article class="card stat-card">
-      <span>Total RON</span>
-      <strong>{{ formatMoney(totalRon, 'RON') }}</strong>
-      <p>Cheltuieli cu sume in lei</p>
-    </article>
-
-    <article class="card stat-card">
-      <span>Total EUR</span>
-      <strong>{{ formatMoney(totalEur, 'EUR') }}</strong>
-      <p>Cheltuieli cu sume in euro</p>
-    </article>
-
-    <article class="card stat-card">
-      <span>Rest de plata</span>
-      <strong>{{ formatMoney(remainingRon, 'RON') }} / {{ formatMoney(remainingEur, 'EUR') }}</strong>
-      <p>Calculat din avansuri si contracte</p>
-    </article>
-
-    <article class="card stat-card">
-      <span>Invitati in lista</span>
-      <strong>{{ invitedGuests }}</strong>
-      <p>{{ confirmedGuests }} confirmati momentan</p>
-    </article>
-  </div>
-
-  <div class="grid grid-3 dashboard-lower">
-    <article class="card">
-      <h3>Task-uri urgente</h3>
-
-      @for (task of highPriorityTasks; track task.id) {
-        <div class="mini-row">
-          <div>
-            <strong>{{ task.title }}</strong>
-            <p>{{ task.category }}</p>
-          </div>
-          <span class="badge">{{ task.priority }}</span>
+            <div class="hero-actions">
+                <a routerLink="/vendors">Vezi furnizorii</a>
+                <a routerLink="/payments">Vezi platile</a>
+                <a routerLink="/documents">Documente</a>
+            </div>
         </div>
-      }
-    </article>
 
-    <article class="card">
-      <h3>Resturi importante</h3>
-
-      @for (payment of nextPayments; track payment.id) {
-        <div class="mini-row">
-          <div>
-            <strong>{{ payment.name }}</strong>
-            <p>{{ payment.category }}</p>
-          </div>
-          <span class="badge">{{ formatMoney(payment.remainingPayment, payment.currency) }}</span>
+        <div class="countdown-card">
+            <span>Au mai ramas</span>
+            <strong>{{ daysUntilWedding }}</strong>
+            <p>zile pana la nunta</p>
         </div>
-      }
-    </article>
+    </section>
 
-    <article class="card">
-      <h3>Ziua nuntii</h3>
-      <p class="date-big">05.09.2026</p>
-      <p class="muted">Cununie religioasa: 12:00</p>
-      <p class="muted">Receptie Wild Garden: 16:00</p>
-      <p class="muted">Photo booth: 16:00 - 00:00</p>
-      <p class="muted">Kids corner: animator 18:00 - 20:00</p>
-    </article>
-  </div>
+    <div class="overview-grid">
+        <article class="card stat-card">
+            <span>Total RON</span>
+            <strong>{{ formatMoney(totalRon, 'RON') }}</strong>
+            <p>Cheltuieli centralizate in lei</p>
+        </article>
+
+        <article class="card stat-card">
+            <span>Total EUR</span>
+            <strong>{{ formatMoney(totalEur, 'EUR') }}</strong>
+            <p>Cheltuieli centralizate in euro</p>
+        </article>
+
+        <article class="card stat-card">
+            <span>Rest de plata</span>
+            <strong>{{ formatMoney(remainingRon, 'RON') }}</strong>
+            <p>{{ formatMoney(remainingEur, 'EUR') }} ramas in euro</p>
+        </article>
+
+        <article class="card stat-card">
+            <span>Invitati</span>
+            <strong>{{ invitedGuests }}</strong>
+            <p>{{ confirmedGuests }} confirmati momentan</p>
+        </article>
+    </div>
+
+    <div class="progress-grid">
+        <article class="card progress-card">
+            <div class="progress-header">
+                <span>Furnizori contractati</span>
+                <strong>{{ vendorProgress }}%</strong>
+            </div>
+            <div class="progress-bar">
+                <div [style.width.%]="vendorProgress"></div>
+            </div>
+            <p>{{ contractedVendors }} din {{ totalVendors }} furnizori sunt marcati contractati.</p>
+        </article>
+
+        <article class="card progress-card">
+            <div class="progress-header">
+                <span>Invitati confirmati</span>
+                <strong>{{ guestProgress }}%</strong>
+            </div>
+            <div class="progress-bar">
+                <div [style.width.%]="guestProgress"></div>
+            </div>
+            <p>{{ confirmedGuests }} din {{ invitedGuests }} invitati sunt confirmati.</p>
+        </article>
+
+        <article class="card progress-card">
+            <div class="progress-header">
+                <span>Plati RON achitate</span>
+                <strong>{{ paidRonProgress }}%</strong>
+            </div>
+            <div class="progress-bar">
+                <div [style.width.%]="paidRonProgress"></div>
+            </div>
+            <p>{{ formatMoney(paidRon, 'RON') }} achitat din {{ formatMoney(totalRon, 'RON') }}.</p>
+        </article>
+    </div>
+
+    <div class="modules-grid">
+        @for (module of modules; track module.route) {
+            <a class="card module-card" [routerLink]="module.route">
+                <span class="module-label">{{ module.label }}</span>
+                <h3>{{ module.title }}</h3>
+                <p>{{ module.description }}</p>
+            </a>
+        }
+    </div>
+
+    <div class="dashboard-bottom-grid">
+        <article class="card timeline-card">
+            <div class="section-heading">
+                <span class="eyebrow">Program</span>
+                <h2>Ziua nuntii</h2>
+            </div>
+
+            <div class="timeline-list">
+                @for (item of weddingTimeline; track item.time) {
+                    <div class="timeline-item">
+                        <div class="timeline-time">{{ item.time }}</div>
+                        <div>
+                            <strong>{{ item.title }}</strong>
+                            <p>{{ item.details }}</p>
+                        </div>
+                    </div>
+                }
+            </div>
+        </article>
+
+        <article class="card attention-card">
+            <div class="section-heading">
+                <span class="eyebrow">Important</span>
+                <h2>Ce necesita atentie</h2>
+            </div>
+
+            @for (task of highPriorityTasks; track task.id) {
+                <div class="attention-row">
+                    <div>
+                        <strong>{{ task.title }}</strong>
+                        <p>{{ task.category }}</p>
+                    </div>
+                    <span class="badge">{{ task.priority }}</span>
+                </div>
+            }
+        </article>
+
+        <article class="card attention-card">
+            <div class="section-heading">
+                <span class="eyebrow">Resturi</span>
+                <h2>Plati de urmarit</h2>
+            </div>
+
+            @for (payment of nextPayments; track payment.id) {
+                <div class="attention-row">
+                    <div>
+                        <strong>{{ payment.name }}</strong>
+                        <p>{{ payment.category }}</p>
+                    </div>
+                    <span class="badge">{{ formatMoney(payment.remainingPayment, payment.currency || 'RON') }}</span>
+                </div>
+            }
+        </article>
+    </div>
 </section>

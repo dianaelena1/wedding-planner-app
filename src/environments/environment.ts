@@ -1,11 +1,11 @@
 export const environment = {
   production: false,
   firebase: {
-    apiKey: 'PASTE_API_KEY_HERE',
-    authDomain: 'PASTE_PROJECT_ID.firebaseapp.com',
-    projectId: 'PASTE_PROJECT_ID',
-    storageBucket: 'PASTE_PROJECT_ID.appspot.com',
-    messagingSenderId: 'PASTE_MESSAGING_SENDER_ID',
-    appId: 'PASTE_APP_ID'
+    apiKey: 'AIzaSyAqvLqWWJPALgiKSwlUyzilPd-89Yw4rOs',
+    authDomain: 'wedding-planner-app-bfe24.firebaseapp.com',
+    projectId: 'wedding-planner-app-bfe24',
+    storageBucket: 'wedding-planner-app-bfe24.firebasestorage.app',
+    messagingSenderId: '404700725968',
+    appId: '1:404700725968:web:dc2813ab280dd94e6254d5'
   }
 };
