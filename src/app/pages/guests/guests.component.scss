@@ -1,0 +1,37 @@
+.guest-summary {
+  margin-bottom: 18px;
+}
+
+.stat-card {
+  span {
+    color: #8a7a68;
+  }
+
+  strong {
+    display: block;
+    margin-top: 8px;
+    font-size: 28px;
+  }
+}
+
+.guests-card {
+  overflow-x: auto;
+}
+
+.guest-row {
+  min-width: 860px;
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr 1.3fr 2fr;
+  gap: 12px;
+  padding: 14px 0;
+  border-bottom: 1px solid #eadfce;
+  align-items: center;
+}
+
+.guest-head {
+  color: #8a7a68;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-weight: 700;
+}

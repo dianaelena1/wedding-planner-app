@@ -1,0 +1,25 @@
+.tasks-board {
+  display: grid;
+  gap: 14px;
+}
+
+.task-card {
+  display: flex;
+  justify-content: space-between;
+  gap: 18px;
+
+  h3 {
+    margin: 10px 0 4px;
+  }
+}
+
+.status {
+  color: #8a7a68;
+  font-weight: 700;
+}
+
+@media (max-width: 650px) {
+  .task-card {
+    flex-direction: column;
+  }
+}

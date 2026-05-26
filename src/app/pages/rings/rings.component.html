@@ -1,0 +1,77 @@
+<section>
+    <div class="page-title">
+        <div class="eyebrow">Simboluri</div>
+        <h2>Verighete</h2>
+        <p>Model, magazin, material, marimi si plati pentru verighete.</p>
+    </div>
+
+    <div class="rings-grid">
+        @for (ring of rings; track ring.id) {
+            <article class="card ring-card" [class.paid-card]="ring.status === 'paid' || ring.status === 'received'">
+                <div class="card-header">
+                    <div>
+                        <span class="badge">Verighete</span>
+                        <h3>{{ ring.name }}</h3>
+                    </div>
+
+                    <span class="status-pill" [class]="'status-' + ring.status">
+            {{ getStatusLabel(ring.status) }}
+          </span>
+                </div>
+
+                <div class="details-grid">
+                    <div>
+                        <small>Magazin</small>
+                        <strong>{{ ring.shop || '-' }}</strong>
+                    </div>
+
+                    <div>
+                        <small>Material</small>
+                        <strong>{{ ring.material || '-' }}</strong>
+                    </div>
+
+                    <div>
+                        <small>Marime Diana</small>
+                        <strong>{{ ring.sizeDiana || '-' }}</strong>
+                    </div>
+
+                    <div>
+                        <small>Marime Dan</small>
+                        <strong>{{ ring.sizeDan || '-' }}</strong>
+                    </div>
+
+                    <div>
+                        <small>Comanda</small>
+                        <strong>{{ ring.orderDate || '-' }}</strong>
+                    </div>
+
+                    <div>
+                        <small>Ridicare</small>
+                        <strong>{{ ring.pickupDate || '-' }}</strong>
+                    </div>
+                </div>
+
+                <div class="money-row">
+                    <div>
+                        <small>Total</small>
+                        <strong>{{ formatMoney(ring.totalPrice, ring.currency) }}</strong>
+                    </div>
+
+                    <div>
+                        <small>Avans</small>
+                        <strong>{{ formatMoney(ring.advancePaid, ring.currency) }}</strong>
+                    </div>
+
+                    <div>
+                        <small>Rest</small>
+                        <strong>{{ formatMoney(ring.remainingPayment, ring.currency) }}</strong>
+                    </div>
+                </div>
+
+                @if (ring.notes) {
+                    <p class="muted">{{ ring.notes }}</p>
+                }
+            </article>
+        }
+    </div>
+</section>

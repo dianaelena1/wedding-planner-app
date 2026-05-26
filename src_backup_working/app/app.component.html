@@ -1,0 +1,23 @@
+<div class="app-shell">
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="brand-icon">D&D</div>
+      <div>
+        <h1>Wedding Planner</h1>
+        <p>05 Septembrie 2026</p>
+      </div>
+    </div>
+
+    <nav>
+      <a routerLink="/dashboard" routerLinkActive="active">Dashboard</a>
+      <a routerLink="/vendors" routerLinkActive="active">Furnizori</a>
+      <a routerLink="/documents" routerLinkActive="active">Documente</a>
+      <a routerLink="/guests" routerLinkActive="active">Invitati</a>
+      <a routerLink="/tasks" routerLinkActive="active">Task-uri</a>
+    </nav>
+  </aside>
+
+  <main class="content">
+    <router-outlet></router-outlet>
+  </main>
+</div>

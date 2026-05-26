@@ -1,0 +1,72 @@
+<section>
+  <div class="page-title">
+    <div class="eyebrow">Organizare</div>
+    <h2>Furnizori</h2>
+    <p>Aici vezi contractele, preturile, avansurile si ce mai trebuie platit.</p>
+  </div>
+
+  <div class="vendors-grid">
+    @for (vendor of vendors; track vendor.id) {
+      <article class="card vendor-card">
+        <div class="vendor-header">
+          <div>
+            <span class="badge">{{ vendor.category }}</span>
+            <h3>{{ vendor.name }}</h3>
+          </div>
+          <span class="status">{{ vendor.status }}</span>
+        </div>
+
+        <div class="money-row">
+          <div>
+            <small>Total</small>
+            <strong>
+              @if (vendor.totalPrice) {
+                {{ vendor.totalPrice }} {{ vendor.currency }}
+              } @else {
+                -
+              }
+            </strong>
+          </div>
+
+          <div>
+            <small>Avans</small>
+            <strong>
+              @if (vendor.advancePaid) {
+                {{ vendor.advancePaid }} {{ vendor.currency }}
+              } @else {
+                -
+              }
+            </strong>
+          </div>
+
+          <div>
+            <small>Rest</small>
+            <strong>
+              @if (vendor.remainingPayment) {
+                {{ vendor.remainingPayment }} {{ vendor.currency }}
+              } @else {
+                -
+              }
+            </strong>
+          </div>
+        </div>
+
+        @if (vendor.paymentDeadline) {
+          <p><strong>Scadenta:</strong> {{ vendor.paymentDeadline }}</p>
+        }
+
+        @if (vendor.eventTime) {
+          <p><strong>Program:</strong> {{ vendor.eventTime }}</p>
+        }
+
+        @if (vendor.location) {
+          <p><strong>Locatie:</strong> {{ vendor.location }}</p>
+        }
+
+        @if (vendor.notes) {
+          <p class="muted">{{ vendor.notes }}</p>
+        }
+      </article>
+    }
+  </div>
+</section>

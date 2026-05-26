@@ -1,0 +1,110 @@
+<section>
+    <div class="page-title">
+        <div class="eyebrow">Logistica</div>
+        <h2>Cazari</h2>
+        <p>Camere pentru rude, prieteni si persoane care raman peste noapte dupa nunta.</p>
+    </div>
+
+    <div class="summary-grid">
+        <article class="card summary-card">
+            <span>Camere</span>
+            <strong>{{ totalRooms }}</strong>
+            <p>Total camere notate</p>
+        </article>
+
+        <article class="card summary-card">
+            <span>Persoane</span>
+            <strong>{{ totalGuests }}</strong>
+            <p>Total persoane cazate</p>
+        </article>
+
+        <article class="card summary-card">
+            <span>Total RON</span>
+            <strong>{{ formatMoney(totalRon, 'RON') }}</strong>
+            <p>Costuri cazare in lei</p>
+        </article>
+
+        <article class="card summary-card">
+            <span>Total EUR</span>
+            <strong>{{ formatMoney(totalEur, 'EUR') }}</strong>
+            <p>Costuri cazare in euro</p>
+        </article>
+    </div>
+
+    <div class="accommodations-grid">
+        @for (item of accommodations; track item.id) {
+            <article class="card accommodation-card" [class.paid-card]="item.status === 'paid'">
+                <div class="card-header">
+                    <div>
+                        <span class="badge">Cazare</span>
+                        <h3>{{ item.name }}</h3>
+                    </div>
+
+                    <span class="status-pill" [class]="getStatusClass(item.status)">
+            {{ getStatusLabel(item.status) }}
+          </span>
+                </div>
+
+                <div class="details-grid">
+                    <div>
+                        <small>Check-in</small>
+                        <strong>{{ item.checkIn || '-' }}</strong>
+                    </div>
+
+                    <div>
+                        <small>Check-out</small>
+                        <strong>{{ item.checkOut || '-' }}</strong>
+                    </div>
+
+                    <div>
+                        <small>Nopti</small>
+                        <strong>{{ item.nights || '-' }}</strong>
+                    </div>
+
+                    <div>
+                        <small>Camere</small>
+                        <strong>{{ item.rooms || '-' }}</strong>
+                    </div>
+
+                    <div>
+                        <small>Persoane</small>
+                        <strong>{{ item.guests || '-' }}</strong>
+                    </div>
+
+                    <div>
+                        <small>Total</small>
+                        <strong>{{ formatMoney(item.totalPrice, item.currency) }}</strong>
+                    </div>
+                </div>
+
+                <div class="payment-row">
+                    <div>
+                        <small>Avans</small>
+                        <strong>{{ formatMoney(item.advancePaid, item.currency) }}</strong>
+                    </div>
+
+                    <div>
+                        <small>Rest</small>
+                        <strong>{{ formatMoney(item.remainingPayment, item.currency) }}</strong>
+                    </div>
+                </div>
+
+                @if (item.location) {
+                    <p><strong>Locatie:</strong> {{ item.location }}</p>
+                }
+
+                @if (item.contactPerson || item.phone) {
+                    <p>
+                        <strong>Contact:</strong>
+                        {{ item.contactPerson || '' }}
+                        {{ item.phone || '' }}
+                    </p>
+                }
+
+                @if (item.notes) {
+                    <p class="muted">{{ item.notes }}</p>
+                }
+            </article>
+        }
+    </div>
+</section>

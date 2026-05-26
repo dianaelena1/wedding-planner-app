@@ -1,0 +1,94 @@
+<section>
+  <div class="page-title">
+    <div class="eyebrow">Excel + contracte</div>
+    <h2>Plati si cheltuieli</h2>
+    <p>Centralizare dupa sheet-ul “Cheltuieli Organizatorice” si dupa contractele atasate.</p>
+  </div>
+
+  <div class="grid grid-4 payment-summary">
+    <article class="card stat-card">
+      <span>Total lei</span>
+      <strong>{{ formatMoney(totalRon, 'RON') }}</strong>
+    </article>
+
+    <article class="card stat-card">
+      <span>Total euro</span>
+      <strong>{{ formatMoney(totalEur, 'EUR') }}</strong>
+    </article>
+
+    <article class="card stat-card">
+      <span>Rest lei</span>
+      <strong>{{ formatMoney(remainingRon, 'RON') }}</strong>
+    </article>
+
+    <article class="card stat-card">
+      <span>Rest euro</span>
+      <strong>{{ formatMoney(remainingEur, 'EUR') }}</strong>
+    </article>
+  </div>
+
+  <div class="category-list">
+    @for (category of categories; track category) {
+      <article class="card category-card">
+        <div class="category-header">
+          <div>
+            <span class="badge">{{ category }}</span>
+            <h3>{{ category }}</h3>
+          </div>
+          <div class="category-total">
+            <span>{{ formatMoney(getCategoryTotal(category, 'RON'), 'RON') }}</span>
+            <span>{{ formatMoney(getCategoryTotal(category, 'EUR'), 'EUR') }}</span>
+          </div>
+        </div>
+
+        <div class="expense-table">
+          <div class="expense-row expense-head">
+            <span>Serviciu</span>
+            <span>Total</span>
+            <span>Avans</span>
+            <span>Rest</span>
+            <span>Status</span>
+          </div>
+
+          @for (expense of getExpensesByCategory(category); track expense.id) {
+            <div class="expense-row">
+              <div>
+                <strong>{{ expense.name }}</strong>
+                <small>
+                  Sursa: {{ expense.source }}
+                  @if (expense.notes) {
+                    · {{ expense.notes }}
+                  }
+                </small>
+              </div>
+
+              <span>{{ formatMoney(expense.total, expense.currency) }}</span>
+              <span>{{ formatMoney(expense.advancePaid, expense.currency) }}</span>
+              <span>{{ formatMoney(expense.remainingPayment, expense.currency) }}</span>
+              <span class="status-pill">{{ expense.status }}</span>
+            </div>
+          }
+        </div>
+      </article>
+    }
+  </div>
+
+  <article class="card drinks-card">
+    <h3>Bauturi din Excel</h3>
+    <p class="muted">Am importat cantitatile si numarul estimat de sticle. Preturile lipsa raman de completat.</p>
+
+    <div class="drink-grid">
+      @for (drink of drinks; track drink.id) {
+        <div class="drink-item">
+          <strong>{{ drink.name }}</strong>
+          <span>{{ drink.quantity }} L · {{ drink.bottles }} sticle</span>
+          @if (drink.total) {
+            <small>{{ drink.total }} RON</small>
+          } @else {
+            <small>Pret necompletat</small>
+          }
+        </div>
+      }
+    </div>
+  </article>
+</section>

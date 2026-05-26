@@ -1,0 +1,22 @@
+<section>
+  <div class="page-title">
+    <div class="eyebrow">Contracte & fisiere</div>
+    <h2>Documente</h2>
+    <p>Momentan sunt listate local. Mai tarziu le incarcam in Firebase Storage.</p>
+  </div>
+
+  <div class="documents-list">
+    @for (document of documents; track document.id) {
+      <article class="card document-card">
+        <div>
+          <span class="badge">{{ document.type }}</span>
+          <h3>{{ document.title }}</h3>
+          <p class="muted">{{ document.vendorName }}</p>
+          <small>{{ document.fileName }}</small>
+        </div>
+
+        <button disabled>Upload Firebase mai tarziu</button>
+      </article>
+    }
+  </div>
+</section>

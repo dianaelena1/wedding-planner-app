@@ -1,0 +1,149 @@
+.rings-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.ring-card {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+
+  h3 {
+    margin: 12px 0 0;
+    font-size: 26px;
+  }
+
+  p {
+    margin: 0;
+  }
+}
+
+.paid-card {
+  border-color: #9fc49f;
+  background: linear-gradient(180deg, #fbfff8 0%, #fffaf3 75%);
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 18px;
+}
+
+.status-pill {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  padding: 8px 12px;
+  background: #eadfce;
+  color: #5f5144;
+  font-size: 12px;
+  font-weight: 800;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.status-to-choose {
+  background: #f4e2cf;
+  color: #87501d;
+}
+
+.status-ordered {
+  background: #e8f0ff;
+  color: #365d9b;
+}
+
+.status-advance-paid {
+  background: #fff2c7;
+  color: #7a5b00;
+}
+
+.status-paid,
+.status-received {
+  background: #2f8f46;
+  color: white;
+}
+
+.status-unknown {
+  background: #ece6dc;
+  color: #6f665c;
+}
+
+.details-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  background: #f3eadf;
+  border-radius: 16px;
+  overflow: hidden;
+
+  div {
+    padding: 14px;
+    border-right: 1px solid #dfd0bd;
+    border-bottom: 1px solid #dfd0bd;
+  }
+
+  div:nth-child(3n) {
+    border-right: none;
+  }
+
+  div:nth-last-child(-n + 3) {
+    border-bottom: none;
+  }
+
+  small {
+    display: block;
+    color: #8a7a68;
+    margin-bottom: 6px;
+  }
+
+  strong {
+    font-size: 16px;
+  }
+}
+
+.money-row {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  background: #fffdf9;
+  border: 1px solid #eadfce;
+  border-radius: 16px;
+  overflow: hidden;
+
+  div {
+    padding: 14px;
+    border-right: 1px solid #eadfce;
+  }
+
+  div:last-child {
+    border-right: none;
+  }
+
+  small {
+    display: block;
+    color: #8a7a68;
+    margin-bottom: 6px;
+  }
+}
+
+@media (max-width: 900px) {
+  .rings-grid,
+  .details-grid,
+  .money-row {
+    grid-template-columns: 1fr;
+  }
+
+  .details-grid div,
+  .money-row div {
+    border-right: none;
+    border-bottom: 1px solid #dfd0bd;
+  }
+
+  .details-grid div:last-child,
+  .money-row div:last-child {
+    border-bottom: none;
+  }
+
+  .card-header {
+    flex-direction: column;
+  }
+}

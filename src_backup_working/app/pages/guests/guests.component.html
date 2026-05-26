@@ -1,0 +1,18 @@
+<section>
+  <div class="page-title">
+    <div class="eyebrow">Lista persoane</div>
+    <h2>Invitati</h2>
+    <p>Aici vom pune lista completa, confirmarile si mesele.</p>
+  </div>
+
+  <div class="card">
+    @for (guest of guests; track guest.id) {
+      <div class="guest-row">
+        <strong>{{ guest.name }}</strong>
+        <span>{{ guest.side }}</span>
+        <span class="badge">{{ guest.status }}</span>
+        <span>{{ guest.adults }} adulti / {{ guest.children }} copii</span>
+      </div>
+    }
+  </div>
+</section>

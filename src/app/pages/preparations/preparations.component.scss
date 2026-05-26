@@ -1,0 +1,146 @@
+.summary-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px;
+  margin-bottom: 24px;
+}
+
+.summary-card {
+  span {
+    color: #8a7a68;
+    font-size: 14px;
+  }
+
+  strong {
+    display: block;
+    margin: 10px 0;
+    font-size: 28px;
+  }
+
+  p {
+    margin: 0;
+    color: #7b6f63;
+  }
+}
+
+.preparations-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.preparation-card {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+
+  h3 {
+    margin: 12px 0 0;
+    font-size: 24px;
+  }
+
+  p {
+    margin: 0;
+  }
+}
+
+.paid-card {
+  border-color: #9fc49f;
+  background: linear-gradient(180deg, #fbfff8 0%, #fffaf3 75%);
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 18px;
+}
+
+.status-pill {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  padding: 8px 12px;
+  background: #eadfce;
+  color: #5f5144;
+  font-size: 12px;
+  font-weight: 800;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.status-booked {
+  background: #e8f0ff;
+  color: #365d9b;
+}
+
+.status-paid,
+.status-done {
+  background: #2f8f46;
+  color: white;
+}
+
+.status-advance-paid {
+  background: #fff2c7;
+  color: #7a5b00;
+}
+
+.status-to-buy {
+  background: #f4e2cf;
+  color: #87501d;
+}
+
+.status-unknown {
+  background: #ece6dc;
+  color: #6f665c;
+}
+
+.info-grid,
+.money-row {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  background: #f3eadf;
+  border-radius: 16px;
+  overflow: hidden;
+
+  div {
+    padding: 14px;
+    border-right: 1px solid #dfd0bd;
+  }
+
+  div:last-child {
+    border-right: none;
+  }
+
+  small {
+    display: block;
+    color: #8a7a68;
+    margin-bottom: 6px;
+  }
+
+  strong {
+    font-size: 16px;
+  }
+}
+
+@media (max-width: 900px) {
+  .summary-grid,
+  .preparations-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .info-grid,
+  .money-row {
+    grid-template-columns: 1fr;
+  }
+
+  .info-grid div,
+  .money-row div {
+    border-right: none;
+    border-bottom: 1px solid #dfd0bd;
+  }
+
+  .info-grid div:last-child,
+  .money-row div:last-child {
+    border-bottom: none;
+  }
+}

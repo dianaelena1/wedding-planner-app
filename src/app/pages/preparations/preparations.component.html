@@ -1,0 +1,82 @@
+<section>
+    <div class="page-title">
+        <div class="eyebrow">Mireasa & Mire</div>
+        <h2>Pregatiri</h2>
+        <p>Rochie, pantofi, machiaj, par si costumul mirelui.</p>
+    </div>
+
+    <div class="summary-grid">
+        <article class="card summary-card">
+            <span>Total</span>
+            <strong>{{ formatMoney(totalRon, 'RON') }}</strong>
+            <p>Total estimat pentru pregatiri</p>
+        </article>
+
+        <article class="card summary-card">
+            <span>Achitat</span>
+            <strong>{{ formatMoney(paidRon, 'RON') }}</strong>
+            <p>Plati facute pana acum</p>
+        </article>
+
+        <article class="card summary-card">
+            <span>Rest</span>
+            <strong>{{ formatMoney(remainingRon, 'RON') }}</strong>
+            <p>Resturi de plata</p>
+        </article>
+    </div>
+
+    <div class="preparations-grid">
+        @for (item of items; track item.id) {
+            <article class="card preparation-card" [class.paid-card]="item.status === 'paid' || item.status === 'done'">
+                <div class="card-header">
+                    <div>
+                        <span class="badge">{{ item.category }}</span>
+                        <h3>{{ item.name }}</h3>
+                    </div>
+
+                    <span class="status-pill" [class]="'status-' + item.status">
+            {{ getStatusLabel(item.status) }}
+          </span>
+                </div>
+
+                <div class="info-grid">
+                    <div>
+                        <small>Furnizor / persoana</small>
+                        <strong>{{ item.provider || '-' }}</strong>
+                    </div>
+
+                    <div>
+                        <small>Data</small>
+                        <strong>{{ item.appointmentDate || '-' }}</strong>
+                    </div>
+
+                    <div>
+                        <small>Ora</small>
+                        <strong>{{ item.appointmentTime || '-' }}</strong>
+                    </div>
+                </div>
+
+                <div class="money-row">
+                    <div>
+                        <small>Total</small>
+                        <strong>{{ formatMoney(item.totalPrice, item.currency) }}</strong>
+                    </div>
+
+                    <div>
+                        <small>Achitat</small>
+                        <strong>{{ formatMoney(item.advancePaid, item.currency) }}</strong>
+                    </div>
+
+                    <div>
+                        <small>Rest</small>
+                        <strong>{{ formatMoney(item.remainingPayment, item.currency) }}</strong>
+                    </div>
+                </div>
+
+                @if (item.notes) {
+                    <p class="muted">{{ item.notes }}</p>
+                }
+            </article>
+        }
+    </div>
+</section>
