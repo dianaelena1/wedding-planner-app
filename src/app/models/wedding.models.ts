@@ -1,41 +1,50 @@
 export type Currency = 'RON' | 'EUR';
-export type PaymentStatus = 'paid' | 'partial' | 'unpaid' | 'unknown';
-export type GuestStatus = 'neconfirmat' | 'vine' | 'nu vine' | 'poate';
 
-export interface Money {
-  amount: number;
-  currency: Currency;
-}
-
-export interface Vendor {
+export interface WeddingVendor {
   id: string;
+  name: string;
   category: string;
-  name: string;
-  service: string;
-  total?: Money;
-  advance?: Money;
-  remaining?: Money;
-  dueDate?: string;
-  status: PaymentStatus;
+  contactPerson?: string;
+  phone?: string;
+  email?: string;
+  totalPrice?: number;
+  currency?: Currency;
+  advancePaid?: number;
+  remainingPayment?: number;
+  paymentDeadline?: string;
+  eventTime?: string;
+  location?: string;
   notes?: string;
+  status: 'contracted' | 'pending' | 'to-contact' | 'done';
 }
 
-export interface Guest {
-  id: number;
-  name: string;
-  status: GuestStatus;
-  persons?: number;
-  children?: number;
-  tableNumber?: number;
-  invitationSent?: boolean;
-  notes?: string;
-}
-
-export interface TaskItem {
-  id: number;
+export interface WeddingDocument {
+  id: string;
   title: string;
-  owner?: 'Diana' | 'Dan' | 'Amandoi';
+  vendorId?: string;
+  vendorName?: string;
+  type: 'contract' | 'offer' | 'invoice' | 'image' | 'other';
+  fileName?: string;
+  notes?: string;
+}
+
+export interface WeddingGuest {
+  id: string;
+  name: string;
+  side: 'Diana' | 'Dan' | 'Both';
+  status: 'confirmed' | 'pending' | 'declined' | 'maybe';
+  adults: number;
+  children: number;
+  table?: number;
+  notes?: string;
+}
+
+export interface WeddingTask {
+  id: string;
+  title: string;
+  category: string;
   dueDate?: string;
-  done: boolean;
-  priority: 'mare' | 'medie' | 'mica';
+  status: 'todo' | 'in-progress' | 'done';
+  priority: 'low' | 'medium' | 'high';
+  notes?: string;
 }

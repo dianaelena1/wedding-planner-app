@@ -1,103 +1,23 @@
-<header class="hero">
-  <p class="eyebrow">Wedding planner</p>
-  <h1>{{ event.couple }}</h1>
-  <p>{{ event.date | date:'d MMMM y' }} • {{ event.reception }} • de la {{ event.receptionTime }}</p>
-</header>
-
-<nav class="tabs">
-  <button [class.active]="activeTab() === 'dashboard'" (click)="setTab('dashboard')">Dashboard</button>
-  <button [class.active]="activeTab() === 'vendors'" (click)="setTab('vendors')">Furnizori</button>
-  <button [class.active]="activeTab() === 'guests'" (click)="setTab('guests')">Invitati</button>
-  <button [class.active]="activeTab() === 'tasks'" (click)="setTab('tasks')">Task-uri</button>
-</nav>
-
-<main class="page">
-  <section *ngIf="activeTab() === 'dashboard'" class="grid dashboard">
-    <article class="card kpi">
-      <span>Total RON</span>
-      <strong>{{ ronTotal().toLocaleString('ro-RO') }} RON</strong>
-      <small>Rest de plata: {{ ronRemaining().toLocaleString('ro-RO') }} RON</small>
-    </article>
-    <article class="card kpi">
-      <span>Total EUR</span>
-      <strong>{{ eurTotal().toLocaleString('ro-RO') }} EUR</strong>
-      <small>Rest de plata: {{ eurRemaining().toLocaleString('ro-RO') }} EUR</small>
-    </article>
-    <article class="card kpi">
-      <span>Invitati confirmati</span>
-      <strong>{{ confirmedGuests() }}</strong>
-      <small>Neconfirmati: {{ unconfirmedGuests() }}</small>
-    </article>
-    <article class="card kpi">
-      <span>Task-uri deschise</span>
-      <strong>{{ openTasks() }}</strong>
-      <small>Prioritizeaza platile si confirmarile</small>
-    </article>
-
-    <article class="card wide">
-      <h2>Program principal</h2>
-      <div class="timeline">
-        <div><b>{{ event.ceremonyTime }}</b><span>{{ event.ceremony }}</span></div>
-        <div><b>{{ event.receptionTime }}</b><span>{{ event.reception }}</span></div>
-        <div><b>05 Aug</b><span>Deadline confirmari RSVP</span></div>
-      </div>
-    </article>
-  </section>
-
-  <section *ngIf="activeTab() === 'vendors'" class="card">
-    <h2>Furnizori si plati</h2>
-    <div class="table-wrap">
-      <table>
-        <thead>
-          <tr>
-            <th>Categorie</th><th>Furnizor</th><th>Serviciu</th><th>Total</th><th>Avans</th><th>Rest</th><th>Status</th><th>Observatii</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let vendor of vendors()">
-            <td>{{ vendor.category }}</td>
-            <td>{{ vendor.name }}</td>
-            <td>{{ vendor.service }}</td>
-            <td>{{ money(vendor, 'total') }}</td>
-            <td>{{ money(vendor, 'advance') }}</td>
-            <td>{{ money(vendor, 'remaining') }}</td>
-            <td><span class="pill" [class.partial]="vendor.status === 'partial'">{{ vendor.status }}</span></td>
-            <td>{{ vendor.notes || vendor.dueDate || '-' }}</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-  </section>
-
-  <section *ngIf="activeTab() === 'guests'" class="card">
-    <div class="section-head">
-      <h2>Lista invitati</h2>
-      <input [ngModel]="search()" (ngModelChange)="search.set($event)" placeholder="Cauta invitat..." />
-    </div>
-    <div class="guest-list">
-      <article *ngFor="let guest of filteredGuests()" class="guest-row">
-        <div>
-          <strong>{{ guest.name }}</strong>
-          <small>{{ guest.persons || '?' }} persoane • masa {{ guest.tableNumber || '-' }}</small>
+<div class="app-shell">
+    <aside class="sidebar">
+        <div class="brand">
+            <div class="brand-icon">D&D</div>
+            <div>
+                <h1>Wedding Planner</h1>
+                <p>05 Septembrie 2026</p>
+            </div>
         </div>
-        <select [ngModel]="guest.status" (ngModelChange)="updateGuestStatus(guest.id, $event)">
-          <option value="neconfirmat">neconfirmat</option>
-          <option value="vine">vine</option>
-          <option value="nu vine">nu vine</option>
-          <option value="poate">poate</option>
-        </select>
-      </article>
-    </div>
-  </section>
 
-  <section *ngIf="activeTab() === 'tasks'" class="card">
-    <h2>Task-uri</h2>
-    <article *ngFor="let task of tasks()" class="task" [class.done]="task.done">
-      <label>
-        <input type="checkbox" [checked]="task.done" (change)="toggleTask(task.id)" />
-        <span>{{ task.title }}</span>
-      </label>
-      <small>{{ task.owner || '-' }} • prioritate {{ task.priority }} <ng-container *ngIf="task.dueDate">• {{ task.dueDate | date:'dd.MM.y' }}</ng-container></small>
-    </article>
-  </section>
-</main>
+        <nav>
+            <a routerLink="/dashboard" routerLinkActive="active">Dashboard</a>
+            <a routerLink="/vendors" routerLinkActive="active">Furnizori</a>
+            <a routerLink="/documents" routerLinkActive="active">Documente</a>
+            <a routerLink="/guests" routerLinkActive="active">Invitati</a>
+            <a routerLink="/tasks" routerLinkActive="active">Task-uri</a>
+        </nav>
+    </aside>
+
+    <main class="content">
+        <router-outlet></router-outlet>
+    </main>
+</div>
