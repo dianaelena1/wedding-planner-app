@@ -2,39 +2,40 @@
   <div class="page-title">
     <div class="eyebrow">Diana & Dan</div>
     <h2>Dashboard nunta</h2>
-    <p>Imagine de ansamblu pentru plati, furnizori, invitati si task-uri.</p>
+    <p>Imagine de ansamblu din Excel si din contractele incarcate.</p>
   </div>
 
   <div class="grid grid-4">
     <article class="card stat-card">
       <span>Total RON</span>
-      <strong>{{ totalRon }} lei</strong>
-      <p>Costuri centralizate pana acum</p>
+      <strong>{{ formatMoney(totalRon, 'RON') }}</strong>
+      <p>Cheltuieli cu sume in lei</p>
     </article>
 
     <article class="card stat-card">
-      <span>Avansuri platite</span>
-      <strong>{{ paidRon }} lei</strong>
-      <p>Plati deja facute</p>
+      <span>Total EUR</span>
+      <strong>{{ formatMoney(totalEur, 'EUR') }}</strong>
+      <p>Cheltuieli cu sume in euro</p>
     </article>
 
     <article class="card stat-card">
       <span>Rest de plata</span>
-      <strong>{{ remainingRon }} lei</strong>
-      <p>De urmarit dupa eveniment</p>
+      <strong>{{ formatMoney(remainingRon, 'RON') }} / {{ formatMoney(remainingEur, 'EUR') }}</strong>
+      <p>Calculat din avansuri si contracte</p>
     </article>
 
     <article class="card stat-card">
-      <span>Furnizori contractati</span>
-      <strong>{{ contractedVendors }}</strong>
-      <p>Contracte / intelegeri existente</p>
+      <span>Invitati in lista</span>
+      <strong>{{ invitedGuests }}</strong>
+      <p>{{ confirmedGuests }} confirmati momentan</p>
     </article>
   </div>
 
   <div class="grid grid-3 dashboard-lower">
     <article class="card">
-      <h3>Urmatoare task-uri</h3>
-      @for (task of tasks; track task.id) {
+      <h3>Task-uri urgente</h3>
+
+      @for (task of highPriorityTasks; track task.id) {
         <div class="mini-row">
           <div>
             <strong>{{ task.title }}</strong>
@@ -46,14 +47,15 @@
     </article>
 
     <article class="card">
-      <h3>Furnizori importanti</h3>
-      @for (vendor of vendors.slice(0, 5); track vendor.id) {
+      <h3>Resturi importante</h3>
+
+      @for (payment of nextPayments; track payment.id) {
         <div class="mini-row">
           <div>
-            <strong>{{ vendor.name }}</strong>
-            <p>{{ vendor.category }}</p>
+            <strong>{{ payment.name }}</strong>
+            <p>{{ payment.category }}</p>
           </div>
-          <span class="badge">{{ vendor.status }}</span>
+          <span class="badge">{{ formatMoney(payment.remainingPayment, payment.currency) }}</span>
         </div>
       }
     </article>
@@ -63,6 +65,8 @@
       <p class="date-big">05.09.2026</p>
       <p class="muted">Cununie religioasa: 12:00</p>
       <p class="muted">Receptie Wild Garden: 16:00</p>
+      <p class="muted">Photo booth: 16:00 - 00:00</p>
+      <p class="muted">Kids corner: animator 18:00 - 20:00</p>
     </article>
   </div>
 </section>

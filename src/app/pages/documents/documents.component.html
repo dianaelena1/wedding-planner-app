@@ -2,21 +2,119 @@
   <div class="page-title">
     <div class="eyebrow">Contracte & fisiere</div>
     <h2>Documente</h2>
-    <p>Momentan sunt listate local. Mai tarziu le incarcam in Firebase Storage.</p>
+    <p>Incarca aici contracte, oferte, facturi si imagini in Firebase Storage.</p>
   </div>
 
-  <div class="documents-list">
-    @for (document of documents; track document.id) {
-      <article class="card document-card">
-        <div>
-          <span class="badge">{{ document.type }}</span>
-          <h3>{{ document.title }}</h3>
-          <p class="muted">{{ document.vendorName }}</p>
-          <small>{{ document.fileName }}</small>
-        </div>
+  <article class="card upload-card">
+    <div class="upload-header">
+      <div>
+        <h3>Incarca document nou</h3>
+        <p class="muted">Fisierul se salveaza in Firebase Storage. Detaliile se salveaza in Firestore.</p>
+      </div>
+      @if (user$ | async; as user) {
+        <span class="badge">Logata</span>
+      } @else {
+        <span class="badge warning">Login necesar</span>
+      }
+    </div>
 
-        <button disabled>Upload Firebase mai tarziu</button>
-      </article>
+    <div class="form-grid">
+      <label>
+        Titlu document
+        <input type="text" [(ngModel)]="form.title" placeholder="Ex: Contract flori" />
+      </label>
+
+      <label>
+        Furnizor
+        <input type="text" [(ngModel)]="form.vendorName" placeholder="Ex: Bamboo Flower" />
+      </label>
+
+      <label>
+        Tip document
+        <select [(ngModel)]="form.type">
+          <option value="contract">Contract</option>
+          <option value="offer">Oferta</option>
+          <option value="invoice">Factura</option>
+          <option value="image">Imagine</option>
+          <option value="invitation">Invitatie</option>
+          <option value="other">Altceva</option>
+        </select>
+      </label>
+
+      <label>
+        Fisier
+        <input
+          id="documentFile"
+          type="file"
+          accept=".pdf,.doc,.docx,.jpg,.jpeg,.png,.xls,.xlsx,.xlsm"
+          (change)="onFileSelected($event)"
+        />
+      </label>
+    </div>
+
+    @if (selectedFile) {
+      <p class="selected-file">Fisier ales: <strong>{{ selectedFile.name }}</strong></p>
     }
+
+    <button class="primary-button" type="button" (click)="upload()" [disabled]="isUploading || !(user$ | async)">
+      {{ isUploading ? 'Se incarca...' : 'Incarca in Firebase' }}
+    </button>
+  </article>
+
+  <div class="documents-section">
+    <h3>Documente incarcate in Firebase</h3>
+
+    @if (firebaseDocuments$ | async; as firebaseDocuments) {
+      @if (firebaseDocuments.length) {
+        <div class="documents-list">
+          @for (document of firebaseDocuments; track document.id) {
+            <article class="card document-card">
+              <div>
+                <span class="badge">{{ document.type }}</span>
+                <h3>{{ document.title }}</h3>
+                @if (document.vendorName) {
+                  <p class="muted">{{ document.vendorName }}</p>
+                }
+                <small>{{ document.fileName }} · {{ formatSize(document.sizeBytes) }}</small>
+              </div>
+
+              <div class="document-actions">
+                <a [href]="document.downloadUrl" target="_blank" rel="noopener noreferrer">Deschide</a>
+                <button type="button" (click)="deleteDocument(document)">Sterge</button>
+              </div>
+            </article>
+          }
+        </div>
+      } @else {
+        <article class="card empty-card">
+          <p>Nu ai documente incarcate in Firebase inca.</p>
+        </article>
+      }
+    }
+  </div>
+
+  <div class="documents-section">
+    <h3>Documente planificate din aplicatie</h3>
+    <p class="muted">Acestea sunt documentele pe care le-am centralizat deja din contracte/Excel. Le poti incarca mai sus in Firebase.</p>
+
+    <div class="documents-list">
+      @for (document of plannedDocuments; track document.id) {
+        <article class="card document-card planned">
+          <div>
+            <span class="badge">{{ document.type }}</span>
+            <h3>{{ document.title }}</h3>
+            @if (document.vendorName) {
+              <p class="muted">{{ document.vendorName }}</p>
+            }
+            <small>{{ document.fileName }}</small>
+            @if (document.notes) {
+              <p>{{ document.notes }}</p>
+            }
+          </div>
+
+          <span class="document-status">{{ document.status }}</span>
+        </article>
+      }
+    </div>
   </div>
 </section>

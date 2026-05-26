@@ -1,72 +1,94 @@
 <section>
-  <div class="page-title">
-    <div class="eyebrow">Organizare</div>
-    <h2>Furnizori</h2>
-    <p>Aici vezi contractele, preturile, avansurile si ce mai trebuie platit.</p>
-  </div>
+    <div class="page-title">
+        <div class="eyebrow">Organizare</div>
+        <h2>Furnizori</h2>
+        <p>Furnizorii principali din Excel si contracte, cu avansuri si resturi de plata.</p>
+    </div>
 
-  <div class="vendors-grid">
-    @for (vendor of vendors; track vendor.id) {
-      <article class="card vendor-card">
-        <div class="vendor-header">
-          <div>
-            <span class="badge">{{ vendor.category }}</span>
-            <h3>{{ vendor.name }}</h3>
-          </div>
-          <span class="status">{{ vendor.status }}</span>
-        </div>
+    <div class="vendors-grid">
+        @for (vendor of vendors; track vendor.id) {
+            <article class="card vendor-card" [class.vendor-card-paid]="vendor.isPaid">
+                <div class="vendor-header">
+                    <div>
+                        <span class="badge">{{ vendor.category }}</span>
+                        <h3>{{ vendor.name }}</h3>
+                    </div>
 
-        <div class="money-row">
-          <div>
-            <small>Total</small>
-            <strong>
-              @if (vendor.totalPrice) {
-                {{ vendor.totalPrice }} {{ vendor.currency }}
-              } @else {
-                -
-              }
-            </strong>
-          </div>
+                    <div class="status-area">
+                        <span class="status">{{ vendor.status }}</span>
 
-          <div>
-            <small>Avans</small>
-            <strong>
-              @if (vendor.advancePaid) {
-                {{ vendor.advancePaid }} {{ vendor.currency }}
-              } @else {
-                -
-              }
-            </strong>
-          </div>
+                        @if (vendor.isPaid) {
+                            <span class="paid-pill">Paid</span>
+                        }
+                    </div>
+                </div>
 
-          <div>
-            <small>Rest</small>
-            <strong>
-              @if (vendor.remainingPayment) {
-                {{ vendor.remainingPayment }} {{ vendor.currency }}
-              } @else {
-                -
-              }
-            </strong>
-          </div>
-        </div>
+                @if (vendor.isPaid) {
+                    <div class="paid-banner">
+                        <span>✓</span>
+                        <div>
+                            <strong>Platit integral</strong>
+                            <p>Nu mai exista rest de plata pentru acest furnizor.</p>
+                        </div>
+                    </div>
+                }
 
-        @if (vendor.paymentDeadline) {
-          <p><strong>Scadenta:</strong> {{ vendor.paymentDeadline }}</p>
+                <div class="money-row" [class.money-row-paid]="vendor.isPaid">
+                    <div>
+                        <small>Total</small>
+                        <strong>{{ formatMoney(vendor.totalPrice, vendor.currency) }}</strong>
+                    </div>
+
+                    <div class="paid-highlight">
+                        <small>Achitat</small>
+                        <strong>{{ formatMoney(vendor.advancePaid, vendor.currency) }}</strong>
+                    </div>
+
+                    <div>
+                        <small>Rest</small>
+
+                        @if (vendor.isPaid) {
+                            <strong class="rest-paid">0 {{ vendor.currency }}</strong>
+                        } @else {
+                            <strong>{{ formatMoney(vendor.remainingPayment, vendor.currency) }}</strong>
+                        }
+                    </div>
+                </div>
+
+                @if (vendor.quantity || vendor.unitPrice) {
+                    <div class="unit-info">
+                        @if (vendor.quantity) {
+                            <div>
+                                <small>Cantitate</small>
+                                <strong>{{ vendor.quantity }} buc</strong>
+                            </div>
+                        }
+
+                        @if (vendor.unitPrice) {
+                            <div>
+                                <small>Pret / bucata</small>
+                                <strong>{{ vendor.unitPrice }} {{ vendor.unitLabel || vendor.currency + '/buc' }}</strong>
+                            </div>
+                        }
+                    </div>
+                }
+
+                @if (vendor.paymentDeadline && !vendor.isPaid) {
+                    <p><strong>Scadenta:</strong> {{ vendor.paymentDeadline }}</p>
+                }
+
+                @if (vendor.eventTime) {
+                    <p><strong>Program:</strong> {{ vendor.eventTime }}</p>
+                }
+
+                @if (vendor.location) {
+                    <p><strong>Locatie:</strong> {{ vendor.location }}</p>
+                }
+
+                @if (vendor.notes) {
+                    <p class="muted">{{ vendor.notes }}</p>
+                }
+            </article>
         }
-
-        @if (vendor.eventTime) {
-          <p><strong>Program:</strong> {{ vendor.eventTime }}</p>
-        }
-
-        @if (vendor.location) {
-          <p><strong>Locatie:</strong> {{ vendor.location }}</p>
-        }
-
-        @if (vendor.notes) {
-          <p class="muted">{{ vendor.notes }}</p>
-        }
-      </article>
-    }
-  </div>
+    </div>
 </section>

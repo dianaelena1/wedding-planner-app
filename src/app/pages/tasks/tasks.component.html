@@ -2,7 +2,7 @@
   <div class="page-title">
     <div class="eyebrow">To do</div>
     <h2>Task-uri</h2>
-    <p>Lucruri de rezolvat pana la nunta.</p>
+    <p>Lucruri de rezolvat rezultate din Excel si contracte.</p>
   </div>
 
   <div class="tasks-board">
@@ -12,6 +12,9 @@
           <span class="badge">{{ task.priority }}</span>
           <h3>{{ task.title }}</h3>
           <p class="muted">{{ task.category }}</p>
+          @if (task.dueDate) {
+            <p><strong>Deadline:</strong> {{ task.dueDate }}</p>
+          }
           @if (task.notes) {
             <p>{{ task.notes }}</p>
           }

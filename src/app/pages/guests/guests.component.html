@@ -2,16 +2,47 @@
   <div class="page-title">
     <div class="eyebrow">Lista persoane</div>
     <h2>Invitati</h2>
-    <p>Aici vom pune lista completa, confirmarile si mesele.</p>
+    <p>Lista importata din sheet-ul “Aranjatu la mese”. Statusurile goale din Excel sunt puse ca pending.</p>
   </div>
 
-  <div class="card">
+  <div class="grid grid-4 guest-summary">
+    <article class="card stat-card">
+      <span>Total randuri</span>
+      <strong>{{ guests.length }}</strong>
+    </article>
+
+    <article class="card stat-card">
+      <span>Confirmati</span>
+      <strong>{{ confirmed }}</strong>
+    </article>
+
+    <article class="card stat-card">
+      <span>Pending</span>
+      <strong>{{ pending }}</strong>
+    </article>
+
+    <article class="card stat-card">
+      <span>Persoane estimate</span>
+      <strong>{{ totalAdults + totalChildren }}</strong>
+    </article>
+  </div>
+
+  <div class="card guests-card">
+    <div class="guest-row guest-head">
+      <span>Nume</span>
+      <span>Invitatie</span>
+      <span>Confirmare</span>
+      <span>Persoane</span>
+      <span>Observatii</span>
+    </div>
+
     @for (guest of guests; track guest.id) {
       <div class="guest-row">
         <strong>{{ guest.name }}</strong>
-        <span>{{ guest.side }}</span>
-        <span class="badge">{{ guest.status }}</span>
+        <span class="badge">{{ guest.invitationStatus }}</span>
+        <span class="badge">{{ guest.attendanceStatus }}</span>
         <span>{{ guest.adults }} adulti / {{ guest.children }} copii</span>
+        <span class="muted">{{ guest.notes || '-' }}</span>
       </div>
     }
   </div>
