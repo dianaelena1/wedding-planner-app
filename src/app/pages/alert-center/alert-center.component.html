@@ -1,0 +1,334 @@
+<section class="alerts-page">
+  <header class="alerts-hero">
+    <div>
+      <span class="eyebrow">CONTROL AUTOMAT</span>
+      <h1>Centru de alerte</h1>
+      <p>
+        Toate lucrurile care necesită atenție, într-un singur loc.
+      </p>
+    </div>
+
+    <div class="alert-summary">
+      <div>
+        <span>Total alerte</span>
+        <strong>{{ totalAlerts }}</strong>
+      </div>
+
+      <div class="critical">
+        <span>Critice</span>
+        <strong>{{ criticalAlerts }}</strong>
+      </div>
+    </div>
+  </header>
+
+  @if (loadError) {
+    <div class="state-banner error">{{ loadError }}</div>
+  } @else if (isLoading) {
+    <div class="state-banner">
+      Se verifică automat toate datele…
+    </div>
+  } @else {
+    <nav class="category-filter" aria-label="Filtre alerte">
+      @for (option of categoryOptions; track option.value) {
+        <button
+          type="button"
+          [class.active]="activeCategory === option.value"
+          (click)="activeCategory = option.value"
+        >
+          <span>{{ option.label }}</span>
+          <strong>{{ option.count }}</strong>
+        </button>
+      }
+    </nav>
+
+    @if (totalAlerts === 0) {
+      <section class="all-clear">
+        <div>✓</div>
+        <h2>Totul este în regulă</h2>
+        <p>
+          Nu există plăți restante, task-uri întârziate sau alte
+          probleme detectate.
+        </p>
+      </section>
+    }
+
+    <div class="alerts-grid">
+      @if (show('payments')) {
+        <article class="alert-section critical-section">
+          <div class="section-heading">
+            <div class="section-icon">€</div>
+            <div>
+              <span>FINANCIAR</span>
+              <h2>Plăți restante</h2>
+              <p>
+                {{ overduePayments.length }} plăți au depășit termenul.
+              </p>
+            </div>
+            <strong>{{ overduePayments.length }}</strong>
+          </div>
+
+          @if (overduePayments.length) {
+            <div class="alert-list">
+              @for (payment of overduePayments; track payment.id) {
+                <a class="alert-row" routerLink="/payments">
+                  <div>
+                    <strong>{{ payment.name }}</strong>
+                    <p>
+                      {{ payment.category }} · termen
+                      {{ formatDate(payment.dueDate) }}
+                    </p>
+                  </div>
+
+                  <span class="value danger">
+                    {{
+                      formatMoney(
+                        payment.remainingPayment,
+                        payment.currency
+                      )
+                    }}
+                  </span>
+                </a>
+              }
+            </div>
+          } @else {
+            <div class="empty-state">Nicio plată restantă.</div>
+          }
+
+          <a class="section-action" routerLink="/payments">
+            Verifică plățile →
+          </a>
+        </article>
+      }
+
+      @if (show('vendors')) {
+        <article class="alert-section">
+          <div class="section-heading">
+            <div class="section-icon">✦</div>
+            <div>
+              <span>FURNIZORI</span>
+              <h2>Furnizori neconfirmați</h2>
+              <p>
+                Contracte și colaborări care mai necesită confirmare.
+              </p>
+            </div>
+            <strong>{{ unconfirmedVendors.length }}</strong>
+          </div>
+
+          @if (unconfirmedVendors.length) {
+            <div class="alert-list">
+              @for (vendor of unconfirmedVendors; track vendor.id) {
+                <a class="alert-row" routerLink="/vendors">
+                  <div>
+                    <strong>{{ vendor.name }}</strong>
+                    <p>{{ vendor.category }}</p>
+                  </div>
+
+                  <span class="status">
+                    {{ vendorStatusLabel(vendor.status) }}
+                  </span>
+                </a>
+              }
+            </div>
+          } @else {
+            <div class="empty-state">
+              Toți furnizorii sunt confirmați sau finalizați.
+            </div>
+          }
+
+          <a class="section-action" routerLink="/vendors">
+            Deschide furnizorii →
+          </a>
+        </article>
+      }
+
+      @if (show('guests')) {
+        <article class="alert-section">
+          <div class="section-heading">
+            <div class="section-icon">?</div>
+            <div>
+              <span>INVITAȚI</span>
+              <h2>Fără răspuns</h2>
+              <p>
+                Invitați cu status „în așteptare” sau „poate”.
+              </p>
+            </div>
+            <strong>{{ unansweredGuests.length }}</strong>
+          </div>
+
+          @if (unansweredGuests.length) {
+            <div class="alert-list">
+              @for (guest of unansweredGuests; track guest.id) {
+                <a class="alert-row" routerLink="/guests">
+                  <div>
+                    <strong>{{ guest.name }}</strong>
+                    <p>
+                      {{ guest.adults }} adulți
+                      @if (guest.children) {
+                        · {{ guest.children }} copii
+                      }
+                    </p>
+                  </div>
+
+                  <span class="status">
+                    {{ attendanceLabel(guest.attendanceStatus) }}
+                  </span>
+                </a>
+              }
+            </div>
+          } @else {
+            <div class="empty-state">
+              Toți invitații au un răspuns final.
+            </div>
+          }
+
+          <a class="section-action" routerLink="/guests">
+            Deschide invitații →
+          </a>
+        </article>
+      }
+
+      @if (show('seating')) {
+        <article class="alert-section critical-section">
+          <div class="section-heading">
+            <div class="section-icon">◫</div>
+            <div>
+              <span>AȘEZARE</span>
+              <h2>Confirmați fără masă</h2>
+              <p>
+                {{ peopleCount(confirmedGuestsWithoutTable) }}
+                persoane confirmate nu au încă masă.
+              </p>
+            </div>
+            <strong>{{ confirmedGuestsWithoutTable.length }}</strong>
+          </div>
+
+          @if (confirmedGuestsWithoutTable.length) {
+            <div class="alert-list">
+              @for (
+                guest of confirmedGuestsWithoutTable;
+                track guest.id
+              ) {
+                <a class="alert-row" routerLink="/seating">
+                  <div>
+                    <strong>{{ guest.name }}</strong>
+                    <p>
+                      {{ guest.adults }} adulți
+                      @if (guest.children) {
+                        · {{ guest.children }} copii
+                      }
+                    </p>
+                  </div>
+
+                  <span class="value danger">Fără masă</span>
+                </a>
+              }
+            </div>
+          } @else {
+            <div class="empty-state">
+              Toți invitații confirmați au masă.
+            </div>
+          }
+
+          <a class="section-action" routerLink="/seating">
+            Deschide planul meselor →
+          </a>
+        </article>
+      }
+
+      @if (show('accommodation')) {
+        <article class="alert-section">
+          <div class="section-heading">
+            <div class="section-icon">⌂</div>
+            <div>
+              <span>CAZARE</span>
+              <h2>Persoane fără cazare</h2>
+              <p>
+                {{ peopleCount(guestsWithoutAccommodation) }}
+                persoane sunt marcate cu „are nevoie”.
+              </p>
+            </div>
+            <strong>{{ guestsWithoutAccommodation.length }}</strong>
+          </div>
+
+          @if (guestsWithoutAccommodation.length) {
+            <div class="alert-list">
+              @for (
+                guest of guestsWithoutAccommodation;
+                track guest.id
+              ) {
+                <a class="alert-row" routerLink="/guests">
+                  <div>
+                    <strong>{{ guest.name }}</strong>
+                    <p>
+                      {{ guest.adults }} adulți
+                      @if (guest.children) {
+                        · {{ guest.children }} copii
+                      }
+                    </p>
+                  </div>
+
+                  <span class="status">Are nevoie</span>
+                </a>
+              }
+            </div>
+          } @else {
+            <div class="empty-state">
+              Nu există invitați marcați ca având nevoie de cazare.
+            </div>
+          }
+
+          <a class="section-action" routerLink="/cazari">
+            Deschide cazările →
+          </a>
+        </article>
+      }
+
+      @if (show('tasks')) {
+        <article class="alert-section critical-section">
+          <div class="section-heading">
+            <div class="section-icon">!</div>
+            <div>
+              <span>TASK-URI</span>
+              <h2>Task-uri întârziate</h2>
+              <p>
+                Activități nefinalizate care au depășit termenul.
+              </p>
+            </div>
+            <strong>{{ overdueTasks.length }}</strong>
+          </div>
+
+          @if (overdueTasks.length) {
+            <div class="alert-list">
+              @for (task of overdueTasks; track task.id) {
+                <a class="alert-row" routerLink="/tasks">
+                  <div>
+                    <strong>{{ task.title }}</strong>
+                    <p>
+                      {{ task.category }} · termen
+                      {{ formatDate(task.dueDate) }}
+                    </p>
+                  </div>
+
+                  <span
+                    class="status"
+                    [attr.data-priority]="task.priority"
+                  >
+                    {{ priorityLabel(task.priority) }}
+                  </span>
+                </a>
+              }
+            </div>
+          } @else {
+            <div class="empty-state">
+              Nu există task-uri întârziate.
+            </div>
+          }
+
+          <a class="section-action" routerLink="/tasks">
+            Deschide task-urile →
+          </a>
+        </article>
+      }
+    </div>
+  }
+</section>

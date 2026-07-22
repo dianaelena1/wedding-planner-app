@@ -1,0 +1,194 @@
+@if (viewModel$ | async; as vm) {
+  <section class="page-header">
+    <div>
+      <span class="eyebrow">PLANIFICARE CENTRALIZATĂ</span>
+      <h1>Calendar & timeline</h1>
+      <p>Task-uri, plăți, programări, furnizori, cazare și verighete într-un singur loc.</p>
+    </div>
+
+    <div class="countdown-card">
+      <span>Până la nuntă</span>
+      <strong>{{ daysUntilWedding }}</strong>
+      <small>zile</small>
+    </div>
+  </section>
+
+  <section class="summary-grid">
+    <article>
+      <span>Evenimente viitoare</span>
+      <strong>{{ vm.upcomingEvents.length }}</strong>
+    </article>
+    <article [class.warning]="vm.overdueEvents.length > 0">
+      <span>Întârziate</span>
+      <strong>{{ vm.overdueEvents.length }}</strong>
+    </article>
+    <article>
+      <span>Luna afișată</span>
+      <strong class="month-summary">{{ monthLabel }}</strong>
+    </article>
+  </section>
+
+  <section class="toolbar">
+    <div class="month-actions">
+      <button type="button" (click)="previousMonth()">‹</button>
+      <button type="button" class="month-label" (click)="goToToday()">{{ monthLabel }}</button>
+      <button type="button" (click)="nextMonth()">›</button>
+    </div>
+
+    <div class="quick-actions">
+      <button type="button" (click)="goToToday()">Astăzi</button>
+      <button type="button" (click)="goToWeddingMonth()">Septembrie 2026</button>
+    </div>
+
+    <select [(ngModel)]="selectedType">
+      @for (option of typeOptions; track option.value) {
+        <option [value]="option.value">{{ option.label }}</option>
+      }
+    </select>
+
+    <input
+      type="search"
+      [(ngModel)]="searchTerm"
+      placeholder="Caută în calendar"
+    />
+  </section>
+
+  <div class="content-layout">
+    <main class="calendar-card">
+      <div class="weekdays">
+        <span>Luni</span><span>Marți</span><span>Miercuri</span>
+        <span>Joi</span><span>Vineri</span><span>Sâmbătă</span><span>Duminică</span>
+      </div>
+
+      <div class="calendar-grid">
+        @for (day of vm.calendarDays; track $index) {
+          <article
+            class="calendar-day"
+            [class.empty]="!day.isCurrentMonth"
+            [class.today]="day.isToday"
+          >
+            @if (day.dayNumber) {
+              <header>
+                <span>{{ day.dayNumber }}</span>
+                @if (eventsForDay(day, vm.events).length) {
+                  <small>{{ eventsForDay(day, vm.events).length }}</small>
+                }
+              </header>
+
+              <div class="day-events">
+                @for (event of eventsForDay(day, vm.events).slice(0, 3); track event.id) {
+                  <button
+                    type="button"
+                    class="event-chip"
+                    [attr.data-type]="event.type"
+                    [class.overdue]="isOverdue(event)"
+                    (click)="selectEvent(event)"
+                  >
+                    @if (event.time) { <span>{{ event.time }}</span> }
+                    <strong>{{ event.title }}</strong>
+                  </button>
+                }
+
+                @if (eventsForDay(day, vm.events).length > 3) {
+                  <button
+                    type="button"
+                    class="more-events"
+                    (click)="selectEvent(eventsForDay(day, vm.events)[3])"
+                  >
+                    +{{ eventsForDay(day, vm.events).length - 3 }} în plus
+                  </button>
+                }
+              </div>
+            }
+          </article>
+        }
+      </div>
+    </main>
+
+    <aside class="upcoming-panel">
+      <div class="panel-heading">
+        <span class="eyebrow">URMEAZĂ</span>
+        <h2>Următoarele evenimente</h2>
+      </div>
+
+      <div class="upcoming-list">
+        @for (event of filteredEvents(vm.upcomingEvents); track event.id) {
+          <button type="button" class="upcoming-item" (click)="selectEvent(event)">
+            <span class="type-dot" [attr.data-type]="event.type"></span>
+            <div>
+              <strong>{{ event.title }}</strong>
+              <span>{{ formatDate(event.date) }} @if (event.time) { · {{ event.time }} }</span>
+              <small>{{ event.sourceLabel }}</small>
+            </div>
+          </button>
+        } @empty {
+          <div class="empty-state">Nu există evenimente pentru filtrul ales.</div>
+        }
+      </div>
+    </aside>
+  </div>
+
+  <section class="timeline-card">
+    <div class="panel-heading">
+      <span class="eyebrow">PÂNĂ LA NUNTĂ</span>
+      <h2>Timeline</h2>
+    </div>
+
+    <div class="timeline">
+      @for (group of vm.timelineGroups; track group.label) {
+        <article class="timeline-group">
+          <div class="timeline-marker"></div>
+          <div class="timeline-content">
+            <h3>{{ group.label }}</h3>
+            <div class="timeline-events">
+              @for (event of filteredEvents(group.events); track event.id) {
+                <button type="button" (click)="selectEvent(event)">
+                  <span class="type-dot" [attr.data-type]="event.type"></span>
+                  <div>
+                    <strong>{{ event.title }}</strong>
+                    <span>{{ formatDate(event.date) }} @if (event.time) { · {{ event.time }} }</span>
+                  </div>
+                </button>
+              }
+            </div>
+          </div>
+        </article>
+      }
+    </div>
+  </section>
+
+  @if (selectedEvent; as event) {
+    <div class="modal-backdrop" (click)="closeEvent()">
+      <article class="event-modal" (click)="$event.stopPropagation()">
+        <button class="close-button" type="button" (click)="closeEvent()">×</button>
+        <span class="event-type" [attr.data-type]="event.type">{{ typeLabel(event.type) }}</span>
+        <h2>{{ event.title }}</h2>
+        <p class="event-date">{{ formatDate(event.date) }} @if (event.time) { · {{ event.time }} }</p>
+
+        @if (event.amount != null) {
+          <div class="detail-row">
+            <span>Sumă</span>
+            <strong>{{ formatAmount(event) }}</strong>
+          </div>
+        }
+
+        @if (event.status) {
+          <div class="detail-row">
+            <span>Status</span>
+            <strong>{{ event.status }}</strong>
+          </div>
+        }
+
+        @if (event.notes) {
+          <div class="notes">{{ event.notes }}</div>
+        }
+
+        @if (event.route) {
+          <a [href]="event.route">Deschide secțiunea</a>
+        }
+      </article>
+    </div>
+  }
+} @else {
+  <div class="empty-state">Se încarcă calendarul...</div>
+}

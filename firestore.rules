@@ -1,0 +1,62 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isWeddingUser() {
+      return isSignedIn()
+        && exists(/databases/$(database)/documents/appAccess/$(request.auth.uid));
+    }
+
+    // Fiecare persoană autorizată are un document appAccess/{uid}.
+    // Documentele se creează manual din Firebase Console.
+    match /appAccess/{userId} {
+      allow read: if isSignedIn() && request.auth.uid == userId;
+      allow create, update, delete: if false;
+    }
+
+    match /weddingVendors/{documentId} {
+      allow read, create, update, delete: if isWeddingUser();
+    }
+
+    match /weddingExpenses/{documentId} {
+      allow read, create, update, delete: if isWeddingUser();
+    }
+
+    match /weddingDrinks/{documentId} {
+      allow read, create, update, delete: if isWeddingUser();
+    }
+
+    match /weddingGuests/{documentId} {
+      allow read, create, update, delete: if isWeddingUser();
+    }
+
+    match /weddingDocuments/{documentId} {
+      allow read, create, update, delete: if isWeddingUser();
+    }
+
+    match /weddingTasks/{documentId} {
+      allow read, create, update, delete: if isWeddingUser();
+    }
+
+    match /weddingAccommodations/{documentId} {
+      allow read, create, update, delete: if isWeddingUser();
+    }
+
+    match /weddingPreparations/{documentId} {
+      allow read, create, update, delete: if isWeddingUser();
+    }
+
+    match /weddingRings/{documentId} {
+      allow read, create, update, delete: if isWeddingUser();
+    }
+
+    // Orice colecție neprevăzută este blocată implicit.
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

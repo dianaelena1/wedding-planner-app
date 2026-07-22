@@ -1,0 +1,159 @@
+<section>
+  <div class="page-title page-title-actions">
+    <div>
+      <div class="eyebrow">Organizare</div>
+      <h2>Furnizori</h2>
+      <p>Furnizori editabili, salvați în Firestore.</p>
+    </div>
+
+    <div class="toolbar">
+      <button class="secondary-button" type="button" (click)="importInitialData()" [disabled]="isSaving">
+        Importă datele existente
+      </button>
+      <button class="primary-button" type="button" (click)="startAdd()">+ Adaugă furnizor</button>
+    </div>
+  </div>
+
+  @if (message) {
+    <div class="feedback success">{{ message }}</div>
+  }
+  @if (errorMessage) {
+    <div class="feedback error">{{ errorMessage }}</div>
+  }
+
+  @if (formVendor) {
+    <form class="card vendor-form" (ngSubmit)="saveVendor()">
+      <div class="form-header">
+        <div>
+          <div class="eyebrow">{{ isNewVendor ? 'Furnizor nou' : 'Editare' }}</div>
+          <h3>{{ isNewVendor ? 'Adaugă furnizor' : formVendor.name }}</h3>
+        </div>
+        <button class="icon-button" type="button" (click)="cancelEdit()" aria-label="Închide">×</button>
+      </div>
+
+      <div class="form-grid">
+        <label>
+          Nume *
+          <input name="name" [(ngModel)]="formVendor.name" required />
+        </label>
+        <label>
+          Categorie *
+          <input name="category" [(ngModel)]="formVendor.category" required />
+        </label>
+        <label>
+          Status
+          <select name="status" [(ngModel)]="formVendor.status">
+            @for (option of statusOptions; track option.value) {
+              <option [value]="option.value">{{ option.label }}</option>
+            }
+          </select>
+        </label>
+        <label>
+          Monedă
+          <select name="currency" [(ngModel)]="formVendor.currency">
+            <option value="RON">RON</option>
+            <option value="EUR">EUR</option>
+          </select>
+        </label>
+        <label>
+          Preț total
+          <input name="totalPrice" type="number" min="0" step="0.01" [(ngModel)]="formVendor.totalPrice" (ngModelChange)="recalculatePayment(formVendor)" />
+        </label>
+        <label>
+          Achitat
+          <input name="advancePaid" type="number" min="0" step="0.01" [(ngModel)]="formVendor.advancePaid" (ngModelChange)="recalculatePayment(formVendor)" />
+        </label>
+        <label>
+          Rest calculat
+          <input name="remainingPayment" type="number" [ngModel]="formVendor.remainingPayment" disabled />
+        </label>
+        <label>
+          Scadență
+          <input name="paymentDeadline" [(ngModel)]="formVendor.paymentDeadline" />
+        </label>
+        <label>
+          Persoană de contact
+          <input name="contactPerson" [(ngModel)]="formVendor.contactPerson" />
+        </label>
+        <label>
+          Telefon
+          <input name="phone" [(ngModel)]="formVendor.phone" />
+        </label>
+        <label>
+          Email
+          <input name="email" type="email" [(ngModel)]="formVendor.email" />
+        </label>
+        <label>
+          Program
+          <input name="eventTime" [(ngModel)]="formVendor.eventTime" />
+        </label>
+        <label class="wide-field">
+          Locație
+          <input name="location" [(ngModel)]="formVendor.location" />
+        </label>
+        <label class="wide-field">
+          Notițe
+          <textarea name="notes" rows="4" [(ngModel)]="formVendor.notes"></textarea>
+        </label>
+      </div>
+
+      <div class="form-actions">
+        <button class="secondary-button" type="button" (click)="cancelEdit()">Renunță</button>
+        <button class="primary-button" type="submit" [disabled]="isSaving">
+          {{ isSaving ? 'Se salvează…' : 'Salvează' }}
+        </button>
+      </div>
+    </form>
+  }
+
+  @if (vendors$ | async; as vendors) {
+    @if (vendors.length === 0) {
+      <div class="card empty-state">
+        <h3>Nu există încă furnizori în Firestore</h3>
+        <p>Apasă „Importă datele existente” pentru a încărca lista actuală sau adaugă primul furnizor manual.</p>
+      </div>
+    } @else {
+      <div class="vendors-grid">
+        @for (vendor of vendors; track vendor.id) {
+          <article class="card vendor-card" [class.vendor-card-paid]="vendor.isPaid">
+            <div class="vendor-header">
+              <div>
+                <span class="badge">{{ vendor.category }}</span>
+                <h3>{{ vendor.name }}</h3>
+              </div>
+              <div class="status-area">
+                <span class="status">{{ getStatusLabel(vendor.status) }}</span>
+                @if (vendor.isPaid) { <span class="paid-pill">Achitat</span> }
+              </div>
+            </div>
+
+            <div class="money-row" [class.money-row-paid]="vendor.isPaid">
+              <div><small>Total</small><strong>{{ formatMoney(vendor.totalPrice, vendor.currency) }}</strong></div>
+              <div class="paid-highlight"><small>Achitat</small><strong>{{ formatMoney(vendor.advancePaid, vendor.currency) }}</strong></div>
+              <div><small>Rest</small><strong [class.rest-paid]="vendor.isPaid">{{ formatMoney(vendor.remainingPayment, vendor.currency) }}</strong></div>
+            </div>
+
+            @if (vendor.paymentDeadline) { <p><strong>Scadență:</strong> {{ vendor.paymentDeadline }}</p> }
+            @if (vendor.eventTime) { <p><strong>Program:</strong> {{ vendor.eventTime }}</p> }
+            @if (vendor.location) { <p><strong>Locație:</strong> {{ vendor.location }}</p> }
+            @if (vendor.contactPerson || vendor.phone || vendor.email) {
+              <p><strong>Contact:</strong> {{ vendor.contactPerson || '' }} {{ vendor.phone || '' }} {{ vendor.email || '' }}</p>
+            }
+            @if (vendor.notes) { <p class="muted">{{ vendor.notes }}</p> }
+
+            @if (firebaseDocuments$ | async; as documents) {
+              @if (getVendorDocument(vendor, documents); as document) {
+                <a class="contract-link" [href]="document.downloadUrl" target="_blank" rel="noopener">Deschide document</a>
+              }
+            }
+
+            <div class="card-actions">
+              <button class="secondary-button" type="button" (click)="startEdit(vendor)">Editează</button>
+              <button class="danger-button" type="button" (click)="deleteVendor(vendor)">Șterge</button>
+            </div>
+          </article>
+        }
+      </div>
+    }
+  }
+</section>

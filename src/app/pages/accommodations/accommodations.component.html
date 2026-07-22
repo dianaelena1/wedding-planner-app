@@ -1,0 +1,197 @@
+<section>
+  <div class="page-header">
+    <div class="page-title">
+      <div class="eyebrow">Logistică</div>
+      <h2>Cazări</h2>
+      <p>Gestionează camerele, persoanele cazate, plățile și datele de contact.</p>
+    </div>
+
+    <div class="header-actions">
+      <button class="secondary" type="button" (click)="importInitialData()" [disabled]="isSaving">
+        Importă datele existente
+      </button>
+      <button class="primary" type="button" (click)="startAdd()">+ Adaugă cazare</button>
+    </div>
+  </div>
+
+  @if (message) {
+    <div class="feedback success">{{ message }}</div>
+  }
+  @if (errorMessage) {
+    <div class="feedback error">{{ errorMessage }}</div>
+  }
+
+  @if (formAccommodation) {
+    <form class="card accommodation-form" (ngSubmit)="saveAccommodation()">
+      <div class="form-title">
+        <div>
+          <div class="eyebrow">{{ isNewAccommodation ? 'Cazare nouă' : 'Editare' }}</div>
+          <h3>{{ isNewAccommodation ? 'Adaugă o cazare' : 'Modifică această cazare' }}</h3>
+        </div>
+        <button class="icon-button" type="button" (click)="cancelEdit()" aria-label="Închide">×</button>
+      </div>
+
+      <div class="form-grid">
+        <label class="full-width">
+          Nume hotel / cazare *
+          <input name="name" [(ngModel)]="formAccommodation.name" required placeholder="Ex: Radisson Blu Cluj" />
+        </label>
+
+        <label class="full-width">
+          Locație
+          <input name="location" [(ngModel)]="formAccommodation.location" placeholder="Adresă sau zonă" />
+        </label>
+
+        <label>
+          Check-in
+          <input name="checkIn" type="date" [(ngModel)]="formAccommodation.checkIn" />
+        </label>
+
+        <label>
+          Check-out
+          <input name="checkOut" type="date" [(ngModel)]="formAccommodation.checkOut" />
+        </label>
+
+        <label>
+          Nopți
+          <input name="nights" type="number" min="1" [(ngModel)]="formAccommodation.nights" (ngModelChange)="recalculateFormTotals()" />
+        </label>
+
+        <label>
+          Camere
+          <input name="rooms" type="number" min="0" [(ngModel)]="formAccommodation.rooms" (ngModelChange)="recalculateFormTotals()" />
+        </label>
+
+        <label>
+          Persoane
+          <input name="guests" type="number" min="0" [(ngModel)]="formAccommodation.guests" />
+        </label>
+
+        <label>
+          Preț / cameră / noapte
+          <input name="pricePerRoom" type="number" min="0" step="0.01" [(ngModel)]="formAccommodation.pricePerRoom" (ngModelChange)="recalculateFormTotals()" />
+        </label>
+
+        <label>
+          Cost total
+          <input name="totalPrice" type="number" min="0" step="0.01" [(ngModel)]="formAccommodation.totalPrice" (ngModelChange)="recalculateFormTotals()" />
+        </label>
+
+        <label>
+          Monedă
+          <select name="currency" [(ngModel)]="formAccommodation.currency">
+            @for (currency of currencyOptions; track currency) {
+              <option [ngValue]="currency">{{ currency }}</option>
+            }
+          </select>
+        </label>
+
+        <label>
+          Avans plătit
+          <input name="advancePaid" type="number" min="0" step="0.01" [(ngModel)]="formAccommodation.advancePaid" (ngModelChange)="recalculateFormTotals()" />
+        </label>
+
+        <label>
+          Rest de plată
+          <input name="remainingPayment" type="number" min="0" step="0.01" [(ngModel)]="formAccommodation.remainingPayment" readonly />
+        </label>
+
+        <label>
+          Status
+          <select name="status" [(ngModel)]="formAccommodation.status">
+            @for (option of statusOptions; track option.value) {
+              <option [ngValue]="option.value">{{ option.label }}</option>
+            }
+          </select>
+        </label>
+
+        <label>
+          Persoană de contact
+          <input name="contactPerson" [(ngModel)]="formAccommodation.contactPerson" />
+        </label>
+
+        <label>
+          Telefon
+          <input name="phone" type="tel" [(ngModel)]="formAccommodation.phone" />
+        </label>
+
+        <label class="full-width">
+          Observații
+          <textarea name="notes" rows="4" [(ngModel)]="formAccommodation.notes" placeholder="Cine este cazat aici, condiții, parcare, mic dejun etc."></textarea>
+        </label>
+      </div>
+
+      <div class="form-actions">
+        <button class="secondary" type="button" (click)="cancelEdit()">Renunță</button>
+        <button class="primary" type="submit" [disabled]="isSaving">
+          {{ isSaving ? 'Se salvează...' : 'Salvează cazarea' }}
+        </button>
+      </div>
+    </form>
+  }
+
+  @if (accommodations$ | async; as accommodations) {
+    <div class="summary-grid">
+      <article class="stat-card"><span>Camere</span><strong>{{ getTotalRooms(accommodations) }}</strong></article>
+      <article class="stat-card"><span>Persoane</span><strong>{{ getTotalGuests(accommodations) }}</strong></article>
+      <article class="stat-card"><span>Total RON</span><strong>{{ formatMoney(getTotalByCurrency(accommodations, 'RON'), 'RON') }}</strong></article>
+      <article class="stat-card"><span>Total EUR</span><strong>{{ formatMoney(getTotalByCurrency(accommodations, 'EUR'), 'EUR') }}</strong></article>
+    </div>
+
+    <div class="filters card">
+      <input type="search" [(ngModel)]="searchTerm" placeholder="Caută hotel, locație, contact sau observații" />
+      <select [(ngModel)]="statusFilter">
+        <option value="all">Toate statusurile</option>
+        @for (option of statusOptions; track option.value) {
+          <option [ngValue]="option.value">{{ option.label }}</option>
+        }
+      </select>
+    </div>
+
+    @if (getFilteredAccommodations(accommodations).length) {
+      <div class="accommodations-grid">
+        @for (item of getFilteredAccommodations(accommodations); track item.id) {
+          <article class="card accommodation-card" [class.paid-card]="item.status === 'paid'">
+            <div class="card-header">
+              <div>
+                <span class="badge">Cazare</span>
+                <h3>{{ item.name }}</h3>
+              </div>
+              <span class="status-pill" [attr.data-status]="item.status">{{ getStatusLabel(item.status) }}</span>
+            </div>
+
+            <div class="details-grid">
+              <div><small>Check-in</small><strong>{{ item.checkIn ? (item.checkIn | date:'dd.MM.yyyy') : '-' }}</strong></div>
+              <div><small>Check-out</small><strong>{{ item.checkOut ? (item.checkOut | date:'dd.MM.yyyy') : '-' }}</strong></div>
+              <div><small>Nopți</small><strong>{{ item.nights ?? '-' }}</strong></div>
+              <div><small>Camere</small><strong>{{ item.rooms ?? '-' }}</strong></div>
+              <div><small>Persoane</small><strong>{{ item.guests ?? '-' }}</strong></div>
+              <div><small>Total</small><strong>{{ formatMoney(item.totalPrice, item.currency) }}</strong></div>
+            </div>
+
+            <div class="payment-row">
+              <div><small>Avans</small><strong>{{ formatMoney(item.advancePaid, item.currency) }}</strong></div>
+              <div><small>Rest</small><strong>{{ formatMoney(item.remainingPayment, item.currency) }}</strong></div>
+            </div>
+
+            @if (item.location) { <p><strong>Locație:</strong> {{ item.location }}</p> }
+            @if (item.contactPerson || item.phone) {
+              <p><strong>Contact:</strong> {{ item.contactPerson || '' }} {{ item.phone || '' }}</p>
+            }
+            @if (item.notes) { <p class="muted notes">{{ item.notes }}</p> }
+
+            <div class="card-actions">
+              <button class="secondary small" type="button" (click)="startEdit(item)">Editează</button>
+              <button class="danger small" type="button" (click)="deleteAccommodation(item)">Șterge</button>
+            </div>
+          </article>
+        }
+      </div>
+    } @else {
+      <div class="empty-state card">
+        <h3>Nu există cazări pentru filtrul selectat.</h3>
+        <p>Schimbă filtrul sau adaugă o cazare nouă.</p>
+      </div>
+    }
+  }
+</section>

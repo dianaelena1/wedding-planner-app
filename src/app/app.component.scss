@@ -1,0 +1,141 @@
+.app-shell {
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  background: #f7f0e8;
+  color: #3f352c;
+}
+
+.sidebar {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  background: #fffaf3;
+  border-right: 1px solid #e8dcca;
+  padding: 28px;
+  overflow-y: auto;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 36px;
+
+  h1 {
+    margin: 0;
+    font-size: 20px;
+    line-height: 1.1;
+  }
+
+  p {
+    margin: 4px 0 0;
+    color: #8a7a68;
+    font-size: 13px;
+  }
+}
+
+.brand-icon {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: #b99b72;
+  color: white;
+  display: grid;
+  place-items: center;
+  font-weight: 700;
+}
+
+nav {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+
+  a {
+    padding: 12px 14px;
+    border-radius: 14px;
+    text-decoration: none;
+    color: #5f5144;
+    font-weight: 600;
+  }
+
+  a.active,
+  a:hover {
+    background: #eadfce;
+    color: #2f261f;
+  }
+}
+
+.sidebar-note {
+  margin-top: 28px;
+  padding: 14px;
+  border-radius: 16px;
+  background: #f4eadb;
+  color: #6a5745;
+  display: grid;
+  gap: 6px;
+  font-size: 13px;
+  line-height: 1.35;
+}
+
+.content {
+  padding: 32px;
+}
+
+@media (max-width: 850px) {
+  .app-shell {
+    grid-template-columns: 1fr;
+  }
+
+  .sidebar {
+    position: static;
+    height: auto;
+    border-right: none;
+    border-bottom: 1px solid #e8dcca;
+  }
+
+  nav {
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+}
+
+.auth-card {
+  margin-top: 26px;
+  padding: 16px;
+  border-radius: 18px;
+  background: #f3eadf;
+  border: 1px solid #e4d6c2;
+  display: grid;
+  gap: 8px;
+
+  .auth-label {
+    color: #8a7a68;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+
+  strong {
+    font-size: 14px;
+    line-height: 1.35;
+    word-break: break-word;
+  }
+
+  button {
+    border: none;
+    border-radius: 999px;
+    padding: 10px 14px;
+    background: #b99b72;
+    color: white;
+    font-weight: 700;
+    cursor: pointer;
+  }
+}
+
+.auth-uid {
+  font-size: 11px;
+  color: #8a7a68;
+  word-break: break-all;
+  user-select: all;
+}

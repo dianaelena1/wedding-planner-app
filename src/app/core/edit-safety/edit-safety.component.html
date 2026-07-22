@@ -1,0 +1,40 @@
+<button type="button" class="save-indicator" [attr.data-state]="editSafety.state()" (click)="editSafety.toggleHistory()">
+  <span class="status-dot"></span>
+  <span>{{ editSafety.statusMessage() }}</span>
+  @if (editSafety.pendingCount()) { <strong>{{ editSafety.pendingCount() }}</strong> }
+</button>
+
+@if (editSafety.confirmation(); as confirmation) {
+  <div class="dialog-backdrop" (click)="editSafety.answerConfirmation(false)"></div>
+  <section class="confirm-dialog" role="dialog" aria-modal="true">
+    <span class="dialog-icon" [class.destructive]="confirmation.destructive">{{ confirmation.destructive ? '!' : '?' }}</span>
+    <h2>{{ confirmation.title }}</h2>
+    @if (confirmation.itemLabel) { <strong class="item-label">{{ confirmation.itemLabel }}</strong> }
+    <p>{{ confirmation.message }}</p>
+    <div class="dialog-actions">
+      <button type="button" class="cancel" (click)="editSafety.answerConfirmation(false)">Renunță</button>
+      <button type="button" [class.delete]="confirmation.destructive" (click)="editSafety.answerConfirmation(true)">{{ confirmation.confirmLabel }}</button>
+    </div>
+  </section>
+}
+
+@if (editSafety.historyOpen()) {
+  <div class="history-backdrop" (click)="editSafety.closeHistory()"></div>
+  <aside class="history-drawer">
+    <header>
+      <div><span>ULTIMELE 100</span><h2>Istoric modificări</h2></div>
+      <button type="button" (click)="editSafety.closeHistory()">×</button>
+    </header>
+    @if (editSafety.history().length) {
+      <div class="history-list">
+        @for (entry of editSafety.history(); track entry.id) {
+          <article>
+            <span [attr.data-action]="entry.action">{{ entry.action }}</span>
+            <div><strong>{{ entry.entityLabel }}</strong><p>{{ entry.entityType }} · {{ formatDate(entry.timestamp) }}</p>@if(entry.details){<small>{{ entry.details }}</small>}</div>
+          </article>
+        }
+      </div>
+      <button type="button" class="clear-history" (click)="editSafety.clearHistory()">Șterge istoricul local</button>
+    } @else { <div class="empty-history">Nu există încă modificări înregistrate.</div> }
+  </aside>
+}

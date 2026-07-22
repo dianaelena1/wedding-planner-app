@@ -1,0 +1,28 @@
+rules_version = '2';
+
+service firebase.storage {
+  match /b/{bucket}/o {
+    function isWeddingUser() {
+      return request.auth != null
+        && firestore.exists(/databases/(default)/documents/appAccess/$(request.auth.uid));
+    }
+
+    function isAllowedFile() {
+      return request.resource.size <= 20 * 1024 * 1024
+        && request.resource.contentType != null
+        && request.resource.contentType.matches(
+          '(application/pdf|application/msword|application/vnd.openxmlformats-officedocument.*|application/vnd.ms-excel|application/vnd.oasis.opendocument.*|text/plain|image/.*)'
+        );
+    }
+
+    match /wedding-documents/{uploaderUid}/{filePath=**} {
+      allow read: if isWeddingUser();
+      allow create, update: if isWeddingUser() && isAllowedFile();
+      allow delete: if isWeddingUser();
+    }
+
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}

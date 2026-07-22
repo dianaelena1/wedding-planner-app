@@ -1,0 +1,214 @@
+<div class="app-shell">
+  <aside class="desktop-sidebar">
+    <div class="brand">
+      <div class="brand-icon">D&D</div>
+
+      <div>
+        <h1>Wedding Planner</h1>
+        <p>05 Septembrie 2026</p>
+      </div>
+    </div>
+
+    <a
+      class="wedding-day-button"
+      routerLink="/ziua-nuntii"
+      routerLinkActive="active"
+    >
+      <span class="wedding-day-icon">♥</span>
+
+      <span>
+        <small>MOD RAPID</small>
+        <strong>Ziua nunții</strong>
+      </span>
+
+      <span class="arrow">›</span>
+    </a>
+
+    <nav class="desktop-navigation" aria-label="Meniu principal">
+      <span class="navigation-label">ORGANIZARE</span>
+
+      @for (item of mainNavigation; track item.route) {
+        <a
+          [routerLink]="item.route"
+          routerLinkActive="active"
+        >
+          <span class="nav-icon">{{ item.icon }}</span>
+          <span>{{ item.label }}</span>
+        </a>
+      }
+
+      <span class="navigation-label navigation-label-secondary">
+        MAI MULTE
+      </span>
+
+      @for (item of secondaryNavigation; track item.route) {
+        <a
+          [routerLink]="item.route"
+          routerLinkActive="active"
+        >
+          <span class="nav-icon">{{ item.icon }}</span>
+          <span>{{ item.label }}</span>
+        </a>
+      }
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="auth-card">
+        @if (user$ | async; as user) {
+          <span class="auth-label">Logată ca</span>
+          <strong>
+            {{ user.displayName || user.email }}
+          </strong>
+
+          <button type="button" (click)="logout()">
+            Logout
+          </button>
+        } @else {
+          <span class="auth-label">Firebase</span>
+          <strong>Documente private</strong>
+
+          <button type="button" (click)="login()">
+            Login cu Google
+          </button>
+        }
+      </div>
+    </div>
+  </aside>
+
+  <header class="mobile-header">
+    <button
+      type="button"
+      class="hamburger-button"
+      (click)="toggleMenu()"
+      [attr.aria-expanded]="menuOpen"
+      aria-controls="mobile-drawer"
+      aria-label="Deschide meniul"
+    >
+      <span></span>
+      <span></span>
+      <span></span>
+    </button>
+
+    <a class="mobile-brand" routerLink="/dashboard">
+      <span class="mobile-brand-icon">D&D</span>
+
+      <span>
+        <strong>Wedding Planner</strong>
+        <small>5 septembrie 2026</small>
+      </span>
+    </a>
+
+    <a
+      class="mobile-day-shortcut"
+      routerLink="/ziua-nuntii"
+      aria-label="Deschide modul Ziua nunții"
+    >
+      ♥
+    </a>
+  </header>
+
+  @if (menuOpen) {
+    <button
+      type="button"
+      class="drawer-backdrop"
+      (click)="closeMenu()"
+      aria-label="Închide meniul"
+    ></button>
+  }
+
+  <aside
+    id="mobile-drawer"
+    class="mobile-drawer"
+    [class.open]="menuOpen"
+    [attr.aria-hidden]="!menuOpen"
+  >
+    <div class="drawer-header">
+      <div class="brand">
+        <div class="brand-icon">D&D</div>
+
+        <div>
+          <h1>Wedding Planner</h1>
+          <p>05 Septembrie 2026</p>
+        </div>
+      </div>
+
+      <button
+        type="button"
+        class="close-button"
+        (click)="closeMenu()"
+        aria-label="Închide meniul"
+      >
+        ×
+      </button>
+    </div>
+
+    <a
+      class="wedding-day-button"
+      routerLink="/ziua-nuntii"
+      routerLinkActive="active"
+    >
+      <span class="wedding-day-icon">♥</span>
+
+      <span>
+        <small>MOD RAPID</small>
+        <strong>Ziua nunții</strong>
+      </span>
+
+      <span class="arrow">›</span>
+    </a>
+
+    <nav class="drawer-navigation" aria-label="Meniu mobil complet">
+      @for (item of mainNavigation; track item.route) {
+        <a
+          [routerLink]="item.route"
+          routerLinkActive="active"
+        >
+          <span class="nav-icon">{{ item.icon }}</span>
+          <span>{{ item.label }}</span>
+        </a>
+      }
+
+      @for (item of secondaryNavigation; track item.route) {
+        <a
+          [routerLink]="item.route"
+          routerLinkActive="active"
+        >
+          <span class="nav-icon">{{ item.icon }}</span>
+          <span>{{ item.label }}</span>
+        </a>
+      }
+    </nav>
+
+    <div class="drawer-auth">
+      @if (user$ | async; as user) {
+        <span>Logată ca</span>
+        <strong>{{ user.displayName || user.email }}</strong>
+
+        <button type="button" (click)="logout()">
+          Logout
+        </button>
+      } @else {
+        <button type="button" (click)="login()">
+          Login cu Google
+        </button>
+      }
+    </div>
+  </aside>
+
+  <main class="content">
+    <router-outlet></router-outlet>
+  </main>
+
+  <nav class="mobile-bottom-navigation" aria-label="Navigare rapidă">
+    @for (item of mobileNavigation; track item.route) {
+      <a
+        [routerLink]="item.route"
+        routerLinkActive="active"
+        [class.wedding-day-nav]="item.route === '/ziua-nuntii'"
+      >
+        <span class="bottom-icon">{{ item.icon }}</span>
+        <span>{{ item.label }}</span>
+      </a>
+    }
+  </nav>
+</div>

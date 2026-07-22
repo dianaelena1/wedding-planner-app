@@ -1,0 +1,388 @@
+<section class="dashboard-page">
+  <section class="hero-card">
+    <div class="hero-copy">
+      <span class="eyebrow">Diana & Dan · 05 septembrie 2026</span>
+      <h1>Wedding Command Center</h1>
+      <p>
+        Situația nunții într-o singură privire, actualizată direct
+        din Firestore.
+      </p>
+
+      <div class="hero-actions">
+        <a routerLink="/ziua-nuntii">Deschide Ziua nunții</a>
+        <a class="secondary" routerLink="/tasks">Vezi task-urile</a>
+      </div>
+    </div>
+
+    <div class="countdown-card">
+      @if (weddingHasPassed) {
+        <span>Ziua cea mare</span>
+        <strong>♥</strong>
+        <p>5 septembrie 2026</p>
+      } @else {
+        <span>Au mai rămas</span>
+        <strong>{{ daysUntilWedding }}</strong>
+        <p>
+          zile · {{ weeksUntilWedding }} săptămâni și
+          {{ remainingDaysAfterWeeks }} zile
+        </p>
+      }
+
+      <div class="overall-progress">
+        <div class="overall-progress__header">
+          <span>Organizare estimată</span>
+          <b>{{ organizationProgress }}%</b>
+        </div>
+
+        <div class="progress-track">
+          <div [style.width.%]="organizationProgress"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  @if (loadError) {
+    <div class="state-banner error">{{ loadError }}</div>
+  } @else if (isLoading) {
+    <div class="state-banner">
+      Se încarcă datele din Firestore…
+    </div>
+  }
+
+  <section class="priority-stats">
+    <a class="priority-card guests" routerLink="/guests">
+      <span class="priority-icon">♥</span>
+      <div>
+        <small>INVITAȚI CONFIRMAȚI</small>
+        <strong>{{ confirmedPeople }}</strong>
+        <p>
+          {{ confirmedGuests }} grupuri ·
+          {{ pendingGuests }} răspunsuri în așteptare
+        </p>
+      </div>
+    </a>
+
+    <a
+      class="priority-card seating"
+      [class.warning]="confirmedPeopleWithoutTable > 0"
+      routerLink="/seating"
+    >
+      <span class="priority-icon">◫</span>
+      <div>
+        <small>FĂRĂ MASĂ</small>
+        <strong>{{ confirmedPeopleWithoutTable }}</strong>
+        <p>
+          {{ confirmedGroupsWithoutTable }}
+          grupuri confirmate de așezat
+        </p>
+      </div>
+    </a>
+
+    <a
+      class="priority-card accommodation"
+      [class.warning]="guestsNeedingAccommodation > 0"
+      routerLink="/cazari"
+    >
+      <span class="priority-icon">⌂</span>
+      <div>
+        <small>CAZARE NECESARĂ</small>
+        <strong>{{ guestsNeedingAccommodation }}</strong>
+        <p>
+          {{ guestsWithBookedAccommodation }} persoane marcate
+          cu cazare rezervată
+        </p>
+      </div>
+    </a>
+
+    <a
+      class="priority-card urgent"
+      [class.warning]="urgentTasks.length || overdueTasks.length"
+      routerLink="/tasks"
+    >
+      <span class="priority-icon">!</span>
+      <div>
+        <small>TASK-URI URGENTE</small>
+        <strong>{{ urgentTasks.length + overdueTasks.length }}</strong>
+        <p>
+          {{ overdueTasks.length }} întârziate ·
+          {{ pendingTasks }} task-uri rămase
+        </p>
+      </div>
+    </a>
+  </section>
+
+  <section class="budget-overview">
+    <div class="section-heading">
+      <div>
+        <span class="eyebrow">Situație financiară</span>
+        <h2>Buget și rest de plată</h2>
+      </div>
+
+      <a routerLink="/payments">Deschide toate plățile →</a>
+    </div>
+
+    <div class="budget-grid">
+      <article class="budget-card ron">
+        <div class="budget-heading">
+          <div>
+            <span>Total RON</span>
+            <strong>{{ formatMoney(totalRon, 'RON') }}</strong>
+          </div>
+          <b>{{ paidRonProgress }}%</b>
+        </div>
+
+        <div class="progress-track">
+          <div [style.width.%]="paidRonProgress"></div>
+        </div>
+
+        <div class="budget-meta">
+          <span>Plătit: {{ formatMoney(paidRon, 'RON') }}</span>
+          <strong>Rest: {{ formatMoney(remainingRon, 'RON') }}</strong>
+        </div>
+      </article>
+
+      <article class="budget-card eur">
+        <div class="budget-heading">
+          <div>
+            <span>Total EUR</span>
+            <strong>{{ formatMoney(totalEur, 'EUR') }}</strong>
+          </div>
+          <b>{{ paidEurProgress }}%</b>
+        </div>
+
+        <div class="progress-track">
+          <div [style.width.%]="paidEurProgress"></div>
+        </div>
+
+        <div class="budget-meta">
+          <span>Plătit: {{ formatMoney(paidEur, 'EUR') }}</span>
+          <strong>Rest: {{ formatMoney(remainingEur, 'EUR') }}</strong>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <section class="dashboard-main-grid sprint-one-grid">
+    <article class="panel payments-panel payment-overview-panel">
+      <div class="panel-heading">
+        <div>
+          <span class="eyebrow">Plăți rămase</span>
+          <h2>Când mai avem de plătit</h2>
+        </div>
+        <a routerLink="/payments">Toate plățile</a>
+      </div>
+
+      <div class="payment-columns">
+        <section class="payment-group">
+          <div class="payment-group__heading">
+            <div>
+              <small>01</small>
+              <strong>Înainte de nuntă</strong>
+            </div>
+            <span>{{ paymentsBeforeWedding.length }}</span>
+          </div>
+          @if (!paymentsBeforeWedding.length) {
+            <div class="compact-empty">Nicio plată înregistrată.</div>
+          } @else {
+            <div class="payments-list compact">
+              @for (payment of paymentsBeforeWedding; track payment.id) {
+                <a class="payment-row" routerLink="/payments">
+                  <div>
+                    <strong>{{ payment.name }}</strong>
+                    <p>{{ paymentTimingLabel(payment) }}</p>
+                  </div>
+                  <div class="payment-value">
+                    <span>{{ formatMoney(payment.remainingPayment, payment.currency || 'RON') }}</span>
+                    <small [attr.data-state]="paymentState(payment)">{{ paymentStateLabel(payment) }}</small>
+                  </div>
+                </a>
+              }
+            </div>
+          }
+        </section>
+
+        <section class="payment-group wedding-day">
+          <div class="payment-group__heading">
+            <div>
+              <small>02</small>
+              <strong>În ziua nunții</strong>
+            </div>
+            <span>{{ paymentsOnWeddingDay.length }}</span>
+          </div>
+          @if (!paymentsOnWeddingDay.length) {
+            <div class="compact-empty">Completează plățile achitate în ziua evenimentului.</div>
+          } @else {
+            <div class="payments-list compact">
+              @for (payment of paymentsOnWeddingDay; track payment.id) {
+                <a class="payment-row" routerLink="/payments">
+                  <div>
+                    <strong>{{ payment.name }}</strong>
+                    <p>{{ payment.category }} · 05 septembrie</p>
+                  </div>
+                  <div class="payment-value">
+                    <span>{{ formatMoney(payment.remainingPayment, payment.currency || 'RON') }}</span>
+                    <small data-state="wedding-day">În ziua nunții</small>
+                  </div>
+                </a>
+              }
+            </div>
+          }
+        </section>
+
+        <section class="payment-group after-wedding">
+          <div class="payment-group__heading">
+            <div>
+              <small>03</small>
+              <strong>După nuntă</strong>
+            </div>
+            <span>{{ paymentsAfterWedding.length }}</span>
+          </div>
+          @if (!paymentsAfterWedding.length) {
+            <div class="compact-empty">Nicio plată de după nuntă înregistrată.</div>
+          } @else {
+            <div class="payments-list compact">
+              @for (payment of paymentsAfterWedding; track payment.id) {
+                <a class="payment-row" routerLink="/payments">
+                  <div>
+                    <strong>{{ payment.name }}</strong>
+                    <p>{{ paymentTimingLabel(payment) }}</p>
+                  </div>
+                  <div class="payment-value">
+                    <span>{{ formatMoney(payment.remainingPayment, payment.currency || 'RON') }}</span>
+                    <small data-state="after">După nuntă</small>
+                  </div>
+                </a>
+              }
+            </div>
+          }
+        </section>
+      </div>
+    </article>
+
+    <article class="panel attention-panel task-focus-panel">
+      <div class="panel-heading">
+        <div>
+          <span class="eyebrow">Ce mai avem de făcut</span>
+          <h2>Până la nuntă</h2>
+        </div>
+        <a routerLink="/tasks">Toate task-urile</a>
+      </div>
+
+      <div class="task-summary">
+        <div><strong>{{ overdueTasks.length }}</strong><span>întârziate</span></div>
+        <div><strong>{{ urgentTasks.length }}</strong><span>urgente</span></div>
+        <div><strong>{{ tasksNextSevenDays.length }}</strong><span>în 7 zile</span></div>
+      </div>
+
+      @if (!urgentTasks.length && !overdueTasks.length && !tasksNextSevenDays.length) {
+        <div class="empty-state">Nu există task-uri urgente. 🎉</div>
+      } @else {
+        <div class="attention-list">
+          @for (task of overdueTasks.slice(0, 3); track task.id) {
+            <a class="attention-row overdue" routerLink="/tasks">
+              <div>
+                <strong>{{ task.title }}</strong>
+                <p>{{ task.category }} · termen {{ formatDate(task.dueDate) }}</p>
+              </div>
+              <span>Întârziat</span>
+            </a>
+          }
+          @for (task of urgentTasks.slice(0, 4); track task.id) {
+            <a class="attention-row" routerLink="/tasks">
+              <div>
+                <strong>{{ task.title }}</strong>
+                <p>{{ task.category }} · {{ formatDate(task.dueDate) }}</p>
+              </div>
+              <span>{{ priorityLabel(task.priority) }}</span>
+            </a>
+          }
+        </div>
+      }
+
+      @if (tasksNextSevenDays.length) {
+        <div class="next-seven-days">
+          <div class="subsection-title">Următoarele 7 zile</div>
+          <div class="task-list">
+            @for (task of tasksNextSevenDays; track task.id) {
+              <a class="task-row" routerLink="/tasks">
+                <div class="date-chip">{{ formatDate(task.dueDate) }}</div>
+                <div>
+                  <strong>{{ task.title }}</strong>
+                  <p>{{ task.category }}</p>
+                </div>
+              </a>
+            }
+          </div>
+        </div>
+      }
+    </article>
+  </section>
+
+  <section class="modules-grid">
+    @for (module of modules; track module.route) {
+      <a class="module-card" [routerLink]="module.route">
+        <div class="module-icon">{{ module.icon }}</div>
+        <span class="module-label">{{ module.label }}</span>
+        <h3>{{ module.title }}</h3>
+        <p>{{ module.description }}</p>
+        <b>Deschide →</b>
+      </a>
+    }
+  </section>
+
+  <section class="dashboard-bottom-grid">
+    <article class="panel">
+      <div class="panel-heading">
+        <div>
+          <span class="eyebrow">În perioada următoare</span>
+          <h2>Următoarele task-uri</h2>
+        </div>
+      </div>
+
+      @if (!upcomingTasks.length) {
+        <div class="empty-state">
+          Nu există task-uri viitoare.
+        </div>
+      } @else {
+        <div class="task-list">
+          @for (task of upcomingTasks; track task.id) {
+            <a class="task-row" routerLink="/tasks">
+              <div class="date-chip">
+                {{ formatDate(task.dueDate) }}
+              </div>
+              <div>
+                <strong>{{ task.title }}</strong>
+                <p>{{ task.category }}</p>
+              </div>
+            </a>
+          }
+        </div>
+      }
+    </article>
+
+    <article class="panel timeline-panel">
+      <div class="panel-heading">
+        <div>
+          <span class="eyebrow">Acces rapid</span>
+          <h2>Ziua nunții</h2>
+        </div>
+
+        <a routerLink="/ziua-nuntii">Deschide modul →</a>
+      </div>
+
+      <div class="timeline-list">
+        @for (item of weddingTimeline; track item.time) {
+          <div class="timeline-item">
+            <div class="timeline-time">{{ item.time }}</div>
+            <div>
+              <strong>{{ item.title }}</strong>
+              @if (item.details) {
+                <p>{{ item.details }}</p>
+              }
+            </div>
+          </div>
+        }
+      </div>
+    </article>
+  </section>
+</section>

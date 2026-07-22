@@ -1,0 +1,55 @@
+<div class="app-shell">
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="brand-icon">D&D</div>
+      <div>
+        <h1>Wedding Planner</h1>
+        <p>05 Septembrie 2026</p>
+      </div>
+    </div>
+
+      <nav>
+          <a routerLink="/dashboard" routerLinkActive="active">Dashboard</a>
+          <a routerLink="/alerts" routerLinkActive="active">
+              ⚠ Centru de alerte
+          </a>
+          <a routerLink="/calendar" routerLinkActive="active">Calendar</a>
+          <a routerLink="/export-backup" routerLinkActive="active">Export & Backup</a>
+          <a routerLink="/vendors" routerLinkActive="active">Furnizori</a>
+          <a routerLink="/payments" routerLinkActive="active">Plati</a>
+          <a routerLink="/documents" routerLinkActive="active">Documente</a>
+          <a routerLink="/guests" routerLinkActive="active">Invitati</a>
+          <a routerLink="/seating" routerLinkActive="active">Asezare mese</a>
+          <a routerLink="/cazari" routerLinkActive="active">Cazari</a>
+          <a routerLink="/pregatiri" routerLinkActive="active">Pregatiri</a>
+          <a routerLink="/verighete" routerLinkActive="active">Verighete</a>
+          <a routerLink="/tasks" routerLinkActive="active">Task-uri</a>
+          <a routerLink="/ziua-nuntii" routerLinkActive="active">
+              💍 Ziua nunții
+          </a>
+      </nav>
+
+    <div class="auth-card">
+      @if (user$ | async; as user) {
+        <span class="auth-label">Logata ca</span>
+        <strong>{{ user.displayName || user.email }}</strong>
+        <button type="button" (click)="logout()">Logout</button>
+      } @else {
+        <span class="auth-label">Firebase</span>
+        <strong>Documente private</strong>
+        <button type="button" (click)="login()">Login cu Google</button>
+      }
+    </div>
+
+    <div class="sidebar-note">
+      <strong>Important</strong>
+      <span>Fișierele rămân în Google Drive, iar în aplicație salvăm doar linkurile și statusurile.</span>
+    </div>
+  </aside>
+
+  <main class="content">
+    <router-outlet></router-outlet>
+  </main>
+</div>
+
+<app-edit-safety></app-edit-safety>

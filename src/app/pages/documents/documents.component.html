@@ -1,0 +1,156 @@
+<section class="documents-page">
+  <div class="page-title page-heading-row">
+    <div>
+      <div class="eyebrow">Document Center</div>
+      <h2>Documente</h2>
+      <p>Păstrează fișierele gratuit în Google Drive și salvează aici doar linkul, statusul și detaliile importante.</p>
+    </div>
+    <button class="primary-button" type="button" (click)="openAddForm()">+ Adaugă document</button>
+  </div>
+
+  @if (feedback) {
+    <div class="feedback-message" [class.success-message]="feedback.type === 'success'" [class.error-message]="feedback.type === 'error'">
+      {{ feedback.message }}
+    </div>
+  }
+
+  @if (firebaseDocuments$ | async; as documents) {
+    <div class="metrics-grid">
+      <article class="metric-card">
+        <span>Total</span><strong>{{ documents.length }}</strong><small>în registru</small>
+      </article>
+      <article class="metric-card">
+        <span>Disponibile</span><strong>{{ countAvailable(documents) }}</strong><small>cu link accesibil</small>
+      </article>
+      <article class="metric-card">
+        <span>Semnate / plătite</span><strong>{{ countSigned(documents) }}</strong><small>finalizate</small>
+      </article>
+      <article class="metric-card attention">
+        <span>Necesită atenție</span><strong>{{ countAttention(documents) }}</strong><small>lipsă, de cerut sau semnat</small>
+      </article>
+    </div>
+
+    @if (isFormOpen) {
+      <article class="card document-form">
+        <div class="form-heading">
+          <div>
+            <div class="eyebrow">{{ editingId ? 'Editare' : 'Document nou' }}</div>
+            <h3>{{ editingId ? 'Actualizează documentul' : 'Adaugă un link Google Drive' }}</h3>
+            <p>În Google Drive folosește Share → Copy link, apoi lipește linkul mai jos.</p>
+          </div>
+          <button class="icon-button" type="button" (click)="closeForm()" aria-label="Închide formularul">×</button>
+        </div>
+
+        <div class="form-grid">
+          <label class="span-2">Nume document
+            <input type="text" [(ngModel)]="form.title" placeholder="Ex: Contract Wild Garden" />
+          </label>
+          <label>Tip
+            <select [(ngModel)]="form.type">
+              @for (option of typeOptions; track option.value) { <option [value]="option.value">{{ option.label }}</option> }
+            </select>
+          </label>
+          <label>Status
+            <select [(ngModel)]="form.status">
+              @for (option of statusOptions; track option.value) { <option [value]="option.value">{{ option.label }}</option> }
+            </select>
+          </label>
+          <label>Furnizor
+            <input type="text" [(ngModel)]="form.vendorName" placeholder="Ex: Wild Garden" />
+          </label>
+          <label>Termen limită
+            <input type="date" [(ngModel)]="form.dueDate" />
+          </label>
+          <label class="span-2">Link Google Drive
+            <input type="url" [(ngModel)]="form.downloadUrl" placeholder="https://drive.google.com/file/d/..." />
+            <small>Poate rămâne gol când documentul este încă „De cerut” sau „Lipsă”.</small>
+          </label>
+          <label class="span-2">Observații
+            <textarea rows="3" [(ngModel)]="form.notes" placeholder="Avans, dată semnare, ce mai trebuie verificat..."></textarea>
+          </label>
+          <label class="favorite-check span-2">
+            <input type="checkbox" [(ngModel)]="form.isFavorite" /> Marchează drept favorit
+          </label>
+        </div>
+
+        <div class="form-actions">
+          <button class="secondary-button" type="button" (click)="closeForm()">Renunță</button>
+          <button class="primary-button" type="button" (click)="save()" [disabled]="isSaving || !(user$ | async)">
+            {{ isSaving ? 'Se salvează...' : (editingId ? 'Salvează modificările' : 'Adaugă documentul') }}
+          </button>
+        </div>
+      </article>
+    }
+
+    <article class="card toolbar-card">
+      <label class="search-field">Caută
+        <input type="search" [(ngModel)]="searchTerm" placeholder="Nume, furnizor, observații..." />
+      </label>
+      <div class="filter-chips" aria-label="Filtre documente">
+        <button type="button" [class.active]="activeFilter === 'all'" (click)="activeFilter = 'all'">Toate</button>
+        <button type="button" [class.active]="activeFilter === 'favorite'" (click)="activeFilter = 'favorite'">★ Favorite</button>
+        <button type="button" [class.active]="activeFilter === 'attention'" (click)="activeFilter = 'attention'">Necesită atenție</button>
+        <button type="button" [class.active]="activeFilter === 'contract'" (click)="activeFilter = 'contract'">Contracte</button>
+        <button type="button" [class.active]="activeFilter === 'invoice'" (click)="activeFilter = 'invoice'">Facturi</button>
+        <button type="button" [class.active]="activeFilter === 'offer'" (click)="activeFilter = 'offer'">Oferte</button>
+      </div>
+    </article>
+
+    @if (filteredDocuments(documents); as visibleDocuments) {
+      @if (visibleDocuments.length) {
+        <div class="documents-grid">
+          @for (document of visibleDocuments; track document.id) {
+            <article class="card document-card" [class.needs-attention]="needsAttention(document)">
+              <div class="document-card-top">
+                <div class="document-icon" aria-hidden="true">{{ typeIcon(document.type) }}</div>
+                <button class="favorite-button" type="button" (click)="toggleFavorite(document)" [attr.aria-label]="document.isFavorite ? 'Elimină din favorite' : 'Adaugă la favorite'">
+                  {{ document.isFavorite ? '★' : '☆' }}
+                </button>
+              </div>
+
+              <div class="document-meta-row">
+                <span class="type-badge">{{ typeLabel(document.type) }}</span>
+                <span class="status-badge" [ngClass]="statusClass(document.status)">{{ statusLabel(document.status) }}</span>
+              </div>
+
+              <h3>{{ document.title }}</h3>
+              @if (document.vendorName) { <p class="vendor-name">{{ document.vendorName }}</p> }
+              @if (document.notes) { <p class="document-notes">{{ document.notes }}</p> }
+              @if (document.dueDate) { <p class="due-date">Termen: {{ document.dueDate | date:'dd.MM.yyyy' }}</p> }
+
+              <div class="document-actions">
+                @if (document.downloadUrl) {
+                  <a class="primary-link" [href]="document.downloadUrl" target="_blank" rel="noopener noreferrer">Deschide în Drive</a>
+                  <button type="button" (click)="copyLink(document)">Copiază link</button>
+                } @else {
+                  <button class="missing-link" type="button" (click)="openEditForm(document)">+ Adaugă link</button>
+                }
+                <button type="button" (click)="openEditForm(document)">Editează</button>
+                <button class="danger-action" type="button" (click)="deleteDocument(document)">Șterge</button>
+              </div>
+            </article>
+          }
+        </div>
+      } @else {
+        <article class="card empty-card">
+          <div class="empty-icon">📂</div>
+          <h3>Nu există documente pentru filtrul ales</h3>
+          <p>Schimbă filtrul sau adaugă un document nou.</p>
+        </article>
+      }
+    }
+  }
+
+  <details class="planned-documents card">
+    <summary>Documente centralizate anterior ({{ plannedDocuments.length }})</summary>
+    <p>Acestea sunt reperele vechi din aplicație. Adaugă-le în registrul de mai sus când le pui în Google Drive.</p>
+    <div class="planned-list">
+      @for (document of plannedDocuments; track document.id) {
+        <div class="planned-row">
+          <div><strong>{{ document.title }}</strong><small>{{ document.vendorName || document.fileName || 'Fără furnizor' }}</small></div>
+          <span>{{ document.status }}</span>
+        </div>
+      }
+    </div>
+  </details>
+</section>

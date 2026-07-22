@@ -1,0 +1,131 @@
+@if (viewModel$ | async; as vm) {
+  <section class="day-shell">
+    <header class="day-header">
+      <div>
+        <span>5 SEPTEMBRIE 2026</span>
+        <h1>Ziua nunții</h1>
+        <p>Wild Garden · Diana & Dan</p>
+      </div>
+      <a class="exit-link" routerLink="/dashboard">Ieși</a>
+    </header>
+
+    <section class="quick-stats">
+      <article><strong>{{ vm.confirmedPeople }}</strong><span>persoane confirmate</span></article>
+      <article [class.warning]="vm.guestsWithoutTable > 0"><strong>{{ vm.guestsWithoutTable }}</strong><span>fără masă</span></article>
+      <article><strong>{{ vm.timeline.length }}</strong><span>momente în program</span></article>
+    </section>
+
+    @if (message) { <div class="message success">{{ message }}</div> }
+    @if (errorMessage) { <div class="message error">{{ errorMessage }}</div> }
+
+    <nav class="mobile-tabs">
+      <button type="button" [class.active]="activeTab === 'timeline'" (click)="activeTab = 'timeline'"><span>⏱</span>Program</button>
+      <button type="button" [class.active]="activeTab === 'guests'" (click)="activeTab = 'guests'"><span>👥</span>Invitați</button>
+      <button type="button" [class.active]="activeTab === 'contacts'" (click)="activeTab = 'contacts'"><span>☎</span>Contacte</button>
+      <button type="button" [class.active]="activeTab === 'tasks'" (click)="activeTab = 'tasks'"><span>✓</span>Urgent</button>
+    </nav>
+
+    <main>
+      @if (activeTab === 'timeline') {
+        <section class="section-card">
+          <div class="section-title">
+            <div><span>PROGRAMUL ZILEI</span><h2>Timeline</h2></div>
+            <button class="primary-action" type="button" (click)="startAddTimelineItem()">+ Adaugă</button>
+          </div>
+
+          @if (showTimelineForm) {
+            <form class="timeline-form" (ngSubmit)="saveTimelineItem()">
+              <div class="form-grid">
+                <label>Ora<input type="time" name="time" [(ngModel)]="timelineForm.time" required></label>
+                <label>Titlu<input type="text" name="title" [(ngModel)]="timelineForm.title" placeholder="Ex. Ceremonie" required></label>
+                <label>Responsabil<input type="text" name="owner" [(ngModel)]="timelineForm.owner" placeholder="Nume"></label>
+                <label>Telefon<input type="tel" name="phone" [(ngModel)]="timelineForm.phone" placeholder="07..."></label>
+                <label class="wide">Locație<input type="text" name="location" [(ngModel)]="timelineForm.location" placeholder="Wild Garden"></label>
+                <label class="wide">Observații<textarea name="notes" [(ngModel)]="timelineForm.notes" rows="3"></textarea></label>
+              </div>
+              <div class="form-actions">
+                <button type="button" class="secondary-action" (click)="cancelTimelineForm()">Renunță</button>
+                <button type="submit" class="primary-action" [disabled]="isUpdating">Salvează</button>
+              </div>
+            </form>
+          }
+
+          <div class="timeline-list">
+            @for (item of vm.timeline; track item.id) {
+              <article class="timeline-item" [class.done]="item.status === 'done'">
+                <button type="button" class="check-button" [disabled]="isUpdating" (click)="toggleTimelineItem(item)">{{ item.status === 'done' ? '✓' : '' }}</button>
+                <div class="time">{{ item.time }}</div>
+                <div class="timeline-details">
+                  <div class="title-row"><h3>{{ item.title }}</h3>@if (item.source === 'vendor') { <span class="source-badge">Furnizor</span> }</div>
+                  @if (item.owner) { <p>{{ item.owner }}</p> }
+                  @if (item.location) { <small>📍 {{ item.location }}</small> }
+                  @if (item.notes) { <small>{{ item.notes }}</small> }
+                </div>
+                <div class="item-actions">
+                  @if (item.phone) { <button type="button" class="icon-button" (click)="call(item.phone)" aria-label="Sună">☎</button> }
+                  <button type="button" class="icon-button muted" (click)="startEditTimelineItem(item)" aria-label="Editează">✎</button>
+                  @if (item.source !== 'vendor') { <button type="button" class="icon-button danger" (click)="deleteTimelineItem(item)" aria-label="Șterge">×</button> }
+                </div>
+              </article>
+            } @empty {
+              <div class="empty-state">
+                <strong>Programul nu este configurat încă.</strong>
+                <span>Poți adăuga manual momente sau importa un program orientativ.</span>
+                <button class="primary-action" type="button" [disabled]="isUpdating" (click)="importDefaultTimeline()">Importă program orientativ</button>
+              </div>
+            }
+          </div>
+        </section>
+      }
+
+      @if (activeTab === 'guests') {
+        <section class="section-card">
+          <div class="section-title"><div><span>CĂUTARE RAPIDĂ</span><h2>Invitați și mese</h2></div></div>
+          <input class="large-search" type="search" [(ngModel)]="guestSearch" placeholder="Scrie numele sau numărul mesei" inputmode="search" autocomplete="off">
+          <div class="guest-list">
+            @for (guest of filteredGuests(vm.guests); track guest.id) {
+              <article class="guest-card">
+                <div><h3>{{ guest.name }}</h3><p>{{ attendanceLabel(guest.attendanceStatus) }} · {{ guest.adults }} adulți @if (guest.children) { · {{ guest.children }} copii }</p>@if (guest.phone) { <button class="text-action" type="button" (click)="call(guest.phone)">Sună</button> }</div>
+                <strong [class.unassigned]="!guest.tableNumber">{{ tableLabel(guest) }}</strong>
+              </article>
+            } @empty {
+              <div class="empty-state"><span>@if (guestSearch) { Nu am găsit invitați. } @else { Introdu un nume sau un număr de masă. }</span></div>
+            }
+          </div>
+        </section>
+      }
+
+      @if (activeTab === 'contacts') {
+        <section class="section-card">
+          <div class="section-title"><div><span>APEL RAPID</span><h2>Furnizori și persoane-cheie</h2></div><strong>{{ vm.contacts.length }}</strong></div>
+          <input class="large-search" type="search" [(ngModel)]="contactSearch" placeholder="Caută furnizor sau categorie" inputmode="search">
+          <div class="contact-list">
+            @for (contact of filteredContacts(vm.contacts); track contact.id) {
+              <article class="contact-card">
+                <div class="contact-info"><span>{{ contact.category }}</span><h3>{{ contact.name }}</h3>@if (contact.person) { <p>{{ contact.person }}</p> }@if (contact.eventTime || contact.location) { <small>{{ contact.eventTime }} @if (contact.eventTime && contact.location) { · } {{ contact.location }}</small> }</div>
+                <div class="contact-actions"><button type="button" [disabled]="!contact.phone" (click)="call(contact.phone)">☎</button><button type="button" [disabled]="!contact.phone" (click)="openWhatsApp(contact.phone)">WA</button></div>
+              </article>
+            } @empty { <div class="empty-state"><span>Nu există contacte pentru filtrul ales.</span></div> }
+          </div>
+        </section>
+      }
+
+      @if (activeTab === 'tasks') {
+        <section class="section-card">
+          <div class="section-title"><div><span>DE REZOLVAT ACUM</span><h2>Task-uri urgente</h2></div><strong>{{ vm.urgentTasks.length }}</strong></div>
+          <div class="task-list">
+            @for (task of vm.urgentTasks; track task.id) {
+              <article class="task-card">
+                <button type="button" class="check-button" [disabled]="isUpdating" (click)="toggleTask(task)"></button>
+                <div><span>{{ task.category }}</span><h3>{{ task.title }}</h3>@if (task.dueDate) { <small>Termen: {{ task.dueDate }}</small> }@if (task.notes) { <p>{{ task.notes }}</p> }</div>
+                <strong [attr.data-priority]="task.priority">{{ priorityLabel(task.priority) }}</strong>
+              </article>
+            } @empty { <div class="success-state">✓ Nu mai există task-uri urgente.</div> }
+          </div>
+        </section>
+      }
+    </main>
+  </section>
+} @else {
+  <div class="loading">Se încarcă modul zilei...</div>
+}
