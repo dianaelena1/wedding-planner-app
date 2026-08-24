@@ -30,8 +30,9 @@ export class VendorsComponent {
   private readonly firebaseVendorsService = inject(FirebaseVendorsService);
 
   readonly vendors$ = this.firebaseVendorsService.getVendors();
+
   readonly firebaseDocuments$: Observable<FirebaseWeddingDocument[]> =
-    this.firebaseDocumentsService.getDocuments();
+      this.firebaseDocumentsService.getDocuments();
 
   readonly statusOptions: { value: WeddingVendorStatus; label: string }[] = [
     { value: 'contracted', label: 'Contractat' },
@@ -42,8 +43,10 @@ export class VendorsComponent {
   ];
 
   formVendor: WeddingVendor | null = null;
+
   isNewVendor = false;
   isSaving = false;
+
   message = '';
   errorMessage = '';
 
@@ -66,8 +69,13 @@ export class VendorsComponent {
   }
 
   async saveVendor(): Promise<void> {
-    if (!this.formVendor || !this.formVendor.name.trim() || !this.formVendor.category.trim()) {
-      this.errorMessage = 'Completează cel puțin numele și categoria furnizorului.';
+    if (
+        !this.formVendor ||
+        !this.formVendor.name.trim() ||
+        !this.formVendor.category.trim()
+    ) {
+      this.errorMessage =
+          'Completează cel puțin numele și categoria furnizorului.';
       return;
     }
 
@@ -76,6 +84,7 @@ export class VendorsComponent {
 
     try {
       this.recalculatePayment(this.formVendor);
+
       const { id, ...vendorData } = this.formVendor;
 
       if (this.isNewVendor) {
@@ -88,7 +97,8 @@ export class VendorsComponent {
       this.isNewVendor = false;
       this.message = 'Furnizorul a fost salvat.';
     } catch (error) {
-      this.errorMessage = this.firebaseErrorService.getMessage(error);
+      this.errorMessage =
+          this.firebaseErrorService.getMessage(error);
     } finally {
       this.isSaving = false;
     }
@@ -105,7 +115,8 @@ export class VendorsComponent {
       await this.firebaseVendorsService.deleteVendor(vendor.id);
       this.message = 'Furnizorul a fost șters.';
     } catch (error) {
-      this.errorMessage = this.firebaseErrorService.getMessage(error);
+      this.errorMessage =
+          this.firebaseErrorService.getMessage(error);
     }
   }
 
@@ -114,10 +125,15 @@ export class VendorsComponent {
     this.clearMessages();
 
     try {
-      await this.firebaseVendorsService.importInitialVendors(WEDDING_VENDORS);
-      this.message = 'Furnizorii existenți au fost importați în Firestore.';
+      await this.firebaseVendorsService.importInitialVendors(
+          WEDDING_VENDORS
+      );
+
+      this.message =
+          'Furnizorii existenți au fost importați în Firestore.';
     } catch (error) {
-      this.errorMessage = this.firebaseErrorService.getMessage(error);
+      this.errorMessage =
+          this.firebaseErrorService.getMessage(error);
     } finally {
       this.isSaving = false;
     }
@@ -126,12 +142,24 @@ export class VendorsComponent {
   recalculatePayment(vendor: WeddingVendor): void {
     const total = Number(vendor.totalPrice) || 0;
     const paid = Number(vendor.advancePaid) || 0;
-    vendor.remainingPayment = Math.max(total - paid, 0);
-    vendor.isPaid = total > 0 && vendor.remainingPayment === 0;
+
+    vendor.remainingPayment =
+        Math.max(total - paid, 0);
+
+    vendor.isPaid =
+        total > 0 &&
+        vendor.remainingPayment === 0;
   }
 
-  formatMoney(value: number | undefined, currency: Currency | undefined): string {
-    if (value === undefined || value === null || !currency) {
+  formatMoney(
+      value: number | undefined,
+      currency: Currency | undefined
+  ): string {
+    if (
+        value === undefined ||
+        value === null ||
+        !currency
+    ) {
       return '-';
     }
 
@@ -139,25 +167,63 @@ export class VendorsComponent {
   }
 
   getStatusLabel(status: WeddingVendorStatus): string {
-    return this.statusOptions.find(option => option.value === status)?.label ?? status;
+    return (
+        this.statusOptions.find(
+            option => option.value === status
+        )?.label ?? status
+    );
   }
 
-  getVendorDocument(
-    vendor: WeddingVendor,
-    documents: FirebaseWeddingDocument[]
-  ): FirebaseWeddingDocument | undefined {
-    const vendorName = this.normalizeText(vendor.name);
+  getVendorDocuments(
+      vendor: WeddingVendor,
+      documents: FirebaseWeddingDocument[]
+  ): FirebaseWeddingDocument[] {
+    const vendorName =
+        this.normalizeText(vendor.name);
 
-    return documents.find(document => {
-      const documentVendorName = this.normalizeText(document.vendorName || '');
-      const documentTitle = this.normalizeText(document.title || '');
+    return documents
+        .filter(document => {
+          if (!document.downloadUrl) {
+            return false;
+          }
 
-      return Boolean(documentVendorName) && (
-        documentVendorName === vendorName ||
-        documentTitle.includes(vendorName) ||
-        vendorName.includes(documentVendorName)
-      );
-    });
+          const documentVendorName =
+              this.normalizeText(
+                  document.vendorName || ''
+              );
+
+          const documentTitle =
+              this.normalizeText(
+                  document.title || ''
+              );
+
+          if (
+              documentVendorName &&
+              (
+                  documentVendorName === vendorName ||
+                  documentVendorName.includes(vendorName) ||
+                  vendorName.includes(documentVendorName)
+              )
+          ) {
+            return true;
+          }
+
+          return (
+              documentTitle.includes(vendorName) ||
+              vendorName.includes(
+                  documentTitle
+                      .replace('contract', '')
+                      .replace('factura', '')
+                      .replace('avans', '')
+              )
+          );
+        })
+        .sort((a, b) =>
+            (a.title || '').localeCompare(
+                b.title || '',
+                'ro'
+            )
+        );
   }
 
   private createEmptyVendor(): WeddingVendor {
@@ -177,12 +243,11 @@ export class VendorsComponent {
     this.errorMessage = '';
   }
 
-
   private normalizeText(value: string): string {
     return value
-      .toLowerCase()
-      .normalize('NFD')
-      .replace(/[\u0300-\u036f]/g, '')
-      .replace(/[^a-z0-9]/g, '');
+        .toLowerCase()
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .replace(/[^a-z0-9]/g, '');
   }
 }

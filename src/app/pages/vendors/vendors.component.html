@@ -141,11 +141,28 @@
             }
             @if (vendor.notes) { <p class="muted">{{ vendor.notes }}</p> }
 
-            @if (firebaseDocuments$ | async; as documents) {
-              @if (getVendorDocument(vendor, documents); as document) {
-                <a class="contract-link" [href]="document.downloadUrl" target="_blank" rel="noopener">Deschide document</a>
+              @if (firebaseDocuments$ | async; as documents) {
+                  @if (getVendorDocuments(vendor, documents); as vendorDocuments) {
+                      @if (vendorDocuments.length) {
+                          <div class="vendor-documents">
+                              <div class="vendor-documents-title">
+                                  Documente asociate
+                              </div>
+
+                              @for (document of vendorDocuments; track document.id) {
+                                  <a
+                                          class="contract-link"
+                                          [href]="document.downloadUrl"
+                                          target="_blank"
+                                          rel="noopener"
+                                  >
+                                      {{ document.title }}
+                                  </a>
+                              }
+                          </div>
+                      }
+                  }
               }
-            }
 
             <div class="card-actions">
               <button class="secondary-button" type="button" (click)="startEdit(vendor)">Editează</button>
