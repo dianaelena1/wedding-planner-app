@@ -88,11 +88,6 @@ export class AppComponent {
       route: '/documents'
     },
     {
-      label: 'Cazări',
-      icon: '⌂',
-      route: '/cazari'
-    },
-    {
       label: 'Pregătiri',
       icon: '◇',
       route: '/pregatiri'

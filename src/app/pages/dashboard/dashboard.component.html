@@ -79,22 +79,6 @@
     </a>
 
     <a
-      class="priority-card accommodation"
-      [class.warning]="guestsNeedingAccommodation > 0"
-      routerLink="/cazari"
-    >
-      <span class="priority-icon">⌂</span>
-      <div>
-        <small>CAZARE NECESARĂ</small>
-        <strong>{{ guestsNeedingAccommodation }}</strong>
-        <p>
-          {{ guestsWithBookedAccommodation }} persoane marcate
-          cu cazare rezervată
-        </p>
-      </div>
-    </a>
-
-    <a
       class="priority-card urgent"
       [class.warning]="urgentTasks.length || overdueTasks.length"
       routerLink="/tasks"
@@ -316,18 +300,6 @@
         </div>
       }
     </article>
-  </section>
-
-  <section class="modules-grid">
-    @for (module of modules; track module.route) {
-      <a class="module-card" [routerLink]="module.route">
-        <div class="module-icon">{{ module.icon }}</div>
-        <span class="module-label">{{ module.label }}</span>
-        <h3>{{ module.title }}</h3>
-        <p>{{ module.description }}</p>
-        <b>Deschide →</b>
-      </a>
-    }
   </section>
 
   <section class="dashboard-bottom-grid">

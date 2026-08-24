@@ -25,9 +25,6 @@
       <article class="metric-card">
         <span>Semnate / plătite</span><strong>{{ countSigned(documents) }}</strong><small>finalizate</small>
       </article>
-      <article class="metric-card attention">
-        <span>Necesită atenție</span><strong>{{ countAttention(documents) }}</strong><small>lipsă, de cerut sau semnat</small>
-      </article>
     </div>
 
     @if (isFormOpen) {
@@ -88,11 +85,8 @@
       </label>
       <div class="filter-chips" aria-label="Filtre documente">
         <button type="button" [class.active]="activeFilter === 'all'" (click)="activeFilter = 'all'">Toate</button>
-        <button type="button" [class.active]="activeFilter === 'favorite'" (click)="activeFilter = 'favorite'">★ Favorite</button>
-        <button type="button" [class.active]="activeFilter === 'attention'" (click)="activeFilter = 'attention'">Necesită atenție</button>
         <button type="button" [class.active]="activeFilter === 'contract'" (click)="activeFilter = 'contract'">Contracte</button>
         <button type="button" [class.active]="activeFilter === 'invoice'" (click)="activeFilter = 'invoice'">Facturi</button>
-        <button type="button" [class.active]="activeFilter === 'offer'" (click)="activeFilter = 'offer'">Oferte</button>
       </div>
     </article>
 
