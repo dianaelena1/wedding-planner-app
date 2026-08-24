@@ -141,16 +141,5 @@
     }
   }
 
-  <details class="planned-documents card">
-    <summary>Documente centralizate anterior ({{ plannedDocuments.length }})</summary>
-    <p>Acestea sunt reperele vechi din aplicație. Adaugă-le în registrul de mai sus când le pui în Google Drive.</p>
-    <div class="planned-list">
-      @for (document of plannedDocuments; track document.id) {
-        <div class="planned-row">
-          <div><strong>{{ document.title }}</strong><small>{{ document.vendorName || document.fileName || 'Fără furnizor' }}</small></div>
-          <span>{{ document.status }}</span>
-        </div>
-      }
-    </div>
-  </details>
+
 </section>
