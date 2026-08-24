@@ -82,65 +82,116 @@
       </div>
     </aside>
 
-    <main class="room-plan">
-      <div class="room-top">
-        <div class="venue-block small">STAFF<br><strong>5 pers.</strong></div>
-        <div class="venue-block dj">DJ</div>
-        <div class="venue-block small">PHOTOBOOTH</div>
-      </div>
+      <main class="room-plan">
 
-      <div class="room-grid">
-        @for (table of tables; track table.number) {
-          <article
-            class="table-card"
-            [class.over-capacity]="getRemainingSeats(guests, table) < 0"
-            (dragover)="allowDrop($event)"
-            (drop)="dropOnTable($event, table, guests)"
-          >
-            <header>
-              <div>
-                <span class="table-number">{{ table.number }}</span>
-                <h3>{{ table.label }}</h3>
-              </div>
-              <div class="capacity" [class.full]="getRemainingSeats(guests, table) === 0">
-                <strong>{{ getOccupiedSeats(guests, table.number) }}/{{ table.capacity }}</strong>
-                <span>{{ getRemainingSeats(guests, table) }} locuri libere</span>
-              </div>
-            </header>
+          <!-- ZONA DE SUS -->
+          <div class="venue-block staff-zone">
+              STAFF
+              <strong>5 pers.</strong>
+          </div>
 
-            <div class="table-guests">
-              @for (guest of getGuestsAtTable(guests, table.number); track guest.id) {
-                <article
-                  class="guest-card compact"
-                  draggable="true"
-                  (dragstart)="dragStart(guest)"
-                  (dragend)="dragEnd()"
-                  [class.saving]="savingGuestId === guest.id"
-                >
-                  <div>
-                    <strong>{{ guest.name }}</strong>
-                    <span>{{ getPeopleCount(guest) }} pers. · {{ guest.side }}</span>
+          <div class="venue-block dj-zone">
+              DJ
+          </div>
+
+          <div class="venue-block photobooth-zone">
+              PHOTOBOOTH
+          </div>
+
+          <div class="venue-block fridge-zone">
+              FRIGIDER
+          </div>
+
+          <div class="venue-block candy-zone">
+              CANDY BAR
+          </div>
+
+
+          <!-- MESE -->
+          @for (table of tables; track table.number) {
+              <article
+                      class="table-card"
+                      [ngClass]="'table-' + table.number"
+                      [class.over-capacity]="getRemainingSeats(guests, table) < 0"
+                      (dragover)="allowDrop($event)"
+                      (drop)="dropOnTable($event, table, guests)"
+              >
+                  <header>
+                      <div>
+                          <span class="table-number">{{ table.number }}</span>
+                          <h3>{{ table.label }}</h3>
+                      </div>
+
+                      <div
+                              class="capacity"
+                              [class.full]="getRemainingSeats(guests, table) === 0"
+                      >
+                          <strong>
+                              {{ getOccupiedSeats(guests, table.number) }}/{{ table.capacity }}
+                          </strong>
+
+                          <span>
+            {{ getRemainingSeats(guests, table) }} locuri libere
+          </span>
+                      </div>
+                  </header>
+
+                  <div class="table-guests">
+                      @for (guest of getGuestsAtTable(guests, table.number); track guest.id) {
+                          <article
+                                  class="guest-card compact"
+                                  draggable="true"
+                                  (dragstart)="dragStart(guest)"
+                                  (dragend)="dragEnd()"
+                                  [class.saving]="savingGuestId === guest.id"
+                          >
+                              <div>
+                                  <strong>{{ guest.name }}</strong>
+                                  <span>
+                {{ getPeopleCount(guest) }} pers. · {{ guest.side }}
+              </span>
+                              </div>
+
+                              <button
+                                      type="button"
+                                      title="Scoate de la masă"
+                                      (click)="moveGuest(guest, undefined)"
+                              >
+                                  ×
+                              </button>
+                          </article>
+                      } @empty {
+                          <div class="drop-hint">
+                              Trage invitații aici
+                          </div>
+                      }
                   </div>
-                  <button
-                    type="button"
-                    title="Scoate de la masă"
-                    (click)="moveGuest(guest, undefined)"
-                  >×</button>
-                </article>
-              } @empty {
-                <div class="drop-hint">Trage invitații aici</div>
-              }
-            </div>
-          </article>
-        }
-      </div>
+              </article>
+          }
 
-      <div class="room-bottom">
-        <div class="venue-block">JAMON BAR</div>
-        <div class="venue-block buffet">BUFET</div>
-        <div class="venue-block entrance">INTRARE</div>
-      </div>
-    </main>
+
+          <!-- PREZIDIU -->
+          <div class="venue-block presidium-zone">
+              <span>PREZIDIU</span>
+              <strong>7 pers.</strong>
+          </div>
+
+
+          <!-- ZONA DE JOS -->
+          <div class="venue-block buffet-zone">
+              BUFET
+          </div>
+
+          <div class="venue-block jamon-zone">
+              JAMON BAR
+          </div>
+
+          <div class="venue-block entrance-zone">
+              INTRARE
+          </div>
+
+      </main>
+
   </div>
 } @else {
   <div class="loading">Se încarcă așezarea...</div>

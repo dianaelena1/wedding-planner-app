@@ -60,7 +60,6 @@ interface WeddingDayViewModel {
   guests: WeddingGuest[];
   contacts: DayContact[];
   timeline: WeddingDayTimelineItem[];
-  urgentTasks: WeddingTask[];
   confirmedPeople: number;
   guestsWithoutTable: number;
 }
@@ -250,7 +249,7 @@ export class WeddingDayComponent {
   }
 
   async importDefaultTimeline(): Promise<void> {
-    if (!confirm('Adaugi programul orientativ pentru ziua nunții? Îl poți modifica apoi.')) {
+    if (!confirm('Adaugi programul zilei nunții? Îl poți modifica apoi.')) {
       return;
     }
 
@@ -258,30 +257,93 @@ export class WeddingDayComponent {
     this.clearMessages();
 
     const items: Array<Omit<WeddingDayTimelineItem, 'id'>> = [
-      { time: '08:00', title: 'Pregătiri mireasă', owner: 'Diana', status: 'todo', sortOrder: 1, source: 'manual' },
-      { time: '11:30', title: 'Foto și video la pregătiri', status: 'todo', sortOrder: 2, source: 'manual' },
-      { time: '14:30', title: 'Plecare spre locație', status: 'todo', sortOrder: 3, source: 'manual' },
-      { time: '16:00', title: 'Primirea invitaților', location: 'Wild Garden', status: 'todo', sortOrder: 4, source: 'manual' },
-      { time: '17:00', title: 'Ceremonie', location: 'Wild Garden', status: 'todo', sortOrder: 5, source: 'manual' },
-      { time: '19:00', title: 'Deschiderea bufetului', status: 'todo', sortOrder: 6, source: 'manual' },
-      { time: '20:30', title: 'Dansul mirilor', status: 'todo', sortOrder: 7, source: 'manual' },
-      { time: '23:30', title: 'Tortul', status: 'todo', sortOrder: 8, source: 'manual' }
+      {
+        time: '12:00',
+        title: 'Biserica',
+        location: 'Apahida',
+        status: 'todo',
+        sortOrder: 1,
+        source: 'manual'
+      },
+      {
+        time: '13:30',
+        title: 'Poze',
+        status: 'todo',
+        sortOrder: 2,
+        source: 'manual'
+      },
+      {
+        time: '15:30',
+        title: 'Sosirea mirilor',
+        location: 'Wild Garden',
+        status: 'todo',
+        sortOrder: 3,
+        source: 'manual'
+      },
+      {
+        time: '16:00',
+        title: 'Sosirea invitaților',
+        location: 'Wild Garden',
+        notes: 'Aperitiv',
+        status: 'todo',
+        sortOrder: 4,
+        source: 'manual'
+      },
+      {
+        time: '17:00',
+        title: 'Miniburgeri',
+        location: 'Wild Garden',
+        status: 'todo',
+        sortOrder: 5,
+        source: 'manual'
+      },
+      {
+        time: '18:00',
+        title: 'Felul principal',
+        location: 'Wild Garden',
+        notes: 'Servire aproximativ 2 ore',
+        status: 'todo',
+        sortOrder: 6,
+        source: 'manual'
+      },
+      {
+        time: '21:00',
+        title: 'Live Cooking',
+        location: 'Wild Garden',
+        status: 'todo',
+        sortOrder: 7,
+        source: 'manual'
+      },
+      {
+        time: '22:30',
+        title: 'Tortul',
+        location: 'Wild Garden',
+        status: 'todo',
+        sortOrder: 8,
+        source: 'manual'
+      }
     ];
 
     try {
       const batch = writeBatch(this.firestore);
-      const timelineCollection = collection(this.firestore, 'weddingDayTimeline');
+      const timelineCollection =
+          collection(this.firestore, 'weddingDayTimeline');
 
       items.forEach((item, index) => {
-        batch.set(doc(timelineCollection, `default-${index + 1}`), {
-          ...item,
-          createdAt: serverTimestamp(),
-          updatedAt: serverTimestamp()
-        }, { merge: true });
+        batch.set(
+            doc(timelineCollection, `default-${index + 1}`),
+            {
+              ...item,
+              createdAt: serverTimestamp(),
+              updatedAt: serverTimestamp()
+            },
+            { merge: true }
+        );
       });
 
       await batch.commit();
-      this.message = 'Programul orientativ a fost importat.';
+
+      this.message = 'Programul zilei a fost importat.';
     } catch (error) {
       this.errorMessage = this.getErrorMessage(error);
     } finally {
@@ -409,34 +471,18 @@ export class WeddingDayComponent {
       }))
       .sort((a, b) => a.category.localeCompare(b.category, 'ro'));
   }
-
   private buildTimeline(
-    vendors: WeddingVendor[],
-    customTimeline: WeddingDayTimelineItem[]
+      vendors: WeddingVendor[],
+      customTimeline: WeddingDayTimelineItem[]
   ): WeddingDayTimelineItem[] {
-    const customIds = new Set(customTimeline.map(item => item.id));
-
-    const vendorItems: WeddingDayTimelineItem[] = vendors
-      .filter(vendor => Boolean(vendor.eventTime) && !customIds.has(`vendor-${vendor.id}`))
-      .map(vendor => ({
-        id: `vendor-${vendor.id}`,
-        time: vendor.eventTime ?? '',
-        title: vendor.name,
-        owner: vendor.contactPerson,
-        location: vendor.location,
-        phone: vendor.phone,
-        notes: vendor.notes,
-        status: 'todo',
-        source: 'vendor'
-      }));
-
-    return [...customTimeline, ...vendorItems]
-      .filter(item => item.time && item.title)
-      .sort((a, b) =>
-        a.time.localeCompare(b.time) ||
-        (a.sortOrder ?? 999) - (b.sortOrder ?? 999)
-      );
+    return [...customTimeline]
+        .filter(item => item.time && item.title)
+        .sort((a, b) =>
+            a.time.localeCompare(b.time) ||
+            (a.sortOrder ?? 999) - (b.sortOrder ?? 999)
+        );
   }
+
 
   private priorityRank(priority: WeddingTask['priority']): number {
     const ranks: Record<WeddingTask['priority'], number> = {

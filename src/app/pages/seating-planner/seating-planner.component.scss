@@ -10,7 +10,10 @@
   margin-bottom: 22px;
 }
 
-h1, h2, h3, p {
+h1,
+h2,
+h3,
+p {
   margin-top: 0;
 }
 
@@ -19,43 +22,49 @@ h1 {
   font-size: clamp(30px, 4vw, 48px);
 }
 
-h2, h3 {
+h2,
+h3 {
   margin-bottom: 0;
 }
 
 .eyebrow {
   display: block;
+  margin-bottom: 6px;
   color: #a77d54;
   font-size: 11px;
   font-weight: 800;
-  letter-spacing: .14em;
-  margin-bottom: 6px;
+  letter-spacing: 0.14em;
 }
 
 .page-header p {
-  color: #786b5e;
   max-width: 720px;
   margin-bottom: 0;
+  color: #786b5e;
 }
 
-button, input {
+button,
+input {
   font: inherit;
 }
 
+/* ------------------------------
+   ACTIONS
+------------------------------ */
+
 .danger-button {
+  padding: 11px 16px;
   border: 1px solid #c88479;
+  border-radius: 999px;
   background: #fff7f4;
   color: #9b4034;
-  border-radius: 999px;
-  padding: 11px 16px;
   font-weight: 700;
   cursor: pointer;
 }
 
 .message {
-  border-radius: 12px;
-  padding: 12px 15px;
   margin-bottom: 16px;
+  padding: 12px 15px;
+  border-radius: 12px;
 }
 
 .message.error {
@@ -68,6 +77,10 @@ button, input {
   color: #2f7145;
 }
 
+/* ------------------------------
+   STATS
+------------------------------ */
+
 .stats-grid {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -76,12 +89,12 @@ button, input {
 }
 
 .stats-grid article {
+  display: grid;
+  gap: 6px;
   padding: 16px;
   border: 1px solid #e8dccb;
   border-radius: 18px;
   background: #fffaf3;
-  display: grid;
-  gap: 6px;
 }
 
 .stats-grid span {
@@ -92,6 +105,10 @@ button, input {
 .stats-grid strong {
   font-size: 28px;
 }
+
+/* ------------------------------
+   MAIN LAYOUT
+------------------------------ */
 
 .planner-layout {
   display: grid;
@@ -105,20 +122,24 @@ button, input {
   border: 1px solid #e4d6c2;
   border-radius: 22px;
   background: #fffaf3;
-  box-shadow: 0 14px 34px rgba(78, 57, 35, .07);
+  box-shadow: 0 14px 34px rgba(78, 57, 35, 0.07);
 }
+
+/* ------------------------------
+   UNASSIGNED PANEL
+------------------------------ */
 
 .unassigned-panel {
   position: sticky;
   top: 24px;
-  padding: 18px;
   min-height: 500px;
+  padding: 18px;
 }
 
 .panel-title {
   display: flex;
-  justify-content: space-between;
   align-items: center;
+  justify-content: space-between;
   gap: 12px;
   margin-bottom: 14px;
 }
@@ -136,12 +157,16 @@ button, input {
 
 .search-input {
   width: 100%;
+  margin-bottom: 14px;
+  padding: 11px 12px;
   border: 1px solid #e1d3bf;
   border-radius: 12px;
-  padding: 11px 12px;
   background: white;
-  margin-bottom: 14px;
 }
+
+/* ------------------------------
+   GUESTS
+------------------------------ */
 
 .guest-list,
 .table-guests {
@@ -151,8 +176,8 @@ button, input {
 
 .guest-list {
   max-height: 68vh;
-  overflow-y: auto;
   padding-right: 3px;
+  overflow-y: auto;
 }
 
 .guest-card {
@@ -165,16 +190,19 @@ button, input {
   border-radius: 13px;
   background: white;
   cursor: grab;
-  transition: transform .15s ease, box-shadow .15s ease, opacity .15s ease;
+  transition:
+          transform 0.15s ease,
+          box-shadow 0.15s ease,
+          opacity 0.15s ease;
 }
 
 .guest-card:hover {
   transform: translateY(-1px);
-  box-shadow: 0 7px 18px rgba(70, 49, 29, .09);
+  box-shadow: 0 7px 18px rgba(70, 49, 29, 0.09);
 }
 
 .guest-card.saving {
-  opacity: .5;
+  opacity: 0.5;
   pointer-events: none;
 }
 
@@ -185,9 +213,9 @@ button, input {
 }
 
 .guest-card strong {
-  white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .guest-card span {
@@ -219,72 +247,304 @@ button, input {
   cursor: pointer;
 }
 
+/* ============================================================
+   PLANUL SĂLII
+   Aproximat după PDF-ul real.
+============================================================ */
+
 .room-plan {
-  padding: 20px;
-  min-height: 760px;
-  background: linear-gradient(180deg, #fffdf8 0%, #f7efe4 100%);
-}
-
-.room-top,
-.room-bottom {
   display: grid;
-  grid-template-columns: 1fr 1.6fr 1fr;
-  gap: 16px;
-  align-items: center;
+
+  grid-template-columns:
+    1.15fr
+    0.9fr
+    0.9fr
+    1fr
+    1fr
+    0.9fr
+    0.9fr
+    0.7fr;
+
+  grid-template-rows:
+    105px
+    245px
+    65px
+    245px
+    105px;
+
+  gap: 18px;
+
+  min-height: 980px;
+  padding: 24px;
+
+  background:
+          linear-gradient(
+                  180deg,
+                  #fffdf8 0%,
+                  #f7efe4 100%
+          );
 }
 
-.room-top {
-  margin-bottom: 22px;
-}
-
-.room-bottom {
-  margin-top: 22px;
-}
+/* ------------------------------
+   FIXED VENUE ELEMENTS
+------------------------------ */
 
 .venue-block {
   min-height: 58px;
   display: grid;
   place-items: center;
-  text-align: center;
+  padding: 10px;
+
   border: 1px solid #8ea3b5;
   border-radius: 12px;
+
   background: #dce8f2;
   color: #334856;
+
+  text-align: center;
   font-weight: 800;
 }
 
-.venue-block.dj {
-  min-height: 92px;
+/* STAFF */
+
+.staff-zone {
+  grid-column: 1;
+  grid-row: 1;
+
+  align-self: start;
+
+  min-height: 85px;
+}
+
+/* DJ */
+
+.dj-zone {
+  grid-column: 3 / 6;
+  grid-row: 1;
+
+  min-height: 100px;
+
   font-size: 24px;
 }
 
-.venue-block.buffet {
-  min-height: 90px;
+/* PHOTOBOOTH */
+
+.photobooth-zone {
+  grid-column: 6 / 8;
+  grid-row: 1;
+
+  align-self: start;
 }
 
-.venue-block.entrance {
-  clip-path: polygon(50% 0, 100% 35%, 82% 35%, 82% 100%, 18% 100%, 18% 35%, 0 35%);
+/* FRIGIDER */
+
+.fridge-zone {
+  grid-column: 8;
+  grid-row: 2;
+
+  align-self: start;
+
+  min-height: 70px;
+
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+}
+
+/* CANDY BAR */
+
+.candy-zone {
+  grid-column: 8;
+  grid-row: 2;
+
+  align-self: end;
+
+  min-height: 105px;
+
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+}
+
+/* ============================================================
+   MESE - PARTEA DE SUS
+============================================================ */
+
+/* Masa 8 - 24 persoane */
+
+.table-8 {
+  grid-column: 1;
+  grid-row: 2 / 4;
+
+  min-height: 330px;
+}
+
+/* Masa 7 */
+
+.table-7 {
+  grid-column: 2 / 4;
+  grid-row: 2;
+}
+
+/* Masa 4 */
+
+.table-4 {
+  grid-column: 5 / 7;
+  grid-row: 2;
+}
+
+/* Masa 3 */
+
+.table-3 {
+  grid-column: 7 / 8;
+  grid-row: 2;
+}
+
+/* ============================================================
+   MESE - PARTEA DE JOS
+============================================================ */
+
+/* Masa 6 - 24 persoane */
+
+.table-6 {
+  grid-column: 1;
+  grid-row: 4;
+
+  min-height: 285px;
+}
+
+/*
+  Zona mesei 5.
+
+  În planul fizic masa 5 este alcătuită din două segmente.
+  În aplicație rămâne o singură masă logică de 16 persoane.
+*/
+
+.table-5 {
+  grid-column: 2 / 4;
+  grid-row: 4;
+}
+
+/*
+  Prezidiul este mutat intenționat aici.
+
+  Astfel, vizual avem în aceeași zonă:
+  segmentul 1 al mesei 5
+  segmentul 2 al mesei 5
+  prezidiul
+*/
+
+.presidium-zone {
+  grid-column: 4;
+  grid-row: 4;
+
+  align-self: center;
+
+  min-height: 170px;
+
+  border-color: #b99b72;
+
+  background: #eee1d0;
+  color: #4d4238;
+
+  box-shadow:
+          0 8px 22px rgba(74, 53, 31, 0.08);
+}
+
+.presidium-zone span {
+  font-size: 12px;
+  font-weight: 900;
+  letter-spacing: 0.12em;
+}
+
+.presidium-zone strong {
+  font-size: 19px;
+}
+
+/* BUFET */
+
+.buffet-zone {
+  grid-column: 5 / 6;
+  grid-row: 4;
+
+  align-self: center;
+
+  min-height: 205px;
+
+  border-radius: 22px;
+}
+
+/* Masa 2 */
+
+.table-2 {
+  grid-column: 6 / 7;
+  grid-row: 4;
+}
+
+/* Masa 1 */
+
+.table-1 {
+  grid-column: 7 / 8;
+  grid-row: 4;
+}
+
+/* ============================================================
+   BOTTOM
+============================================================ */
+
+.jamon-zone {
+  grid-column: 1 / 3;
+  grid-row: 5;
+
+  min-height: 75px;
+}
+
+.entrance-zone {
+  grid-column: 7 / 9;
+  grid-row: 5;
+
+  min-height: 85px;
+
+  clip-path:
+          polygon(
+                  50% 0,
+                  100% 35%,
+                  82% 35%,
+                  82% 100%,
+                  18% 100%,
+                  18% 35%,
+                  0 35%
+          );
+
   border-radius: 0;
 }
 
-.room-grid {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 15px;
-}
+/* ============================================================
+   TABLE CARDS
+============================================================ */
 
 .table-card {
-  min-height: 230px;
+  min-width: 0;
+  min-height: 215px;
+
   padding: 14px;
+
   border: 2px dashed #c7b69f;
   border-radius: 18px;
-  background: rgba(255, 255, 255, .88);
-  transition: border-color .15s ease, background .15s ease;
+
+  background: rgba(255, 255, 255, 0.9);
+
+  transition:
+          border-color 0.15s ease,
+          background 0.15s ease,
+          box-shadow 0.15s ease;
 }
 
 .table-card:hover {
   border-color: #a7825d;
+
   background: white;
+
+  box-shadow:
+          0 8px 20px rgba(78, 57, 35, 0.07);
 }
 
 .table-card.over-capacity {
@@ -303,19 +563,25 @@ button, input {
 .table-number {
   width: 31px;
   height: 31px;
+
   display: inline-grid;
   place-items: center;
+
+  margin-bottom: 5px;
+
   border-radius: 50%;
+
   background: #b99b72;
   color: white;
+
   font-weight: 800;
-  margin-bottom: 5px;
 }
 
 .capacity {
   display: grid;
   justify-items: end;
   gap: 2px;
+
   color: #786b5e;
 }
 
@@ -331,25 +597,104 @@ button, input {
   color: #a65446;
 }
 
+/* ------------------------------
+   DROP STATE
+------------------------------ */
+
 .drop-hint,
 .empty-state,
 .loading {
+  padding: 18px;
+
   border: 1px dashed #d9cbb8;
   border-radius: 12px;
-  padding: 18px;
+
   color: #958473;
+
   text-align: center;
 }
 
-@media (max-width: 1250px) {
-  .room-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+/* ============================================================
+   RESPONSIVE
+============================================================ */
+
+@media (max-width: 1400px) {
+
+  .room-plan {
+    gap: 12px;
+    padding: 18px;
+  }
+
+  .table-card {
+    padding: 11px;
+  }
+
+  .capacity strong {
+    font-size: 15px;
+  }
+
+  .capacity span {
+    font-size: 10px;
+  }
+}
+
+/*
+  Sub 1150 px nu mai încercăm să reproducem sala fizic 1:1.
+  Prioritatea devine utilizarea simplă.
+*/
+
+@media (max-width: 1150px) {
+
+  .room-plan {
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
+
+    grid-template-rows: auto;
+
+    min-height: auto;
+  }
+
+  .staff-zone,
+  .dj-zone,
+  .photobooth-zone,
+  .fridge-zone,
+  .candy-zone,
+  .table-1,
+  .table-2,
+  .table-3,
+  .table-4,
+  .table-5,
+  .table-6,
+  .table-7,
+  .table-8,
+  .presidium-zone,
+  .buffet-zone,
+  .jamon-zone,
+  .entrance-zone {
+    grid-column: auto;
+    grid-row: auto;
+
+    min-height: 120px;
+
+    writing-mode: horizontal-tb;
+    transform: none;
+  }
+
+  .table-card {
+    min-height: 210px;
+  }
+
+  .table-6,
+  .table-8 {
+    min-height: 210px;
   }
 }
 
 @media (max-width: 900px) {
+
   .stats-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
   }
 
   .planner-layout {
@@ -362,18 +707,25 @@ button, input {
 }
 
 @media (max-width: 600px) {
+
   .page-header {
     display: grid;
   }
 
-  .stats-grid,
-  .room-grid,
-  .room-top,
-  .room-bottom {
+  .stats-grid {
     grid-template-columns: 1fr;
   }
 
   .room-plan {
+    grid-template-columns: 1fr;
     padding: 13px;
+  }
+
+  .table-card,
+  .table-6,
+  .table-8,
+  .presidium-zone,
+  .buffet-zone {
+    min-height: auto;
   }
 }
