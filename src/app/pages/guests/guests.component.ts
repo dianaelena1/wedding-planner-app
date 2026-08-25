@@ -475,7 +475,7 @@ export class GuestsComponent {
       return;
     }
 
-    this.syncChildrenTotal(
+    this.setChildrenTotalFromCategories(
         this.newGuest
     );
 
@@ -502,8 +502,6 @@ export class GuestsComponent {
   async saveGuest(
       guest: WeddingGuest
   ): Promise<void> {
-    this.syncChildrenTotal(guest);
-
     this.savingGuestId = guest.id;
     this.clearMessages();
 
@@ -571,8 +569,6 @@ export class GuestsComponent {
   queueGuestSave(
       guest: WeddingGuest
   ): void {
-    this.syncChildrenTotal(guest);
-
     this.editSafety.schedule(
         `guest-${guest.id}`,
         guest.name || 'Invitat',
@@ -592,14 +588,43 @@ export class GuestsComponent {
   onChildCountChange(
       guest: WeddingGuest
   ): void {
-    this.syncChildrenTotal(guest);
+    this.setChildrenTotalFromCategories(guest);
     this.queueGuestSave(guest);
   }
 
   onNewChildCountChange(): void {
-    this.syncChildrenTotal(
+    this.setChildrenTotalFromCategories(
         this.newGuest
     );
+  }
+
+  removeUnspecifiedChildren(
+      guest: WeddingGuest
+  ): void {
+    guest.children =
+        this.getCategorizedChildren(guest);
+
+    this.queueGuestSave(guest);
+
+    this.message =
+        guest.children === 0
+            ? 'Copilul fără vârstă a fost șters.'
+            : 'Copiii fără vârstă au fost șterși.';
+  }
+
+  removeAllChildren(
+      guest: WeddingGuest
+  ): void {
+    guest.childrenUnder5 = 0;
+    guest.children5To8 = 0;
+    guest.children8To12 = 0;
+    guest.children13To17 = 0;
+    guest.children = 0;
+
+    this.queueGuestSave(guest);
+
+    this.message =
+        'Copiii au fost șterși din această înregistrare.';
   }
 
   exportCsv(
@@ -1039,18 +1064,13 @@ export class GuestsComponent {
     );
   }
 
-  private syncChildrenTotal(
+  private setChildrenTotalFromCategories(
       guest: Partial<WeddingGuest>
   ): void {
-    const categorized =
+    guest.children =
         this.getCategorizedChildren(
             guest
         );
-
-    if (categorized > 0) {
-      guest.children =
-          categorized;
-    }
   }
 
   private createEmptyGuest():
@@ -1112,5 +1132,3 @@ export class GuestsComponent {
         : message;
   }
 }
-
-

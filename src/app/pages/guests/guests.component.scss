@@ -176,3 +176,49 @@ button { border:0; border-radius:11px; padding:10px 14px; font-weight:800; curso
     box-sizing: border-box;
   }
 }
+
+
+/* ==========================================
+   CHILDREN EDIT ACTIONS
+========================================== */
+
+.children-edit-hint {
+  margin: 0 0 10px;
+  font-size: 11px;
+  color: #806e68;
+  font-weight: 600;
+}
+
+.children-edit-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.child-action-button,
+.child-delete-button {
+  padding: 8px 11px;
+  font-size: 11px;
+}
+
+.child-delete-button {
+  background: #ffe5df;
+  color: #a23a2c;
+  border: 1px solid #f2c8bd;
+}
+
+.child-delete-button:hover {
+  background: #ffd9d0;
+}
+
+@media (max-width:760px) {
+  .children-edit-actions {
+    justify-content: stretch;
+  }
+
+  .children-edit-actions button {
+    flex: 1 1 100%;
+  }
+}

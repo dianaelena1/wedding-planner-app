@@ -1047,6 +1047,10 @@
                                 </legend>
 
 
+                                <p class="children-edit-hint">
+                                    Poți seta orice grupă la 0 pentru a șterge copilul din acea categorie.
+                                </p>
+
                                 <div class="children-grid">
 
                                     <label>
@@ -1097,6 +1101,40 @@
                                     </label>
 
                                 </div>
+
+
+                                @if (guest.children) {
+                                    <div class="children-edit-actions">
+
+                                        @if (getUnspecifiedChildrenForGuest(guest)) {
+                                            <button
+                                                    type="button"
+                                                    class="secondary-button child-action-button"
+                                                    (click)="removeUnspecifiedChildren(guest)"
+                                            >
+                                                Șterge
+                                                {{
+                                                    getUnspecifiedChildrenForGuest(guest) === 1
+                                                        ? 'copilul fără vârstă'
+                                                        : 'copiii fără vârstă'
+                                                }}
+                                            </button>
+                                        }
+
+                                        <button
+                                                type="button"
+                                                class="child-delete-button"
+                                                (click)="removeAllChildren(guest)"
+                                        >
+                                            {{
+                                                guest.children === 1
+                                                    ? 'Șterge copilul'
+                                                    : 'Șterge toți copiii'
+                                            }}
+                                        </button>
+
+                                    </div>
+                                }
 
 
                                 @if (
