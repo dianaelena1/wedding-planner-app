@@ -1,5 +1,9 @@
 import { AsyncPipe } from '@angular/common';
-import { Component, inject } from '@angular/core';
+import {
+  Component,
+  inject
+} from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
 import {
   NavigationEnd,
   Router,
@@ -11,58 +15,84 @@ import { filter } from 'rxjs';
 
 import { AuthService } from './services/auth.service';
 import { FirebaseErrorService } from './services/firebase-error.service';
+import { EditSafetyComponent } from './core/edit-safety/edit-safety.component';
 
 interface NavigationItem {
   label: string;
   icon: string;
   route: string;
+  adminOnly?: boolean;
 }
 
 @Component({
   selector: 'app-root',
+
   standalone: true,
+
   imports: [
     RouterOutlet,
     RouterLink,
     RouterLinkActive,
-    AsyncPipe
+    AsyncPipe,
+    EditSafetyComponent
   ],
+
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss'
 })
 export class AppComponent {
-  private readonly authService = inject(AuthService);
+  private readonly authService =
+      inject(AuthService);
+
   private readonly firebaseErrorService =
-    inject(FirebaseErrorService);
-  private readonly router = inject(Router);
+      inject(FirebaseErrorService);
 
-  readonly user$ = this.authService.user$;
+  private readonly router =
+      inject(Router);
 
-  readonly mainNavigation: NavigationItem[] = [
+  readonly user$ =
+      this.authService.user$;
+
+  readonly role$ =
+      this.authService.role$;
+
+  readonly isAdmin =
+      toSignal(
+          this.authService.isAdmin$,
+          {
+            initialValue: false
+          }
+      );
+
+  readonly navigation: NavigationItem[] = [
     {
       label: 'Dashboard',
       icon: '⌂',
       route: '/dashboard'
     },
     {
-      label: 'Alerte',
-      icon: '!',
-      route: '/alerts'
-    },
-    {
-      label: 'Calendar',
-      icon: '□',
-      route: '/calendar'
+      label: 'Task-uri',
+      icon: '✓',
+      route: '/tasks',
+      adminOnly: true
     },
     {
       label: 'Furnizori',
       icon: '✦',
-      route: '/vendors'
+      route: '/vendors',
+      adminOnly: true
+    },
+    {
+      label: 'Documente',
+      icon: '▤',
+      route: '/documents',
+      adminOnly: true
     },
     {
       label: 'Plăți',
       icon: '€',
-      route: '/payments'
+      route: '/payments',
+      adminOnly: true
     },
     {
       label: 'Invitați',
@@ -72,48 +102,8 @@ export class AppComponent {
     {
       label: 'Așezare mese',
       icon: '◫',
-      route: '/seating'
-    },
-    {
-      label: 'Task-uri',
-      icon: '✓',
-      route: '/tasks'
-    }
-  ];
-
-  readonly secondaryNavigation: NavigationItem[] = [
-    {
-      label: 'Documente',
-      icon: '▤',
-      route: '/documents'
-    },
-    {
-      label: 'Pregătiri',
-      icon: '◇',
-      route: '/pregatiri'
-    },
-    {
-      label: 'Verighete',
-      icon: '○',
-      route: '/verighete'
-    },
-    {
-      label: 'Export & Backup',
-      icon: '⇩',
-      route: '/export-backup'
-    }
-  ];
-
-  readonly mobileNavigation: NavigationItem[] = [
-    {
-      label: 'Acasă',
-      icon: '⌂',
-      route: '/dashboard'
-    },
-    {
-      label: 'Invitați',
-      icon: '♙',
-      route: '/guests'
+      route: '/seating',
+      adminOnly: true
     },
     {
       label: 'Ziua nunții',
@@ -121,14 +111,10 @@ export class AppComponent {
       route: '/ziua-nuntii'
     },
     {
-      label: 'Mese',
-      icon: '◫',
-      route: '/seating'
-    },
-    {
-      label: 'Task-uri',
-      icon: '✓',
-      route: '/tasks'
+      label: 'Export & Backup',
+      icon: '⇩',
+      route: '/export-backup',
+      adminOnly: true
     }
   ];
 
@@ -136,41 +122,61 @@ export class AppComponent {
 
   constructor() {
     this.router.events
-      .pipe(
-        filter(
-          (event): event is NavigationEnd =>
-            event instanceof NavigationEnd
+        .pipe(
+            filter(
+                (
+                    event
+                ): event is NavigationEnd =>
+                    event instanceof NavigationEnd
+            )
         )
-      )
-      .subscribe(() => {
-        this.closeMenu();
-        window.scrollTo({ top: 0, behavior: 'auto' });
-      });
+        .subscribe(() => {
+          this.closeMenu();
+
+          window.scrollTo({
+            top: 0,
+            behavior: 'auto'
+          });
+        });
   }
 
   toggleMenu(): void {
-    this.menuOpen = !this.menuOpen;
+    this.menuOpen =
+        !this.menuOpen;
+
     document.body.classList.toggle(
-      'mobile-menu-open',
-      this.menuOpen
+        'mobile-menu-open',
+        this.menuOpen
     );
   }
 
   closeMenu(): void {
     this.menuOpen = false;
-    document.body.classList.remove('mobile-menu-open');
+
+    document.body.classList.remove(
+        'mobile-menu-open'
+    );
   }
 
   login(): void {
-    this.authService.loginWithGoogle().catch(error => {
-      console.error(error);
-      alert(this.firebaseErrorService.getMessage(error));
-    });
+    this.authService
+        .loginWithGoogle()
+        .catch(error => {
+          console.error(error);
+
+          alert(
+              this.firebaseErrorService
+                  .getMessage(error)
+          );
+        });
   }
 
   logout(): void {
     this.authService
-      .logout()
-      .catch(error => console.error(error));
+        .logout()
+        .catch(
+            error =>
+                console.error(error)
+        );
   }
 }
