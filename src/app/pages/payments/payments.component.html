@@ -57,12 +57,12 @@
     </article>
   }
 
-  <div class="grid grid-4 payment-summary">
-    <article class="card stat-card"><span>Total lei</span><strong>{{ formatMoney(totalRon, 'RON') }}</strong></article>
-    <article class="card stat-card"><span>Total euro</span><strong>{{ formatMoney(totalEur, 'EUR') }}</strong></article>
-    <article class="card stat-card"><span>Rest lei</span><strong>{{ formatMoney(remainingRon, 'RON') }}</strong></article>
-    <article class="card stat-card"><span>Rest euro</span><strong>{{ formatMoney(remainingEur, 'EUR') }}</strong></article>
-  </div>
+<!--  <div class="grid grid-4 payment-summary">-->
+<!--    <article class="card stat-card"><span>Total lei</span><strong>{{ formatMoney(totalRon, 'RON') }}</strong></article>-->
+<!--    <article class="card stat-card"><span>Total euro</span><strong>{{ formatMoney(totalEur, 'EUR') }}</strong></article>-->
+<!--    <article class="card stat-card"><span>Rest lei</span><strong>{{ formatMoney(remainingRon, 'RON') }}</strong></article>-->
+<!--    <article class="card stat-card"><span>Rest euro</span><strong>{{ formatMoney(remainingEur, 'EUR') }}</strong></article>-->
+<!--  </div>-->
 
   @if (!expenses.length) {
     <article class="card empty-state"><h3>Nu există încă plăți în Firestore</h3><p>Apasă „Importă datele existente” sau adaugă manual o cheltuială.</p></article>

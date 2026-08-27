@@ -15,17 +15,17 @@
   }
 
   @if (firebaseDocuments$ | async; as documents) {
-    <div class="metrics-grid">
-      <article class="metric-card">
-        <span>Total</span><strong>{{ documents.length }}</strong><small>în registru</small>
-      </article>
-      <article class="metric-card">
-        <span>Disponibile</span><strong>{{ countAvailable(documents) }}</strong><small>cu link accesibil</small>
-      </article>
-      <article class="metric-card">
-        <span>Semnate / plătite</span><strong>{{ countSigned(documents) }}</strong><small>finalizate</small>
-      </article>
-    </div>
+<!--    <div class="metrics-grid">-->
+<!--      <article class="metric-card">-->
+<!--        <span>Total</span><strong>{{ documents.length }}</strong><small>în registru</small>-->
+<!--      </article>-->
+<!--      <article class="metric-card">-->
+<!--        <span>Disponibile</span><strong>{{ countAvailable(documents) }}</strong><small>cu link accesibil</small>-->
+<!--      </article>-->
+<!--      <article class="metric-card">-->
+<!--        <span>Semnate / plătite</span><strong>{{ countSigned(documents) }}</strong><small>finalizate</small>-->
+<!--      </article>-->
+<!--    </div>-->
 
     @if (isFormOpen) {
       <article class="card document-form">
@@ -78,12 +78,14 @@
         </div>
       </article>
     }
+      <label class="search-field">Caută
+          <input type="search" [(ngModel)]="searchTerm" placeholder="Nume, furnizor..." />
+      </label>
 
     <article class="card toolbar-card">
-      <label class="search-field">Caută
-        <input type="search" [(ngModel)]="searchTerm" placeholder="Nume, furnizor, observații..." />
-      </label>
+
       <div class="filter-chips" aria-label="Filtre documente">
+
         <button type="button" [class.active]="activeFilter === 'all'" (click)="activeFilter = 'all'">Toate</button>
         <button type="button" [class.active]="activeFilter === 'contract'" (click)="activeFilter = 'contract'">Contracte</button>
         <button type="button" [class.active]="activeFilter === 'invoice'" (click)="activeFilter = 'invoice'">Facturi</button>
