@@ -1,0 +1,114 @@
+<section class="day-viewer-shell">
+
+  <header class="day-header">
+    <div>
+      <span>
+        5 SEPTEMBRIE 2026
+      </span>
+
+      <h1>
+        Ziua nunții
+      </h1>
+
+      <p>
+        Diana & Dan · Wild Garden
+      </p>
+    </div>
+
+    <div class="header-actions">
+      <span class="readonly-badge">
+        Doar vizualizare
+      </span>
+
+      <a
+        class="exit-link"
+        routerLink="/dashboard"
+      >
+        Dashboard
+      </a>
+    </div>
+  </header>
+
+
+  <section class="section-card">
+    <div class="section-title">
+      <div>
+        <span>
+          5 SEPTEMBRIE 2026
+        </span>
+
+        <h2>
+          Programul zilei
+        </h2>
+
+        <p>
+          Programul principal al nunții,
+          în ordine cronologică.
+        </p>
+      </div>
+    </div>
+
+
+    @if (timeline$ | async; as timeline) {
+      @if (timeline.length) {
+        <div class="timeline-list">
+          @for (
+            item of timeline;
+            track item.id
+          ) {
+            <article
+              class="timeline-item"
+              [class.done]="item.status === 'done'"
+            >
+              <span
+                class="check-indicator"
+                aria-hidden="true"
+              >
+                {{
+                  item.status === 'done'
+                    ? '✓'
+                    : ''
+                }}
+              </span>
+
+              <div class="time">
+                {{ item.time }}
+              </div>
+
+              <div class="timeline-details">
+                <h3>
+                  {{ item.title }}
+                </h3>
+
+                @if (item.owner) {
+                  <p>
+                    Responsabil:
+                    {{ item.owner }}
+                  </p>
+                }
+
+                @if (item.location) {
+                  <small>
+                    📍
+                    {{ item.location }}
+                  </small>
+                }
+
+                @if (item.notes) {
+                  <p class="notes">
+                    {{ item.notes }}
+                  </p>
+                }
+              </div>
+            </article>
+          }
+        </div>
+      } @else {
+        <div class="empty-state">
+          Programul nu este disponibil momentan.
+        </div>
+      }
+    }
+  </section>
+
+</section>

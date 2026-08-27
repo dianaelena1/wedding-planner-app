@@ -1,0 +1,159 @@
+@if (viewModel$ | async; as vm) {
+  <section class="viewer-dashboard">
+
+    <section class="viewer-hero">
+      <div>
+        <span class="eyebrow">
+          DIANA & DAN · 05 SEPTEMBRIE 2026 · ORA 16:00
+        </span>
+
+        <h1>
+          Wedding Command Center
+        </h1>
+
+        <p>
+          Informațiile esențiale pentru ziua nunții, într-o singură privire.
+        </p>
+
+        <div class="hero-actions">
+          <a routerLink="/ziua-nuntii">
+            Deschide Ziua nunții
+          </a>
+
+          <a
+            class="secondary"
+            routerLink="/guests"
+          >
+            Vezi invitații
+          </a>
+        </div>
+      </div>
+
+      <div class="countdown">
+        @if (weddingHasPassed) {
+          <span>ZIUA CEA MARE</span>
+
+          <strong>♡</strong>
+
+          <p>5 septembrie 2026</p>
+        } @else {
+          <span>AU MAI RĂMAS</span>
+
+          <strong>
+            {{ daysUntilWedding }}
+          </strong>
+
+          <p>
+            zile ·
+            {{ weeksUntilWedding }}
+            săptămâni și
+            {{ remainingDaysAfterWeeks }}
+            zile
+          </p>
+        }
+      </div>
+    </section>
+
+
+    <section class="viewer-stats">
+      <a
+        class="stat-card"
+        routerLink="/guests"
+      >
+        <span>INVITAȚI CONFIRMAȚI</span>
+
+        <strong>
+          {{ vm.confirmedPeople }}
+        </strong>
+
+        <p>
+          {{ vm.confirmedGroups }}
+          grupuri confirmate
+        </p>
+      </a>
+
+      <a
+        class="stat-card"
+        routerLink="/guests"
+      >
+        <span>ÎN AȘTEPTARE</span>
+
+        <strong>
+          {{ vm.pendingGroups }}
+        </strong>
+
+        <p>
+          răspunsuri de confirmat
+        </p>
+      </a>
+
+      <a
+        class="stat-card"
+        routerLink="/guests"
+      >
+        <span>FĂRĂ MASĂ</span>
+
+        <strong>
+          {{ vm.peopleWithoutTable }}
+        </strong>
+
+        <p>
+          persoane confirmate
+        </p>
+      </a>
+    </section>
+
+
+    <section class="timeline-panel">
+      <div class="panel-heading">
+        <div>
+          <span class="eyebrow">
+            ACCES RAPID
+          </span>
+
+          <h2>
+            Ziua nunții
+          </h2>
+        </div>
+
+        <a routerLink="/ziua-nuntii">
+          Deschide programul →
+        </a>
+      </div>
+
+      @if (vm.timeline.length) {
+        <div class="timeline-list">
+          @for (
+            item of vm.timeline;
+            track item.time + item.title
+          ) {
+            <div class="timeline-item">
+              <div class="timeline-time">
+                {{ item.time }}
+              </div>
+
+              <div class="timeline-dot"></div>
+
+              <div>
+                <strong>
+                  {{ item.title }}
+                </strong>
+
+                @if (item.details) {
+                  <p>
+                    {{ item.details }}
+                  </p>
+                }
+              </div>
+            </div>
+          }
+        </div>
+      } @else {
+        <div class="empty-state">
+          Programul zilei nu este disponibil momentan.
+        </div>
+      }
+    </section>
+
+  </section>
+}
