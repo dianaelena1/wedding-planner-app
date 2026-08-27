@@ -167,7 +167,9 @@ textarea {
 
 .filters {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 220px;
+  grid-template-columns:
+    minmax(250px, 1fr)
+    repeat(4, minmax(150px, 195px));
   gap: 12px;
   margin-bottom: 18px;
 }
@@ -268,45 +270,6 @@ textarea {
   margin-top: 0;
 }
 
-@media (max-width: 900px) {
-  .page-header,
-  .task-card {
-    align-items: stretch;
-    flex-direction: column;
-  }
-
-  .stats-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
-  .filters,
-  .form-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .full-width {
-    grid-column: auto;
-  }
-
-  .task-actions {
-    justify-content: flex-start;
-  }
-}
-
-@media (max-width: 520px) {
-  .stats-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .header-actions {
-    width: 100%;
-  }
-
-  .header-actions button {
-    flex: 1 1 100%;
-  }
-}
-
 .checklist-editor {
   border: 1px solid #e5d7c5;
   border-radius: 16px;
@@ -364,10 +327,6 @@ textarea {
 
 .add-checklist-row input {
   flex: 1;
-}
-
-.filters {
-  grid-template-columns: minmax(250px, 1fr) repeat(3, minmax(160px, 210px));
 }
 
 .checklist-badge {
@@ -448,25 +407,15 @@ textarea {
   text-decoration: line-through;
 }
 
-@media (max-width: 1100px) {
-  .filters {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-}
 
-@media (max-width: 700px) {
-  .filters,
-  .add-checklist-row {
-    grid-template-columns: 1fr;
-    flex-direction: column;
-    align-items: stretch;
-  }
-}
+/* ==========================================
+   TIMELINE
+========================================== */
 
 .timeline-board {
   position: relative;
   display: grid;
-  gap: 20px;
+  gap: 8px;
 }
 
 .timeline-board::before {
@@ -488,19 +437,68 @@ textarea {
   display: flex;
   gap: 16px;
   align-items: flex-start;
-  margin-bottom: 12px;
 }
 
-.timeline-marker {
-  position: absolute;
-  left: 6px;
-  top: 8px;
-  width: 20px;
-  height: 20px;
-  border: 5px solid #fffaf3;
-  border-radius: 50%;
-  background: #8b7355;
-  box-shadow: 0 0 0 1px #ccb99f;
+
+/* ==========================================
+   CLICKABLE TIMELINE STAGE
+========================================== */
+
+.clickable-stage {
+  margin-left: -10px;
+  padding: 12px 18px 12px 10px;
+  border: 1px solid transparent;
+  border-radius: 17px;
+  cursor: pointer;
+
+  transition:
+          background 0.22s ease,
+          border-color 0.22s ease,
+          box-shadow 0.22s ease,
+          transform 0.22s ease;
+}
+
+.clickable-stage:hover {
+  transform: translateX(4px);
+
+  border-color: rgba(174, 128, 87, 0.23);
+
+  background:
+          linear-gradient(
+                  90deg,
+                  rgba(255, 252, 247, 0.95),
+                  rgba(247, 236, 223, 0.72)
+          );
+
+  box-shadow:
+          0 9px 26px rgba(92, 67, 42, 0.07),
+          0 0 24px rgba(190, 145, 103, 0.09);
+}
+
+.clickable-stage:focus-visible {
+  outline: none;
+
+  border-color: rgba(174, 128, 87, 0.32);
+
+  box-shadow:
+          0 0 0 3px rgba(184, 137, 94, 0.11),
+          0 9px 26px rgba(92, 67, 42, 0.07);
+}
+
+.clickable-stage.expanded {
+  border-color: rgba(174, 128, 87, 0.18);
+
+  background:
+          linear-gradient(
+                  90deg,
+                  rgba(250, 241, 231, 0.82),
+                  rgba(255, 253, 249, 0.55)
+          );
+}
+
+.timeline-stage-content {
+  min-width: 0;
+  width: 100%;
 }
 
 .timeline-stage-title {
@@ -513,6 +511,15 @@ textarea {
 .timeline-stage-title h3 {
   margin: 0;
   font-size: 21px;
+
+  transition:
+          color 0.22s ease,
+          transform 0.22s ease;
+}
+
+.clickable-stage:hover .timeline-stage-title h3 {
+  color: #6f4e34;
+  transform: translateX(2px);
 }
 
 .timeline-stage-title span,
@@ -525,21 +532,48 @@ textarea {
   margin: 5px 0 0;
 }
 
-.timeline-stage-tasks {
-  display: grid;
-  gap: 12px;
+
+/* ==========================================
+   TIMELINE MARKER
+========================================== */
+
+.timeline-marker {
+  position: absolute;
+  left: 6px;
+  top: 20px;
+
+  width: 20px;
+  height: 20px;
+
+  border: 5px solid #fffaf3;
+  border-radius: 50%;
+
+  background: #8b7355;
+
+  box-shadow:
+          0 0 0 1px #ccb99f;
+
+  transition:
+          transform 0.22s ease,
+          box-shadow 0.22s ease,
+          background 0.22s ease;
 }
 
-.timeline-stage-tasks .task-card {
-  background: #fffdf9;
+.clickable-stage:hover .timeline-marker {
+  transform: scale(1.16);
+
+  box-shadow:
+          0 0 0 1px #c9ad8c,
+          0 0 0 5px rgba(177, 132, 91, 0.09),
+          0 0 18px rgba(177, 132, 91, 0.19);
 }
 
-.timeline-empty {
-  padding: 14px 16px;
-  border: 1px dashed #d9c9b4;
-  border-radius: 14px;
-  color: #8a7a68;
-  background: rgba(255, 250, 243, 0.65);
+.clickable-stage.expanded .timeline-marker {
+  transform: scale(1.12);
+
+  box-shadow:
+          0 0 0 1px #c9ad8c,
+          0 0 0 4px rgba(177, 132, 91, 0.08);
 }
 
 .timeline-stage[data-stage='wedding-day'] .timeline-marker {
@@ -550,7 +584,80 @@ textarea {
   background: #6f7f6e;
 }
 
+
+/* ==========================================
+   EXPANDED TASKS
+========================================== */
+
+.timeline-stage-tasks {
+  display: grid;
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.timeline-stage-tasks .task-card {
+  background: #fffdf9;
+}
+
+.timeline-empty {
+  margin-top: 12px;
+  padding: 14px 16px;
+
+  border: 1px dashed #d9c9b4;
+  border-radius: 14px;
+
+  color: #8a7a68;
+
+  background:
+          rgba(255, 250, 243, 0.65);
+}
+
+
+/* ==========================================
+   RESPONSIVE
+========================================== */
+
+@media (max-width: 1100px) {
+  .filters {
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 900px) {
+  .page-header,
+  .task-card {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .stats-grid {
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
+  }
+
+  .filters,
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .full-width {
+    grid-column: auto;
+  }
+
+  .task-actions {
+    justify-content: flex-start;
+  }
+}
+
 @media (max-width: 700px) {
+  .filters,
+  .add-checklist-row {
+    grid-template-columns: 1fr;
+    flex-direction: column;
+    align-items: stretch;
+  }
+
   .timeline-stage {
     padding-left: 36px;
   }
@@ -561,5 +668,28 @@ textarea {
 
   .timeline-marker {
     left: 1px;
+  }
+
+  .clickable-stage {
+    margin-left: -6px;
+    padding-left: 6px;
+  }
+
+  .clickable-stage:hover {
+    transform: none;
+  }
+}
+
+@media (max-width: 520px) {
+  .stats-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .header-actions {
+    width: 100%;
+  }
+
+  .header-actions button {
+    flex: 1 1 100%;
   }
 }

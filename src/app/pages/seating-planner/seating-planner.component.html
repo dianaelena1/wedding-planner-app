@@ -21,7 +21,7 @@
 
   <section class="stats-grid">
     <article>
-      <span>Capacitate sală</span>
+      <span>Nr. total de persoane</span>
       <strong>{{ getTotalCapacity() }}</strong>
     </article>
     <article>
@@ -29,11 +29,11 @@
       <strong>{{ getAssignedPeople(guests) }}</strong>
     </article>
     <article>
-      <span>Fără masă</span>
+      <span>Persoane fără masă</span>
       <strong>{{ getUnassignedPeople(guests) }}</strong>
     </article>
     <article>
-      <span>Locuri libere</span>
+      <span>Locuri neocupate</span>
       <strong>{{ getTotalCapacity() - getAssignedPeople(guests) }}</strong>
     </article>
   </section>

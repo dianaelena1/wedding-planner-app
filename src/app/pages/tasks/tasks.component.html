@@ -1,362 +1,739 @@
 <section>
-  <div class="page-header">
-    <div class="page-title">
-      <div class="eyebrow">To do & checklisturi</div>
-      <h2>Task-uri până la nuntă</h2>
-      <p>Urmărește confirmările, logistica, planul sălii, decorul și plățile furnizorilor.</p>
-    </div>
-
-    <div class="header-actions">
-      <button class="secondary" type="button" (click)="importSprint3Checklist()" [disabled]="isSaving">
-        Importă checklisturile din foi
-      </button>
-      <button class="primary" type="button" (click)="startAdd()">+ Adaugă task</button>
-    </div>
-  </div>
-
-  @if (message) {
-    <div class="feedback success">{{ message }}</div>
-  }
-  @if (errorMessage) {
-    <div class="feedback error">{{ errorMessage }}</div>
-  }
-
-  @if (formTask) {
-    <form class="card task-form" (ngSubmit)="saveTask()">
-      <div class="form-title">
-        <div>
-          <div class="eyebrow">{{ isNewTask ? 'Task nou' : 'Editare' }}</div>
-          <h3>{{ isNewTask ? 'Adaugă un task sau checklist' : 'Modifică task-ul' }}</h3>
-        </div>
-        <button class="icon-button" type="button" (click)="cancelEdit()" aria-label="Închide">×</button>
-      </div>
-
-      <div class="form-grid">
-        <label class="full-width">
-          Titlu *
-          <input name="title" [(ngModel)]="formTask.title" required placeholder="Ex: Confirmă montajul candy bar-ului" />
-        </label>
-
-        <label>
-          Categorie *
-          <input name="category" [(ngModel)]="formTask.category" required placeholder="Ex: Logistică" />
-        </label>
-
-        <label>
-          Deadline exact
-          <input name="dueDate" type="date" [(ngModel)]="formTask.dueDate" />
-        </label>
-
-        <label>
-          Etapă în timeline
-          <select name="timelineStage" [(ngModel)]="formTask.timelineStage">
-            @for (option of timelineOptions; track option.value) {
-              <option [ngValue]="option.value">{{ option.label }}</option>
-            }
-          </select>
-        </label>
-
-        <label>
-          Perioadă / termen relativ
-          <input name="timingLabel" [(ngModel)]="formTask.timingLabel" placeholder="Ex: Cu 3 săptămâni înainte" />
-        </label>
-
-        <label>
-          Furnizor asociat
-          <input name="vendorName" [(ngModel)]="formTask.vendorName" placeholder="Ex: Mr. Cake" />
-        </label>
-
-        <label>
-          Responsabil
-          <input name="assignee" [(ngModel)]="formTask.assignee" placeholder="Ex: Diana, Dan, planner" />
-        </label>
-
-        <label>
-          Status
-          <select name="status" [(ngModel)]="formTask.status">
-            @for (option of statusOptions; track option.value) {
-              <option [ngValue]="option.value">{{ option.label }}</option>
-            }
-          </select>
-        </label>
-
-        <label>
-          Prioritate
-          <select name="priority" [(ngModel)]="formTask.priority">
-            @for (option of priorityOptions; track option.value) {
-              <option [ngValue]="option.value">{{ option.label }}</option>
-            }
-          </select>
-        </label>
-
-        <div class="full-width checklist-editor">
-          <div class="checklist-editor-header">
-            <div>
-              <strong>Pași / checklist</strong>
-              <span>Adaugă pașii care trebuie bifați separat.</span>
-            </div>
-          </div>
-
-          @if (formTask.checklist?.length) {
-            <div class="editable-checklist">
-              @for (item of formTask.checklist; track item.id) {
-                <div class="editable-checklist-item">
-                  <input type="checkbox" [name]="'edit-' + item.id" [(ngModel)]="item.done" />
-                  <input class="checklist-label-input" [name]="'label-' + item.id" [(ngModel)]="item.label" />
-                  <button class="remove-item" type="button" (click)="removeChecklistItem(item.id)" aria-label="Șterge pasul">×</button>
-                </div>
-              }
-            </div>
-          }
-
-          <div class="add-checklist-row">
-            <input
-              name="newChecklistLabel"
-              [(ngModel)]="newChecklistLabel"
-              placeholder="Ex: Confirmă ora livrării"
-              (keyup.enter)="$event.preventDefault(); addChecklistItem()"
-            />
-            <button class="secondary" type="button" (click)="addChecklistItem()">+ Adaugă pas</button>
-          </div>
+    <div class="page-header">
+        <div class="page-title">
+            <div class="eyebrow">To do & checklisturi</div>
+            <h2>Task-uri până la nuntă</h2>
+            <p>
+                Urmărește confirmările, logistica, decorul și plățile furnizorilor.
+            </p>
         </div>
 
-        <label class="full-width">
-          Observații
-          <textarea name="notes" rows="4" [(ngModel)]="formTask.notes" placeholder="Detalii utile, persoane de contact, sume etc."></textarea>
-        </label>
-      </div>
+        <div class="header-actions">
+            <button
+                    class="secondary"
+                    type="button"
+                    (click)="importSprint3Checklist()"
+                    [disabled]="isSaving"
+            >
+                Importă checklisturile din foi
+            </button>
 
-      <div class="form-actions">
-        <button class="secondary" type="button" (click)="cancelEdit()">Renunță</button>
-        <button class="primary" type="submit" [disabled]="isSaving">
-          {{ isSaving ? 'Se salvează...' : 'Salvează task-ul' }}
-        </button>
-      </div>
-    </form>
-  }
-
-  @if (tasks$ | async; as tasks) {
-    <div class="stats-grid">
-      <article class="stat-card">
-        <span>Total</span>
-        <strong>{{ tasks.length }}</strong>
-      </article>
-      <article class="stat-card">
-        <span>De făcut</span>
-        <strong>{{ getCount(tasks, 'todo') }}</strong>
-      </article>
-      <article class="stat-card">
-        <span>În lucru</span>
-        <strong>{{ getCount(tasks, 'in-progress') }}</strong>
-      </article>
-      <article class="stat-card">
-        <span>Checklisturi</span>
-        <strong>{{ getChecklistCount(tasks) }}</strong>
-      </article>
+            <button
+                    class="primary"
+                    type="button"
+                    (click)="startAdd()"
+            >
+                + Adaugă task
+            </button>
+        </div>
     </div>
 
-    <div class="filters card">
-      <input type="search" [(ngModel)]="searchTerm" placeholder="Caută în taskuri și pașii checklisturilor" />
-      <select [(ngModel)]="statusFilter">
-        <option value="all">Toate statusurile</option>
-        @for (option of statusOptions; track option.value) {
-          <option [ngValue]="option.value">{{ option.label }}</option>
-        }
-      </select>
-      <select [(ngModel)]="categoryFilter">
-        <option value="all">Toate categoriile</option>
-        @for (category of getCategories(tasks); track category) {
-          <option [ngValue]="category">{{ category }}</option>
-        }
-      </select>
-      <select [(ngModel)]="viewMode">
-        <option value="all">Taskuri și checklisturi</option>
-        <option value="checklists">Doar checklisturi</option>
-        <option value="simple">Doar taskuri simple</option>
-      </select>
-      <select [(ngModel)]="layoutMode">
-        <option value="timeline">Vizualizare timeline</option>
-        <option value="list">Listă simplă</option>
-      </select>
-    </div>
-
-    @if (getFilteredTasks(tasks).length) {
-      @if (layoutMode === 'timeline') {
-        <div class="timeline-board">
-          @for (stage of timelineOptions; track stage.value) {
-            @let stageTasks = getTimelineTasks(tasks, stage.value);
-            <section class="timeline-stage" [attr.data-stage]="stage.value">
-              <div class="timeline-stage-header">
-                <div class="timeline-marker"></div>
-                <div>
-                  <div class="timeline-stage-title">
-                    <h3>{{ stage.label }}</h3>
-                    <span>{{ stageTasks.length }} taskuri · {{ getTimelineOpenCount(tasks, stage.value) }} deschise</span>
-                  </div>
-                  <p>{{ stage.description }}</p>
-                </div>
-              </div>
-
-              @if (stageTasks.length) {
-                <div class="timeline-stage-tasks">
-                  @for (task of stageTasks; track task.id) {
-                    <article class="card task-card" [class.done]="task.status === 'done'" [class.overdue]="isOverdue(task)">
-                      <div class="task-main">
-                        <div class="badges">
-                          <span class="badge priority" [attr.data-priority]="task.priority">
-                            {{ getPriorityLabel(task.priority) }}
-                          </span>
-                          <span class="badge status" [attr.data-status]="task.status">
-                            {{ getStatusLabel(task.status) }}
-                          </span>
-                          @if (task.checklist?.length) {
-                            <span class="badge checklist-badge">Checklist</span>
-                          }
-                          @if (isOverdue(task)) {
-                            <span class="badge overdue-badge">Întârziat</span>
-                          }
-                        </div>
-
-                        <h3>{{ task.title }}</h3>
-                        <p class="muted">{{ task.category }}</p>
-
-                        <div class="task-meta">
-                          @if (task.dueDate) {
-                            <span><strong>Deadline:</strong> {{ task.dueDate | date:'dd.MM.yyyy' }}</span>
-                          }
-                          @if (task.timingLabel) {
-                            <span><strong>Perioadă:</strong> {{ task.timingLabel }}</span>
-                          }
-                          @if (task.vendorName) {
-                            <span><strong>Furnizor:</strong> {{ task.vendorName }}</span>
-                          }
-                          @if (task.assignee) {
-                            <span><strong>Responsabil:</strong> {{ task.assignee }}</span>
-                          }
-                        </div>
-
-                        @if (task.checklist?.length) {
-                          @let progress = getChecklistProgress(task);
-                          <div class="checklist-progress">
-                            <div class="progress-copy">
-                              <span>{{ progress.done }} din {{ progress.total }} pași finalizați</span>
-                              <strong>{{ progress.percent }}%</strong>
-                            </div>
-                            <div class="progress-track"><span [style.width.%]="progress.percent"></span></div>
-                          </div>
-
-                          <div class="task-checklist">
-                            @for (item of task.checklist; track item.id) {
-                              <label class="task-checklist-item" [class.checked]="item.done">
-                                <input
-                                  type="checkbox"
-                                  [checked]="item.done"
-                                  (change)="toggleChecklistItem(task, item)"
-                                />
-                                <span>{{ item.label }}</span>
-                              </label>
-                            }
-                          </div>
-                        }
-
-                        @if (task.notes) {
-                          <p class="notes">{{ task.notes }}</p>
-                        }
-                      </div>
-
-                      <div class="task-actions">
-                        <button class="secondary small" type="button" (click)="startEdit(task)">Editează</button>
-                        <button class="danger small" type="button" (click)="deleteTask(task)">Șterge</button>
-                      </div>
-                    </article>
-                  }
-                </div>
-              } @else {
-                <div class="timeline-empty">Niciun task în această etapă.</div>
-              }
-            </section>
-          }
+    @if (message) {
+        <div class="feedback success">
+            {{ message }}
         </div>
-      } @else {
-        <div class="tasks-board">
-          @for (task of getFilteredTasks(tasks); track task.id) {
-          <article class="card task-card" [class.done]="task.status === 'done'" [class.overdue]="isOverdue(task)">
-            <div class="task-main">
-              <div class="badges">
-                <span class="badge priority" [attr.data-priority]="task.priority">
-                  {{ getPriorityLabel(task.priority) }}
-                </span>
-                <span class="badge status" [attr.data-status]="task.status">
-                  {{ getStatusLabel(task.status) }}
-                </span>
-                @if (task.checklist?.length) {
-                  <span class="badge checklist-badge">Checklist</span>
-                }
-                @if (isOverdue(task)) {
-                  <span class="badge overdue-badge">Întârziat</span>
-                }
-              </div>
-
-              <h3>{{ task.title }}</h3>
-              <p class="muted">{{ task.category }}</p>
-
-              <div class="task-meta">
-                @if (task.dueDate) {
-                  <span><strong>Deadline:</strong> {{ task.dueDate | date:'dd.MM.yyyy' }}</span>
-                }
-                @if (task.timingLabel) {
-                  <span><strong>Perioadă:</strong> {{ task.timingLabel }}</span>
-                }
-                @if (task.vendorName) {
-                  <span><strong>Furnizor:</strong> {{ task.vendorName }}</span>
-                }
-                @if (task.assignee) {
-                  <span><strong>Responsabil:</strong> {{ task.assignee }}</span>
-                }
-              </div>
-
-              @if (task.checklist?.length) {
-                @let progress = getChecklistProgress(task);
-                <div class="checklist-progress">
-                  <div class="progress-copy">
-                    <span>{{ progress.done }} din {{ progress.total }} pași finalizați</span>
-                    <strong>{{ progress.percent }}%</strong>
-                  </div>
-                  <div class="progress-track"><span [style.width.%]="progress.percent"></span></div>
-                </div>
-
-                <div class="task-checklist">
-                  @for (item of task.checklist; track item.id) {
-                    <label class="task-checklist-item" [class.checked]="item.done">
-                      <input
-                        type="checkbox"
-                        [checked]="item.done"
-                        (change)="toggleChecklistItem(task, item)"
-                      />
-                      <span>{{ item.label }}</span>
-                    </label>
-                  }
-                </div>
-              }
-
-              @if (task.notes) {
-                <p class="notes">{{ task.notes }}</p>
-              }
-            </div>
-
-            <div class="task-actions">
-              <button class="secondary small" type="button" (click)="startEdit(task)">Editează</button>
-              <button class="danger small" type="button" (click)="deleteTask(task)">Șterge</button>
-            </div>
-          </article>
-          }
-        </div>
-      }
-    } @else {
-      <div class="empty-state card">
-        <h3>Nu există task-uri pentru filtrul selectat.</h3>
-        <p>Schimbă filtrul sau adaugă un task nou.</p>
-      </div>
     }
-  }
+
+    @if (errorMessage) {
+        <div class="feedback error">
+            {{ errorMessage }}
+        </div>
+    }
+
+    @if (formTask) {
+        <form
+                class="card task-form"
+                (ngSubmit)="saveTask()"
+        >
+            <div class="form-title">
+                <div>
+                    <div class="eyebrow">
+                        {{ isNewTask ? 'Task nou' : 'Editare' }}
+                    </div>
+
+                    <h3>
+                        {{
+                            isNewTask
+                                ? 'Adaugă un task sau checklist'
+                                : 'Modifică task-ul'
+                        }}
+                    </h3>
+                </div>
+
+                <button
+                        class="icon-button"
+                        type="button"
+                        (click)="cancelEdit()"
+                        aria-label="Închide"
+                >
+                    ×
+                </button>
+            </div>
+
+            <div class="form-grid">
+                <label class="full-width">
+                    Titlu *
+
+                    <input
+                            name="title"
+                            [(ngModel)]="formTask.title"
+                            required
+                            placeholder="Ex: Confirmă montajul candy bar-ului"
+                    />
+                </label>
+
+                <label>
+                    Categorie *
+
+                    <input
+                            name="category"
+                            [(ngModel)]="formTask.category"
+                            required
+                            placeholder="Ex: Logistică"
+                    />
+                </label>
+
+                <label>
+                    Deadline exact
+
+                    <input
+                            name="dueDate"
+                            type="date"
+                            [(ngModel)]="formTask.dueDate"
+                    />
+                </label>
+
+                <label>
+                    Etapă în timeline
+
+                    <select
+                            name="timelineStage"
+                            [(ngModel)]="formTask.timelineStage"
+                    >
+                        @for (option of timelineOptions; track option.value) {
+                            <option [ngValue]="option.value">
+                                {{ option.label }}
+                            </option>
+                        }
+                    </select>
+                </label>
+
+                <label>
+                    Perioadă / termen relativ
+
+                    <input
+                            name="timingLabel"
+                            [(ngModel)]="formTask.timingLabel"
+                            placeholder="Ex: Cu 3 săptămâni înainte"
+                    />
+                </label>
+
+                <label>
+                    Furnizor asociat
+
+                    <input
+                            name="vendorName"
+                            [(ngModel)]="formTask.vendorName"
+                            placeholder="Ex: Mr. Cake"
+                    />
+                </label>
+
+                <label>
+                    Responsabil
+
+                    <input
+                            name="assignee"
+                            [(ngModel)]="formTask.assignee"
+                            placeholder="Ex: Diana, Dan, planner"
+                    />
+                </label>
+
+                <label>
+                    Status
+
+                    <select
+                            name="status"
+                            [(ngModel)]="formTask.status"
+                    >
+                        @for (option of statusOptions; track option.value) {
+                            <option [ngValue]="option.value">
+                                {{ option.label }}
+                            </option>
+                        }
+                    </select>
+                </label>
+
+                <label>
+                    Prioritate
+
+                    <select
+                            name="priority"
+                            [(ngModel)]="formTask.priority"
+                    >
+                        @for (option of priorityOptions; track option.value) {
+                            <option [ngValue]="option.value">
+                                {{ option.label }}
+                            </option>
+                        }
+                    </select>
+                </label>
+
+                <div class="full-width checklist-editor">
+                    <div class="checklist-editor-header">
+                        <div>
+                            <strong>Pași / checklist</strong>
+                            <span>
+                Adaugă pașii care trebuie bifați separat.
+              </span>
+                        </div>
+                    </div>
+
+                    @if (formTask.checklist?.length) {
+                        <div class="editable-checklist">
+                            @for (item of formTask.checklist; track item.id) {
+                                <div class="editable-checklist-item">
+                                    <input
+                                            type="checkbox"
+                                            [name]="'edit-' + item.id"
+                                            [(ngModel)]="item.done"
+                                    />
+
+                                    <input
+                                            class="checklist-label-input"
+                                            [name]="'label-' + item.id"
+                                            [(ngModel)]="item.label"
+                                    />
+
+                                    <button
+                                            class="remove-item"
+                                            type="button"
+                                            (click)="removeChecklistItem(item.id)"
+                                            aria-label="Șterge pasul"
+                                    >
+                                        ×
+                                    </button>
+                                </div>
+                            }
+                        </div>
+                    }
+
+                    <div class="add-checklist-row">
+                        <input
+                                name="newChecklistLabel"
+                                [(ngModel)]="newChecklistLabel"
+                                placeholder="Ex: Confirmă ora livrării"
+                                (keyup.enter)="$event.preventDefault(); addChecklistItem()"
+                        />
+
+                        <button
+                                class="secondary"
+                                type="button"
+                                (click)="addChecklistItem()"
+                        >
+                            + Adaugă pas
+                        </button>
+                    </div>
+                </div>
+
+                <label class="full-width">
+                    Observații
+
+                    <textarea
+                            name="notes"
+                            rows="4"
+                            [(ngModel)]="formTask.notes"
+                            placeholder="Detalii utile, persoane de contact, sume etc."
+                    ></textarea>
+                </label>
+            </div>
+
+            <div class="form-actions">
+                <button
+                        class="secondary"
+                        type="button"
+                        (click)="cancelEdit()"
+                >
+                    Renunță
+                </button>
+
+                <button
+                        class="primary"
+                        type="submit"
+                        [disabled]="isSaving"
+                >
+                    {{ isSaving ? 'Se salvează...' : 'Salvează task-ul' }}
+                </button>
+            </div>
+        </form>
+    }
+
+    @if (tasks$ | async; as tasks) {
+
+        <div class="stats-grid">
+            <article class="stat-card">
+                <span>Total</span>
+                <strong>{{ tasks.length }}</strong>
+            </article>
+
+            <article class="stat-card">
+                <span>De făcut</span>
+                <strong>{{ getCount(tasks, 'todo') }}</strong>
+            </article>
+
+            <article class="stat-card">
+                <span>În lucru</span>
+                <strong>{{ getCount(tasks, 'in-progress') }}</strong>
+            </article>
+
+            <article class="stat-card">
+                <span>Finalizate</span>
+                <strong>{{ getCount(tasks, 'done') }}</strong>
+            </article>
+        </div>
+
+        <div class="filters card">
+            <input
+                    type="search"
+                    [(ngModel)]="searchTerm"
+                    placeholder="Caută în taskuri și pașii checklisturilor"
+            />
+
+            <select [(ngModel)]="statusFilter">
+                <option value="all">
+                    Toate statusurile
+                </option>
+
+                @for (option of statusOptions; track option.value) {
+                    <option [ngValue]="option.value">
+                        {{ option.label }}
+                    </option>
+                }
+            </select>
+
+            <select [(ngModel)]="categoryFilter">
+                <option value="all">
+                    Toate categoriile
+                </option>
+
+                @for (category of getCategories(tasks); track category) {
+                    <option [ngValue]="category">
+                        {{ category }}
+                    </option>
+                }
+            </select>
+
+            <select [(ngModel)]="viewMode">
+                <option value="all">
+                    Taskuri și checklisturi
+                </option>
+
+                <option value="checklists">
+                    Doar checklisturi
+                </option>
+
+                <option value="simple">
+                    Doar taskuri simple
+                </option>
+            </select>
+
+        </div>
+
+        @if (getFilteredTasks(tasks).length) {
+
+            @if (layoutMode === 'timeline') {
+
+                <div class="timeline-board">
+
+                    @for (stage of timelineOptions; track stage.value) {
+
+                        @let stageTasks = getTimelineTasks(tasks, stage.value);
+
+                        <section
+                                class="timeline-stage"
+                                [attr.data-stage]="stage.value"
+                        >
+
+                            <div
+                                    class="timeline-stage-header clickable-stage"
+                                    role="button"
+                                    tabindex="0"
+                                    [class.expanded]="isTimelineStageExpanded(stage.value)"
+                                    [attr.aria-expanded]="isTimelineStageExpanded(stage.value)"
+                                    (click)="toggleTimelineStage(stage.value)"
+                                    (keydown)="handleTimelineStageKeydown($event, stage.value)"
+                            >
+                                <div class="timeline-marker"></div>
+
+                                <div class="timeline-stage-content">
+                                    <div class="timeline-stage-title">
+                                        <h3>
+                                            {{ stage.label }}
+                                        </h3>
+
+                                        <span>
+                      {{ stageTasks.length }} taskuri ·
+                                            {{ getTimelineOpenCount(tasks, stage.value) }} deschise
+                    </span>
+                                    </div>
+
+                                    <p>
+                                        {{ stage.description }}
+                                    </p>
+                                </div>
+                            </div>
+
+                            @if (isTimelineStageExpanded(stage.value)) {
+
+                                @if (stageTasks.length) {
+
+                                    <div class="timeline-stage-tasks">
+
+                                        @for (task of stageTasks; track task.id) {
+
+                                            <article
+                                                    class="card task-card"
+                                                    [class.done]="task.status === 'done'"
+                                                    [class.overdue]="isOverdue(task)"
+                                            >
+
+                                                <div class="task-main">
+
+                                                    <div class="badges">
+                            <span
+                                    class="badge priority"
+                                    [attr.data-priority]="task.priority"
+                            >
+                              {{ getPriorityLabel(task.priority) }}
+                            </span>
+
+                                                        <span
+                                                                class="badge status"
+                                                                [attr.data-status]="task.status"
+                                                        >
+                              {{ getStatusLabel(task.status) }}
+                            </span>
+
+                                                        @if (task.checklist?.length) {
+                                                            <span class="badge checklist-badge">
+                                Checklist
+                              </span>
+                                                        }
+
+                                                        @if (isOverdue(task)) {
+                                                            <span class="badge overdue-badge">
+                                Întârziat
+                              </span>
+                                                        }
+                                                    </div>
+
+                                                    <h3>
+                                                        {{ task.title }}
+                                                    </h3>
+
+                                                    <p class="muted">
+                                                        {{ task.category }}
+                                                    </p>
+
+                                                    <div class="task-meta">
+
+                                                        @if (task.dueDate) {
+                                                            <span>
+                                <strong>Deadline:</strong>
+                                                                {{ task.dueDate | date:'dd.MM.yyyy' }}
+                              </span>
+                                                        }
+
+                                                        @if (task.timingLabel) {
+                                                            <span>
+                                <strong>Perioadă:</strong>
+                                                                {{ task.timingLabel }}
+                              </span>
+                                                        }
+
+                                                        @if (task.vendorName) {
+                                                            <span>
+                                <strong>Furnizor:</strong>
+                                                                {{ task.vendorName }}
+                              </span>
+                                                        }
+
+                                                        @if (task.assignee) {
+                                                            <span>
+                                <strong>Responsabil:</strong>
+                                                                {{ task.assignee }}
+                              </span>
+                                                        }
+
+                                                    </div>
+
+                                                    @if (task.checklist?.length) {
+
+                                                        @let progress = getChecklistProgress(task);
+
+                                                        <div class="checklist-progress">
+                                                            <div class="progress-copy">
+                                <span>
+                                  {{ progress.done }}
+                                    din
+                                    {{ progress.total }}
+                                    pași finalizați
+                                </span>
+
+                                                                <strong>
+                                                                    {{ progress.percent }}%
+                                                                </strong>
+                                                            </div>
+
+                                                            <div class="progress-track">
+                                <span
+                                        [style.width.%]="progress.percent"
+                                ></span>
+                                                            </div>
+                                                        </div>
+
+                                                        <div class="task-checklist">
+                                                            @for (item of task.checklist; track item.id) {
+                                                                <label
+                                                                        class="task-checklist-item"
+                                                                        [class.checked]="item.done"
+                                                                >
+                                                                    <input
+                                                                            type="checkbox"
+                                                                            [checked]="item.done"
+                                                                            (change)="toggleChecklistItem(task, item)"
+                                                                    />
+
+                                                                    <span>
+                                    {{ item.label }}
+                                  </span>
+                                                                </label>
+                                                            }
+                                                        </div>
+                                                    }
+
+                                                    @if (task.notes) {
+                                                        <p class="notes">
+                                                            {{ task.notes }}
+                                                        </p>
+                                                    }
+
+                                                </div>
+
+                                                <div class="task-actions">
+                                                    <button
+                                                            class="secondary small"
+                                                            type="button"
+                                                            (click)="startEdit(task)"
+                                                    >
+                                                        Editează
+                                                    </button>
+
+                                                    <button
+                                                            class="danger small"
+                                                            type="button"
+                                                            (click)="deleteTask(task)"
+                                                    >
+                                                        Șterge
+                                                    </button>
+                                                </div>
+
+                                            </article>
+
+                                        }
+
+                                    </div>
+
+                                } @else {
+
+                                    <div class="timeline-empty">
+                                        Niciun task în această etapă.
+                                    </div>
+
+                                }
+
+                            }
+
+                        </section>
+
+                    }
+
+                </div>
+
+            } @else {
+
+                <div class="tasks-board">
+
+                    @for (task of getFilteredTasks(tasks); track task.id) {
+
+                        <article
+                                class="card task-card"
+                                [class.done]="task.status === 'done'"
+                                [class.overdue]="isOverdue(task)"
+                        >
+
+                            <div class="task-main">
+
+                                <div class="badges">
+                  <span
+                          class="badge priority"
+                          [attr.data-priority]="task.priority"
+                  >
+                    {{ getPriorityLabel(task.priority) }}
+                  </span>
+
+                                    <span
+                                            class="badge status"
+                                            [attr.data-status]="task.status"
+                                    >
+                    {{ getStatusLabel(task.status) }}
+                  </span>
+
+                                    @if (task.checklist?.length) {
+                                        <span class="badge checklist-badge">
+                      Checklist
+                    </span>
+                                    }
+
+                                    @if (isOverdue(task)) {
+                                        <span class="badge overdue-badge">
+                      Întârziat
+                    </span>
+                                    }
+                                </div>
+
+                                <h3>
+                                    {{ task.title }}
+                                </h3>
+
+                                <p class="muted">
+                                    {{ task.category }}
+                                </p>
+
+                                <div class="task-meta">
+
+                                    @if (task.dueDate) {
+                                        <span>
+                      <strong>Deadline:</strong>
+                                            {{ task.dueDate | date:'dd.MM.yyyy' }}
+                    </span>
+                                    }
+
+                                    @if (task.timingLabel) {
+                                        <span>
+                      <strong>Perioadă:</strong>
+                                            {{ task.timingLabel }}
+                    </span>
+                                    }
+
+                                    @if (task.vendorName) {
+                                        <span>
+                      <strong>Furnizor:</strong>
+                                            {{ task.vendorName }}
+                    </span>
+                                    }
+
+                                    @if (task.assignee) {
+                                        <span>
+                      <strong>Responsabil:</strong>
+                                            {{ task.assignee }}
+                    </span>
+                                    }
+
+                                </div>
+
+                                @if (task.checklist?.length) {
+
+                                    @let progress = getChecklistProgress(task);
+
+                                    <div class="checklist-progress">
+                                        <div class="progress-copy">
+                      <span>
+                        {{ progress.done }}
+                          din
+                          {{ progress.total }}
+                          pași finalizați
+                      </span>
+
+                                            <strong>
+                                                {{ progress.percent }}%
+                                            </strong>
+                                        </div>
+
+                                        <div class="progress-track">
+                      <span
+                              [style.width.%]="progress.percent"
+                      ></span>
+                                        </div>
+                                    </div>
+
+                                    <div class="task-checklist">
+                                        @for (item of task.checklist; track item.id) {
+                                            <label
+                                                    class="task-checklist-item"
+                                                    [class.checked]="item.done"
+                                            >
+                                                <input
+                                                        type="checkbox"
+                                                        [checked]="item.done"
+                                                        (change)="toggleChecklistItem(task, item)"
+                                                />
+
+                                                <span>
+                          {{ item.label }}
+                        </span>
+                                            </label>
+                                        }
+                                    </div>
+
+                                }
+
+                                @if (task.notes) {
+                                    <p class="notes">
+                                        {{ task.notes }}
+                                    </p>
+                                }
+
+                            </div>
+
+                            <div class="task-actions">
+                                <button
+                                        class="secondary small"
+                                        type="button"
+                                        (click)="startEdit(task)"
+                                >
+                                    Editează
+                                </button>
+
+                                <button
+                                        class="danger small"
+                                        type="button"
+                                        (click)="deleteTask(task)"
+                                >
+                                    Șterge
+                                </button>
+                            </div>
+
+                        </article>
+
+                    }
+
+                </div>
+
+            }
+
+        } @else {
+
+            <div class="empty-state card">
+                <h3>
+                    Nu există task-uri pentru filtrul selectat.
+                </h3>
+
+                <p>
+                    Schimbă filtrul sau adaugă un task nou.
+                </p>
+            </div>
+
+        }
+
+    }
 </section>

@@ -145,9 +145,7 @@
                   @if (getVendorDocuments(vendor, documents); as vendorDocuments) {
                       @if (vendorDocuments.length) {
                           <div class="vendor-documents">
-                              <div class="vendor-documents-title">
-                                  Documente asociate
-                              </div>
+
 
                               @for (document of vendorDocuments; track document.id) {
                                   <a
