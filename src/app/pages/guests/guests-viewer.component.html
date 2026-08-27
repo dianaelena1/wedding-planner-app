@@ -1,168 +1,168 @@
 <section class="guest-viewer-page">
-  <div class="page-heading">
-    <div>
+    <div class="page-heading">
+        <div>
       <span class="eyebrow">
         LISTA PERSOANE
       </span>
 
-      <h1>
-        Invitați
-      </h1>
-
-      <p>
-        Vizualizare read-only a invitaților și a meselor.
-      </p>
-    </div>
-
-    <span class="readonly-badge">
-      Doar vizualizare
-    </span>
-  </div>
-
-
-  @if (guests$ | async; as guests) {
-
-    <section class="summary-grid">
-      <article>
-        <span>PERSOANE CONFIRMATE</span>
-
-        <strong>
-          {{ getConfirmedPeople(guests) }}
-        </strong>
-      </article>
-
-      <article>
-        <span>FAMILII / RÂNDURI</span>
-
-        <strong>
-          {{ guests.length }}
-        </strong>
-      </article>
-
-      <article>
-        <span>ÎN AȘTEPTARE</span>
-
-        <strong>
-          {{ getPendingRows(guests) }}
-        </strong>
-      </article>
-    </section>
-
-
-    <section class="filters">
-      <input
-        type="search"
-        [(ngModel)]="searchTerm"
-        placeholder="Caută după nume, grup, masă..."
-      />
-
-      <select
-        [(ngModel)]="attendanceFilter"
-      >
-        <option value="all">
-          Toate confirmările
-        </option>
-
-        <option value="confirmed">
-          Confirmat
-        </option>
-
-        <option value="pending">
-          În așteptare
-        </option>
-
-        <option value="maybe">
-          Poate
-        </option>
-
-        <option value="declined">
-          Nu participă
-        </option>
-      </select>
-
-      <select
-        [(ngModel)]="groupFilter"
-      >
-        <option value="all">
-          Toate grupurile
-        </option>
-
-        @for (
-          group of getGroups(guests);
-          track group
-        ) {
-          <option [value]="group">
-            {{ group }}
-          </option>
-        }
-      </select>
-
-      <button
-        type="button"
-        (click)="clearFilters()"
-      >
-        Șterge filtre
-      </button>
-    </section>
-
-
-    <section class="guest-list">
-      @for (
-        guest of getFilteredGuests(guests);
-        track guest.id
-      ) {
-        <article
-          class="guest-row"
-          [attr.data-status]="guest.attendanceStatus"
-        >
-          <span class="status-dot"></span>
-
-          <div class="guest-main">
-            <strong>
-              {{ guest.name }}
-            </strong>
+            <h1>
+                Invitați
+            </h1>
 
             <p>
-              {{ guest.groupName || 'Fără grup' }}
-              ·
-              {{ getPeople(guest) }}
-              persoane
+                Vizualizare read-only a invitaților și a meselor.
             </p>
+        </div>
 
-            @if (guest.allergies) {
-              <small>
-                Alergii / restricții:
-                {{ guest.allergies }}
-              </small>
-            }
-          </div>
+        <span class="readonly-badge">
+      Doar vizualizare
+    </span>
+    </div>
 
-          <div class="guest-meta">
+
+    @if (guests$ | async; as guests) {
+
+        <section class="summary-grid">
+            <article>
+                <span>PERSOANE CONFIRMATE</span>
+
+                <strong>
+                    {{ getConfirmedPeople(guests) }}
+                </strong>
+            </article>
+
+            <article>
+                <span>ÎN AȘTEPTARE</span>
+
+                <strong>
+                    {{ getPendingRows(guests) }}
+                </strong>
+            </article>
+
+            <article>
+                <span>COPII CONFIRMAȚI</span>
+
+                <strong>
+                    {{ getConfirmedChildren(guests) }}
+                </strong>
+            </article>
+        </section>
+
+
+        <section class="filters">
+            <input
+                    type="search"
+                    [(ngModel)]="searchTerm"
+                    placeholder="Caută după nume, grup, masă..."
+            />
+
+            <select
+                    [(ngModel)]="attendanceFilter"
+            >
+                <option value="all">
+                    Toate confirmările
+                </option>
+
+                <option value="confirmed">
+                    Confirmat
+                </option>
+
+                <option value="pending">
+                    În așteptare
+                </option>
+
+                <option value="maybe">
+                    Poate
+                </option>
+
+                <option value="declined">
+                    Nu participă
+                </option>
+            </select>
+
+            <select
+                    [(ngModel)]="groupFilter"
+            >
+                <option value="all">
+                    Toate grupurile
+                </option>
+
+                @for (
+                    group of getGroups(guests);
+                    track group
+                        ) {
+                    <option [value]="group">
+                        {{ group }}
+                    </option>
+                }
+            </select>
+
+            <button
+                    type="button"
+                    (click)="clearFilters()"
+            >
+                Șterge filtre
+            </button>
+        </section>
+
+
+        <section class="guest-list">
+            @for (
+                guest of getFilteredGuests(guests);
+                track guest.id
+                    ) {
+                <article
+                        class="guest-row"
+                        [attr.data-status]="guest.attendanceStatus"
+                >
+                    <span class="status-dot"></span>
+
+                    <div class="guest-main">
+                        <strong>
+                            {{ guest.name }}
+                        </strong>
+
+                        <p>
+                            {{ guest.groupName || 'Fără grup' }}
+                            ·
+                            {{ getPeople(guest) }}
+                            persoane
+                        </p>
+
+                        @if (guest.allergies) {
+                            <small>
+                                Alergii / restricții:
+                                {{ guest.allergies }}
+                            </small>
+                        }
+                    </div>
+
+                    <div class="guest-meta">
             <span
-              class="status-pill"
-              [attr.data-status]="guest.attendanceStatus"
+                    class="status-pill"
+                    [attr.data-status]="guest.attendanceStatus"
             >
               {{
-                attendanceLabel(
-                  guest.attendanceStatus
-                )
-              }}
+                    attendanceLabel(
+                        guest.attendanceStatus
+                    )
+                }}
             </span>
 
-            <strong>
-              {{
-                guest.tableNumber
-                  ? 'Masa ' + guest.tableNumber
-                  : 'Fără masă'
-              }}
-            </strong>
-          </div>
-        </article>
-      } @empty {
-        <div class="empty-state">
-          Nu există invitați pentru filtrele selectate.
-        </div>
-      }
-    </section>
-  }
+                        <strong>
+                            {{
+                                guest.tableNumber
+                                    ? 'Masa ' + guest.tableNumber
+                                    : 'Fără masă'
+                            }}
+                        </strong>
+                    </div>
+                </article>
+            } @empty {
+                <div class="empty-state">
+                    Nu există invitați pentru filtrele selectate.
+                </div>
+            }
+        </section>
+    }
 </section>

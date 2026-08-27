@@ -881,62 +881,62 @@ textarea {
 }
 
 
-/* ==========================================
-   TIMELINE MARKER
-========================================== */
-
-.timeline-marker {
-  position: absolute;
-
-  left: 6px;
-  top: 20px;
-
-  width: 20px;
-  height: 20px;
-
-  box-sizing: border-box;
-
-  border: 5px solid #f7f0e8;
-  border-radius: 50%;
-
-  background: #907556;
-
-  box-shadow:
-    0 0 0 1px #ccb99f;
-
-  transition:
-    transform 0.2s ease,
-    box-shadow 0.2s ease;
-}
-
-.clickable-stage:hover
-.timeline-marker {
-  transform: scale(1.12);
-
-  box-shadow:
-    0 0 0 1px #c6aa89,
-    0 0 0 4px rgba(177, 132, 91, 0.07),
-    0 0 13px rgba(177, 132, 91, 0.12);
-}
-
-.clickable-stage.expanded
-.timeline-marker {
-  transform: scale(1.07);
-
-  box-shadow:
-    0 0 0 1px #c6aa89,
-    0 0 0 3px rgba(177, 132, 91, 0.06);
-}
-
-.timeline-stage[data-stage='wedding-day']
-.timeline-marker {
-  background: #ad7470;
-}
-
-.timeline-stage[data-stage='after-wedding']
-.timeline-marker {
-  background: #748270;
-}
+///* ==========================================
+//   TIMELINE MARKER
+//========================================== */
+//
+//.timeline-marker {
+//  position: absolute;
+//
+//  left: 6px;
+//  top: 20px;
+//
+//  width: 20px;
+//  height: 20px;
+//
+//  box-sizing: border-box;
+//
+//  border: 5px solid #f7f0e8;
+//  border-radius: 50%;
+//
+//  background: #907556;
+//
+//  box-shadow:
+//    0 0 0 1px #ccb99f;
+//
+//  transition:
+//    transform 0.2s ease,
+//    box-shadow 0.2s ease;
+//}
+//
+//.clickable-stage:hover
+//.timeline-marker {
+//  transform: scale(1.12);
+//
+//  box-shadow:
+//    0 0 0 1px #c6aa89,
+//    0 0 0 4px rgba(177, 132, 91, 0.07),
+//    0 0 13px rgba(177, 132, 91, 0.12);
+//}
+//
+//.clickable-stage.expanded
+//.timeline-marker {
+//  transform: scale(1.07);
+//
+//  box-shadow:
+//    0 0 0 1px #c6aa89,
+//    0 0 0 3px rgba(177, 132, 91, 0.06);
+//}
+//
+//.timeline-stage[data-stage='wedding-day']
+//.timeline-marker {
+//  background: #ad7470;
+//}
+//
+//.timeline-stage[data-stage='after-wedding']
+//.timeline-marker {
+//  background: #748270;
+//}
 
 
 /* ==========================================

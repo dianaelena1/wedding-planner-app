@@ -25,148 +25,167 @@ import {
 })
 export class GuestsViewerComponent {
   private readonly guestsService =
-    inject(FirebaseGuestsService);
+      inject(FirebaseGuestsService);
 
   readonly guests$ =
-    this.guestsService.getGuests();
+      this.guestsService.getGuests();
 
   searchTerm = '';
 
   attendanceFilter:
-    | GuestAttendanceStatus
-    | 'all' =
-    'all';
+      | GuestAttendanceStatus
+      | 'all' =
+      'all';
 
   groupFilter = 'all';
 
   getGroups(
-    guests: WeddingGuest[]
+      guests: WeddingGuest[]
   ): string[] {
     return [
       ...new Set(
-        guests
-          .map(
-            guest =>
-              guest.groupName?.trim()
-          )
-          .filter(
-            (
-              value
-            ): value is string =>
-              Boolean(value)
-          )
+          guests
+              .map(
+                  guest =>
+                      guest.groupName?.trim()
+              )
+              .filter(
+                  (
+                      value
+                  ): value is string =>
+                      Boolean(value)
+              )
       )
     ].sort(
-      (a, b) =>
-        a.localeCompare(
-          b,
-          'ro'
-        )
+        (a, b) =>
+            a.localeCompare(
+                b,
+                'ro'
+            )
     );
   }
 
   getFilteredGuests(
-    guests: WeddingGuest[]
+      guests: WeddingGuest[]
   ): WeddingGuest[] {
     const term =
-      this.searchTerm
-        .trim()
-        .toLocaleLowerCase('ro');
+        this.searchTerm
+            .trim()
+            .toLocaleLowerCase('ro');
 
     return [...guests]
-      .filter(guest => {
-        const searchable = [
-          guest.name,
-          guest.groupName ?? '',
-          String(
-            guest.tableNumber ?? ''
-          ),
-          guest.allergies ?? ''
-        ]
-          .join(' ')
-          .toLocaleLowerCase('ro');
+        .filter(guest => {
+          const searchable = [
+            guest.name,
+            guest.groupName ?? '',
+            String(
+                guest.tableNumber ?? ''
+            ),
+            guest.allergies ?? ''
+          ]
+              .join(' ')
+              .toLocaleLowerCase('ro');
 
-        const matchesSearch =
-          !term ||
-          searchable.includes(term);
+          const matchesSearch =
+              !term ||
+              searchable.includes(term);
 
-        const matchesAttendance =
-          this.attendanceFilter ===
-            'all' ||
-          guest.attendanceStatus ===
-            this.attendanceFilter;
+          const matchesAttendance =
+              this.attendanceFilter ===
+              'all' ||
+              guest.attendanceStatus ===
+              this.attendanceFilter;
 
-        const matchesGroup =
-          this.groupFilter === 'all' ||
-          (
-            guest.groupName?.trim() ??
-            ''
-          ) === this.groupFilter;
+          const matchesGroup =
+              this.groupFilter === 'all' ||
+              (
+                  guest.groupName?.trim() ??
+                  ''
+              ) === this.groupFilter;
 
-        return (
-          matchesSearch &&
-          matchesAttendance &&
-          matchesGroup
+          return (
+              matchesSearch &&
+              matchesAttendance &&
+              matchesGroup
+          );
+        })
+        .sort(
+            (a, b) =>
+                a.name.localeCompare(
+                    b.name,
+                    'ro'
+                )
         );
-      })
-      .sort(
-        (a, b) =>
-          a.name.localeCompare(
-            b.name,
-            'ro'
-          )
-      );
   }
 
   getConfirmedPeople(
-    guests: WeddingGuest[]
+      guests: WeddingGuest[]
   ): number {
     return guests
-      .filter(
-        guest =>
-          guest.attendanceStatus ===
-          'confirmed'
-      )
-      .reduce(
-        (sum, guest) =>
-          sum +
-          this.getPeople(guest),
-        0
-      );
+        .filter(
+            guest =>
+                guest.attendanceStatus ===
+                'confirmed'
+        )
+        .reduce(
+            (sum, guest) =>
+                sum +
+                this.getPeople(guest),
+            0
+        );
   }
 
   getPendingRows(
-    guests: WeddingGuest[]
+      guests: WeddingGuest[]
   ): number {
     return guests.filter(
-      guest =>
-        guest.attendanceStatus ===
-          'pending' ||
-        guest.attendanceStatus ===
-          'maybe'
+        guest =>
+            guest.attendanceStatus ===
+            'pending' ||
+            guest.attendanceStatus ===
+            'maybe'
     ).length;
   }
 
+  getConfirmedChildren(
+      guests: WeddingGuest[]
+  ): number {
+    return guests
+        .filter(
+            guest =>
+                guest.attendanceStatus ===
+                'confirmed'
+        )
+        .reduce(
+            (sum, guest) =>
+                sum +
+                Number(
+                    guest.children || 0
+                ),
+            0
+        );
+  }
+
   getPeople(
-    guest: WeddingGuest
+      guest: WeddingGuest
   ): number {
     return (
-      Number(
-        guest.adults || 0
-      ) +
-      Number(
-        guest.children || 0
-      )
+        Number(
+            guest.adults || 0
+        ) +
+        Number(
+            guest.children || 0
+        )
     );
   }
 
   attendanceLabel(
-    status:
+      status:
       WeddingGuest['attendanceStatus']
   ): string {
     const labels: Record<
-      WeddingGuest['attendanceStatus'],
-      string
+        WeddingGuest['attendanceStatus'],
+        string
     > = {
       confirmed: 'Confirmat',
       pending: 'În așteptare',
