@@ -1,100 +1,616 @@
 <section>
+
     <div class="page-title">
+
         <div>
-            <div class="eyebrow">Lista persoane</div>
-            <h2>Invitați</h2>
-            <p>Overview pe categorii, confirmări, meniuri, cazare și mese.</p>
+            <div class="eyebrow">
+                Lista persoane
+            </div>
+
+            <h2>
+                Invitați
+            </h2>
+
+            <p>
+                Overview pe categorii, confirmări, meniuri, cazare și mese.
+            </p>
         </div>
+
+
+        <button
+                type="button"
+                class="primary-button page-add-button"
+                (click)="toggleAddGuestForm()"
+        >
+            {{
+                isAddGuestOpen
+                    ? '× Închide'
+                    : '+ Adaugă invitat'
+            }}
+        </button>
+
     </div>
+
 
     @if (guests$ | async; as guests) {
 
         <div class="guest-summary-grid">
-            <article class="card stat-card">
-                <span>Familii / rânduri</span>
-                <strong>{{ guests.length }}</strong>
-                <p>{{ getGroups(guests).length }} categorii</p>
-            </article>
 
             <article class="card stat-card">
-                <span>Invitații date</span>
-                <strong>{{ getGivenInvitations(guests) }}</strong>
-                <p>Din totalul listei</p>
+                <span>
+                    Familii / rânduri
+                </span>
+
+                <strong>
+                    {{ guests.length }}
+                </strong>
+
+                <p>
+                    {{ getGroups(guests).length }}
+                    categorii
+                </p>
             </article>
+
+
+            <article class="card stat-card">
+
+                <span>
+                    Invitații date
+                </span>
+
+                <strong>
+                    {{ getGivenInvitations(guests) }}
+                </strong>
+
+                <p>
+                    Din totalul listei
+                </p>
+
+            </article>
+
 
             <article class="card stat-card highlight-card">
-                <span>Persoane confirmate</span>
-                <strong>{{ getConfirmedPeople(guests) }}</strong>
-                <p>{{ getConfirmedRows(guests) }} rânduri confirmate</p>
+
+                <span>
+                    Persoane confirmate
+                </span>
+
+                <strong>
+                    {{ getConfirmedPeople(guests) }}
+                </strong>
+
+                <p>
+                    {{ getConfirmedRows(guests) }}
+                    rânduri confirmate
+                </p>
+
             </article>
 
-            <article class="card stat-card">
-                <span>În așteptare</span>
-                <strong>{{ getPendingRows(guests) }}</strong>
-                <p>Pending + poate</p>
-            </article>
 
             <article class="card stat-card">
-                <span>Au nevoie de cazare</span>
-                <strong>{{ getAccommodationNeeded(guests) }}</strong>
-                <p>Persoane</p>
+
+                <span>
+                    În așteptare
+                </span>
+
+                <strong>
+                    {{ getPendingRows(guests) }}
+                </strong>
+
+                <p>
+                    Pending + poate
+                </p>
+
             </article>
+
+
+            <article class="card stat-card">
+
+                <span>
+                    Au nevoie de cazare
+                </span>
+
+                <strong>
+                    {{ getAccommodationNeeded(guests) }}
+                </strong>
+
+                <p>
+                    Persoane
+                </p>
+
+            </article>
+
 
             <article class="card stat-card warning-card">
-                <span>Fără masă</span>
-                <strong>{{ getUnassignedPeople(guests) }}</strong>
-                <p>Persoane confirmate</p>
+
+                <span>
+                    Fără masă
+                </span>
+
+                <strong>
+                    {{ getUnassignedPeople(guests) }}
+                </strong>
+
+                <p>
+                    Persoane confirmate
+                </p>
+
             </article>
 
+
             <article class="card stat-card menu-cost-card">
-                <span>Cost meniuri confirmate</span>
+
+                <span>
+                    Cost meniuri confirmate
+                </span>
+
                 <strong>
-                    {{ getConfirmedMenuCost(guests) }} {{ menuCurrency }}
+                    {{ getConfirmedMenuCost(guests) }}
+                    {{ menuCurrency }}
                 </strong>
-                <p>{{ getConfirmedMenus(guests) }} meniuri estimate</p>
+
+                <p>
+                    {{ getConfirmedMenus(guests) }}
+                    meniuri estimate
+                </p>
+
             </article>
+
         </div>
 
 
         <article class="card menu-prices-card">
+
             <div>
-                <span class="section-kicker">Estimare meniuri</span>
-                <h3>Prețuri folosite în calcule</h3>
+
+                <span class="section-kicker">
+                    Estimare meniuri
+                </span>
+
+                <h3>
+                    Prețuri folosite în calcule
+                </h3>
+
             </div>
+
 
             <div class="price-chips">
-                <span><strong>Adult</strong> 130 EUR</span>
-                <span><strong>Sub 5 ani</strong> gratuit</span>
-                <span><strong>5–8 ani</strong> 13 EUR + TVA</span>
-                <span><strong>8–12 ani</strong> 38 EUR + TVA</span>
-                <span><strong>13–17 ani</strong> 130 EUR</span>
+
+                <span>
+                    <strong>
+                        Adult
+                    </strong>
+                    130 EUR
+                </span>
+
+                <span>
+                    <strong>
+                        Sub 5 ani
+                    </strong>
+                    gratuit
+                </span>
+
+                <span>
+                    <strong>
+                        5–8 ani
+                    </strong>
+                    13 EUR + TVA
+                </span>
+
+                <span>
+                    <strong>
+                        8–12 ani
+                    </strong>
+                    38 EUR + TVA
+                </span>
+
+                <span>
+                    <strong>
+                        13–17 ani
+                    </strong>
+                    130 EUR
+                </span>
+
             </div>
 
+
             @if (getUnspecifiedChildren(guests) > 0) {
+
                 <p class="price-note warning-text">
+
                     {{ getUnspecifiedChildren(guests) }}
                     copii nu au încă grupa de vârstă completată.
-                    Pentru estimare sunt calculați temporar cu 38 EUR/copil.
+
+                    Pentru estimare sunt calculați temporar cu
+                    38 EUR/copil.
+
                 </p>
+
             } @else {
+
                 <p class="price-note">
-                    Prețul pentru 8–12 ani include 25 EUR meniu + 13 EUR open bar.
-                    TVA-ul meniurilor pentru copii nu este inclus în totalul de mai sus.
+
+                    Prețul pentru 8–12 ani include 25 EUR meniu
+                    + 13 EUR open bar.
+
+                    TVA-ul meniurilor pentru copii nu este inclus
+                    în totalul de mai sus.
+
                 </p>
+
             }
+
         </article>
 
 
         @if (message) {
+
             <div class="alert success">
                 {{ message }}
             </div>
+
         }
 
+
         @if (errorMessage) {
+
             <div class="alert error">
                 {{ errorMessage }}
             </div>
+
+        }
+
+
+        @if (isAddGuestOpen) {
+
+            <article class="card add-guest-card">
+
+                <div class="add-guest-form-heading">
+
+                    <div>
+
+                        <span class="section-kicker">
+                            Invitat nou
+                        </span>
+
+                        <h3>
+                            Adaugă un invitat
+                        </h3>
+
+                    </div>
+
+
+                    <button
+                            type="button"
+                            class="add-form-close"
+                            (click)="closeAddGuestForm()"
+                            aria-label="Închide formularul"
+                    >
+                        ×
+                    </button>
+
+                </div>
+
+
+                <div class="add-guest-grid">
+
+                    <label>
+
+                        Nume *
+
+                        <input
+                                type="text"
+                                [(ngModel)]="newGuest.name"
+                        />
+
+                    </label>
+
+
+                    <label>
+
+                        Grup
+
+                        <input
+                                type="text"
+                                [(ngModel)]="newGuest.groupName"
+                                placeholder="Ex: Prieteni Diana"
+                        />
+
+                    </label>
+
+
+                    <label>
+
+                        Partea
+
+                        <select
+                                [(ngModel)]="newGuest.side"
+                        >
+
+                            @for (
+                                o of sideOptions;
+                                track o.value
+                                    ) {
+
+                                <option [value]="o.value">
+                                    {{ o.label }}
+                                </option>
+
+                            }
+
+                        </select>
+
+                    </label>
+
+
+                    <label>
+
+                        Adulți
+
+                        <input
+                                type="number"
+                                min="0"
+                                [(ngModel)]="newGuest.adults"
+                        />
+
+                    </label>
+
+
+                    <fieldset class="children-fieldset wide-field">
+
+                        <legend>
+                            Copii pe grupe de vârstă
+                        </legend>
+
+
+                        <div class="children-grid">
+
+                            <label>
+
+                                Sub 5 ani
+
+                                <input
+                                        type="number"
+                                        min="0"
+                                        [(ngModel)]="newGuest.childrenUnder5"
+                                        (ngModelChange)="onNewChildCountChange()"
+                                />
+
+                            </label>
+
+
+                            <label>
+
+                                5–8 ani
+
+                                <input
+                                        type="number"
+                                        min="0"
+                                        [(ngModel)]="newGuest.children5To8"
+                                        (ngModelChange)="onNewChildCountChange()"
+                                />
+
+                            </label>
+
+
+                            <label>
+
+                                8–12 ani
+
+                                <input
+                                        type="number"
+                                        min="0"
+                                        [(ngModel)]="newGuest.children8To12"
+                                        (ngModelChange)="onNewChildCountChange()"
+                                />
+
+                            </label>
+
+
+                            <label>
+
+                                13–17 ani
+
+                                <input
+                                        type="number"
+                                        min="0"
+                                        [(ngModel)]="newGuest.children13To17"
+                                        (ngModelChange)="onNewChildCountChange()"
+                                />
+
+                            </label>
+
+                        </div>
+
+                    </fieldset>
+
+
+                    <label>
+
+                        Invitație
+
+                        <select
+                                [(ngModel)]="newGuest.invitationStatus"
+                        >
+
+                            @for (
+                                o of invitationOptions;
+                                track o.value
+                                    ) {
+
+                                <option [value]="o.value">
+                                    {{ o.label }}
+                                </option>
+
+                            }
+
+                        </select>
+
+                    </label>
+
+
+                    <label>
+
+                        Confirmare
+
+                        <select
+                                [(ngModel)]="newGuest.attendanceStatus"
+                        >
+
+                            @for (
+                                o of attendanceOptions;
+                                track o.value
+                                    ) {
+
+                                <option [value]="o.value">
+                                    {{ o.label }}
+                                </option>
+
+                            }
+
+                        </select>
+
+                    </label>
+
+
+                    <label>
+
+                        Cazare
+
+                        <select
+                                [(ngModel)]="newGuest.accommodationStatus"
+                        >
+
+                            @for (
+                                o of accommodationOptions;
+                                track o.value
+                                    ) {
+
+                                <option [value]="o.value">
+                                    {{ o.label }}
+                                </option>
+
+                            }
+
+                        </select>
+
+                    </label>
+
+
+                    <label>
+
+                        Meniu adulți
+
+                        <select
+                                [(ngModel)]="newGuest.menuType"
+                        >
+
+                            @for (
+                                o of menuOptions;
+                                track o.value
+                                    ) {
+
+                                <option [value]="o.value">
+                                    {{ o.label }}
+                                </option>
+
+                            }
+
+                        </select>
+
+                    </label>
+
+
+                    <label>
+
+                        Telefon
+
+                        <input
+                                type="tel"
+                                [(ngModel)]="newGuest.phone"
+                        />
+
+                    </label>
+
+
+                    <label>
+
+                        Email
+
+                        <input
+                                type="email"
+                                [(ngModel)]="newGuest.email"
+                        />
+
+                    </label>
+
+
+                    <label>
+
+                        Nr. masă
+
+                        <input
+                                type="number"
+                                min="1"
+                                [(ngModel)]="newGuest.tableNumber"
+                        />
+
+                    </label>
+
+
+                    <label>
+
+                        Alergii / restricții
+
+                        <input
+                                type="text"
+                                [(ngModel)]="newGuest.allergies"
+                        />
+
+                    </label>
+
+
+                    <label class="checkbox-row">
+
+                        <input
+                                type="checkbox"
+                                [(ngModel)]="newGuest.transportNeeded"
+                        />
+
+                        Are nevoie de transport
+
+                    </label>
+
+
+                    <label class="wide-field">
+
+                        Observații
+
+                        <textarea
+                                rows="2"
+                                [(ngModel)]="newGuest.notes"
+                        ></textarea>
+
+                    </label>
+
+
+                    <button
+                            type="button"
+                            class="primary-button"
+                            (click)="addGuest()"
+                            [disabled]="isAddingGuest"
+                    >
+                        {{
+                            isAddingGuest
+                                ? 'Se adaugă...'
+                                : 'Adaugă invitat'
+                        }}
+                    </button>
+
+                </div>
+
+            </article>
+
         }
 
 
@@ -103,16 +619,19 @@
                 role="group"
                 aria-label="Mod afișare invitați"
         >
-
         </div>
 
 
         <article class="card toolbar-card">
 
             <div class="toolbar-top">
+
                 <div>
-                    <h3>Caută și filtrează invitatii</h3>
+                    <h3>
+                        Caută și filtrează invitatii
+                    </h3>
                 </div>
+
 
                 <div class="toolbar-actions">
 
@@ -129,6 +648,7 @@
                         }}
                     </button>
 
+
                     <button
                             type="button"
                             class="secondary-button"
@@ -136,6 +656,7 @@
                     >
                         Export CSV
                     </button>
+
 
                     <button
                             type="button"
@@ -146,338 +667,167 @@
                     </button>
 
                 </div>
+
             </div>
 
 
             <div class="filters-grid">
 
                 <label class="search-field">
+
                     Căutare
+
                     <input
                             type="search"
                             [(ngModel)]="searchTerm"
                             placeholder="Nume, telefon, grup, alergii..."
                     />
+
                 </label>
 
 
                 <label>
+
                     Partea
 
-                    <select [(ngModel)]="sideFilter">
-                        <option value="all">Toate</option>
+                    <select
+                            [(ngModel)]="sideFilter"
+                    >
 
-                        @for (o of sideOptions; track o.value) {
+                        <option value="all">
+                            Toate
+                        </option>
+
+                        @for (
+                            o of sideOptions;
+                            track o.value
+                                ) {
+
                             <option [value]="o.value">
                                 {{ o.label }}
                             </option>
+
                         }
+
                     </select>
+
                 </label>
 
 
                 <label>
+
                     Confirmare
 
-                    <select [(ngModel)]="attendanceFilter">
-                        <option value="all">Toate</option>
+                    <select
+                            [(ngModel)]="attendanceFilter"
+                    >
 
-                        @for (o of attendanceOptions; track o.value) {
+                        <option value="all">
+                            Toate
+                        </option>
+
+                        @for (
+                            o of attendanceOptions;
+                            track o.value
+                                ) {
+
                             <option [value]="o.value">
                                 {{ o.label }}
                             </option>
+
                         }
+
                     </select>
+
                 </label>
 
 
                 <label>
+
                     Invitație
 
-                    <select [(ngModel)]="invitationFilter">
-                        <option value="all">Toate</option>
+                    <select
+                            [(ngModel)]="invitationFilter"
+                    >
 
-                        @for (o of invitationOptions; track o.value) {
+                        <option value="all">
+                            Toate
+                        </option>
+
+                        @for (
+                            o of invitationOptions;
+                            track o.value
+                                ) {
+
                             <option [value]="o.value">
                                 {{ o.label }}
                             </option>
+
                         }
+
                     </select>
+
                 </label>
 
 
                 <label>
+
                     Cazare
 
-                    <select [(ngModel)]="accommodationFilter">
-                        <option value="all">Toate</option>
+                    <select
+                            [(ngModel)]="accommodationFilter"
+                    >
 
-                        @for (o of accommodationOptions; track o.value) {
+                        <option value="all">
+                            Toate
+                        </option>
+
+                        @for (
+                            o of accommodationOptions;
+                            track o.value
+                                ) {
+
                             <option [value]="o.value">
                                 {{ o.label }}
                             </option>
+
                         }
+
                     </select>
+
                 </label>
 
 
                 <label>
+
                     Grup
 
-                    <select [(ngModel)]="groupFilter">
-                        <option value="all">Toate</option>
+                    <select
+                            [(ngModel)]="groupFilter"
+                    >
 
-                        @for (group of getGroups(guests); track group) {
+                        <option value="all">
+                            Toate
+                        </option>
+
+                        @for (
+                            group of getGroups(guests);
+                            track group
+                                ) {
+
                             <option [value]="group">
                                 {{ group }}
                             </option>
+
                         }
+
                     </select>
+
                 </label>
 
             </div>
 
         </article>
-
-
-        <details class="card add-guest-card">
-
-            <summary>
-                + Adaugă invitat nou
-            </summary>
-
-
-            <div class="add-guest-grid">
-
-                <label>
-                    Nume *
-                    <input
-                            type="text"
-                            [(ngModel)]="newGuest.name"
-                    />
-                </label>
-
-
-                <label>
-                    Grup
-                    <input
-                            type="text"
-                            [(ngModel)]="newGuest.groupName"
-                            placeholder="Ex: Prieteni Diana"
-                    />
-                </label>
-
-
-                <label>
-                    Partea
-
-                    <select [(ngModel)]="newGuest.side">
-                        @for (o of sideOptions; track o.value) {
-                            <option [value]="o.value">
-                                {{ o.label }}
-                            </option>
-                        }
-                    </select>
-                </label>
-
-
-                <label>
-                    Adulți
-
-                    <input
-                            type="number"
-                            min="0"
-                            [(ngModel)]="newGuest.adults"
-                    />
-                </label>
-
-
-                <fieldset class="children-fieldset wide-field">
-
-                    <legend>
-                        Copii pe grupe de vârstă
-                    </legend>
-
-                    <div class="children-grid">
-
-                        <label>
-                            Sub 5 ani
-
-                            <input
-                                    type="number"
-                                    min="0"
-                                    [(ngModel)]="newGuest.childrenUnder5"
-                                    (ngModelChange)="onNewChildCountChange()"
-                            />
-                        </label>
-
-
-                        <label>
-                            5–8 ani
-
-                            <input
-                                    type="number"
-                                    min="0"
-                                    [(ngModel)]="newGuest.children5To8"
-                                    (ngModelChange)="onNewChildCountChange()"
-                            />
-                        </label>
-
-
-                        <label>
-                            8–12 ani
-
-                            <input
-                                    type="number"
-                                    min="0"
-                                    [(ngModel)]="newGuest.children8To12"
-                                    (ngModelChange)="onNewChildCountChange()"
-                            />
-                        </label>
-
-
-                        <label>
-                            13–17 ani
-
-                            <input
-                                    type="number"
-                                    min="0"
-                                    [(ngModel)]="newGuest.children13To17"
-                                    (ngModelChange)="onNewChildCountChange()"
-                            />
-                        </label>
-
-                    </div>
-                </fieldset>
-
-
-                <label>
-                    Invitație
-
-                    <select [(ngModel)]="newGuest.invitationStatus">
-                        @for (o of invitationOptions; track o.value) {
-                            <option [value]="o.value">
-                                {{ o.label }}
-                            </option>
-                        }
-                    </select>
-                </label>
-
-
-                <label>
-                    Confirmare
-
-                    <select [(ngModel)]="newGuest.attendanceStatus">
-                        @for (o of attendanceOptions; track o.value) {
-                            <option [value]="o.value">
-                                {{ o.label }}
-                            </option>
-                        }
-                    </select>
-                </label>
-
-
-                <label>
-                    Cazare
-
-                    <select [(ngModel)]="newGuest.accommodationStatus">
-                        @for (o of accommodationOptions; track o.value) {
-                            <option [value]="o.value">
-                                {{ o.label }}
-                            </option>
-                        }
-                    </select>
-                </label>
-
-
-                <label>
-                    Meniu adulți
-
-                    <select [(ngModel)]="newGuest.menuType">
-                        @for (o of menuOptions; track o.value) {
-                            <option [value]="o.value">
-                                {{ o.label }}
-                            </option>
-                        }
-                    </select>
-                </label>
-
-
-                <label>
-                    Telefon
-
-                    <input
-                            type="tel"
-                            [(ngModel)]="newGuest.phone"
-                    />
-                </label>
-
-
-                <label>
-                    Email
-
-                    <input
-                            type="email"
-                            [(ngModel)]="newGuest.email"
-                    />
-                </label>
-
-
-                <label>
-                    Nr. masă
-
-                    <input
-                            type="number"
-                            min="1"
-                            [(ngModel)]="newGuest.tableNumber"
-                    />
-                </label>
-
-
-                <label>
-                    Alergii / restricții
-
-                    <input
-                            type="text"
-                            [(ngModel)]="newGuest.allergies"
-                    />
-                </label>
-
-
-                <label class="checkbox-row">
-                    <input
-                            type="checkbox"
-                            [(ngModel)]="newGuest.transportNeeded"
-                    />
-                    Are nevoie de transport
-                </label>
-
-
-                <label class="wide-field">
-                    Observații
-
-                    <textarea
-                            rows="2"
-                            [(ngModel)]="newGuest.notes"
-                    ></textarea>
-                </label>
-
-
-                <button
-                        type="button"
-                        class="primary-button"
-                        (click)="addGuest()"
-                        [disabled]="isAddingGuest"
-                >
-                    {{
-                        isAddingGuest
-                            ? 'Se adaugă...'
-                            : 'Adaugă invitat'
-                    }}
-                </button>
-
-            </div>
-        </details>
 
 
         @if (currentView === 'overview') {
@@ -495,15 +845,16 @@
 
                             <div class="group-heading">
 
-                <span
-                        class="group-icon"
-                        aria-hidden="true"
-                >
-                  {{ getGroupIcon(group.name) }}
-                </span>
+                                <span
+                                        class="group-icon"
+                                        aria-hidden="true"
+                                >
+                                    {{ getGroupIcon(group.name) }}
+                                </span>
 
 
                                 <div>
+
                                     <h3>
                                         {{ group.name }}
                                     </h3>
@@ -514,6 +865,7 @@
                                         {{ group.people }}
                                         persoane
                                     </p>
+
                                 </div>
 
                             </div>
@@ -525,33 +877,39 @@
 
                                     <div class="group-stats">
 
-                    <span class="confirmed-mini">
-                      {{ group.confirmedPeople }}
-                        confirmați
-                    </span>
+                                        <span class="confirmed-mini">
+                                            {{ group.confirmedPeople }}
+                                            confirmați
+                                        </span>
 
 
                                         @if (group.pendingRows) {
+
                                             <span>
-                        {{ group.pendingRows }}
+                                                {{ group.pendingRows }}
                                                 în așteptare
-                      </span>
+                                            </span>
+
                                         }
 
 
                                         @if (group.accommodationPeople) {
+
                                             <span>
-                        {{ group.accommodationPeople }}
+                                                {{ group.accommodationPeople }}
                                                 cazare
-                      </span>
+                                            </span>
+
                                         }
 
 
                                         @if (group.unassignedPeople) {
+
                                             <span class="warning-mini">
-                        {{ group.unassignedPeople }}
+                                                {{ group.unassignedPeople }}
                                                 fără masă
-                      </span>
+                                            </span>
+
                                         }
 
                                     </div>
@@ -561,63 +919,82 @@
 
                                         <div class="children-summary">
 
-                      <span class="children-total">
-                        👶
-                          {{ group.children }}
-                          {{ getChildLabel(group.children) }}
-                      </span>
+                                            <span class="children-total">
+
+                                                👶
+                                                {{ group.children }}
+                                                {{ getChildLabel(group.children) }}
+
+                                            </span>
 
 
                                             @if (group.childrenUnder5) {
+
                                                 <span>
-                          Sub 5 ani:
-                          <strong>
-                            {{ group.childrenUnder5 }}
-                          </strong>
-                        </span>
+                                                    Sub 5 ani:
+                                                    <strong>
+                                                        {{ group.childrenUnder5 }}
+                                                    </strong>
+                                                </span>
+
                                             }
 
 
                                             @if (group.children5To8) {
+
                                                 <span>
-                          5–8 ani:
-                          <strong>
-                            {{ group.children5To8 }}
-                          </strong>
-                        </span>
+                                                    5–8 ani:
+                                                    <strong>
+                                                        {{ group.children5To8 }}
+                                                    </strong>
+                                                </span>
+
                                             }
 
 
                                             @if (group.children8To12) {
+
                                                 <span>
-                          8–12 ani:
-                          <strong>
-                            {{ group.children8To12 }}
-                          </strong>
-                        </span>
+                                                    8–12 ani:
+                                                    <strong>
+                                                        {{ group.children8To12 }}
+                                                    </strong>
+                                                </span>
+
                                             }
 
 
                                             @if (group.children13To17) {
+
                                                 <span>
-                          13–17 ani:
-                          <strong>
-                            {{ group.children13To17 }}
-                          </strong>
-                        </span>
+                                                    13–17 ani:
+                                                    <strong>
+                                                        {{ group.children13To17 }}
+                                                    </strong>
+                                                </span>
+
                                             }
 
 
                                             @if (group.unspecifiedChildren) {
+
                                                 <span class="children-warning">
-                          ⚠
+
+                                                    ⚠
                                                     {{ group.unspecifiedChildren }}
-                                                    {{ getChildLabel(group.unspecifiedChildren) }}
+                                                    {{
+                                                        getChildLabel(
+                                                            group.unspecifiedChildren
+                                                        )
+                                                    }}
                                                     fără vârstă
-                        </span>
+
+                                                </span>
+
                                             }
 
                                         </div>
+
                                     }
 
                                 </div>
@@ -627,8 +1004,8 @@
                                         class="group-chevron"
                                         aria-hidden="true"
                                 >
-                  ⌄
-                </span>
+                                    ⌄
+                                </span>
 
                             </div>
 
@@ -649,112 +1026,147 @@
                                         [class.selected]="expandedGuestId === guest.id"
                                 >
 
-                  <span
-                          class="attendance-dot"
-                          [class.confirmed]="guest.attendanceStatus === 'confirmed'"
-                          [class.declined]="guest.attendanceStatus === 'declined'"
-                  ></span>
+                                    <span
+                                            class="attendance-dot"
+                                            [class.confirmed]="guest.attendanceStatus === 'confirmed'"
+                                            [class.declined]="guest.attendanceStatus === 'declined'"
+                                    ></span>
 
 
                                     <span class="name-main">
 
-                    <strong>
-                      {{ guest.name }}
-                    </strong>
+                                        <strong>
+                                            {{ guest.name }}
+                                        </strong>
 
 
-                    <small>
-                      {{ getPeople(guest) }}
-                        persoane ·
-                        {{ getAttendanceLabel(guest.attendanceStatus) }}
-                    </small>
+                                        <small>
+                                            {{ getPeople(guest) }}
+                                            persoane ·
+                                            {{
+                                                getAttendanceLabel(
+                                                    guest.attendanceStatus
+                                                )
+                                            }}
+                                        </small>
 
 
                                         @if (guest.children) {
 
                                             <small class="children-line">
 
-                        <span>
-                          👶
-                            {{ guest.adults }}
-                            {{ getAdultLabel(guest.adults) }}
-                            ·
-                            {{ guest.children }}
-                            {{ getChildLabel(guest.children) }}
-                        </span>
+                                                <span>
+
+                                                    👶
+                                                    {{ guest.adults }}
+                                                    {{
+                                                        getAdultLabel(
+                                                            guest.adults
+                                                        )
+                                                    }}
+                                                    ·
+                                                    {{ guest.children }}
+                                                    {{
+                                                        getChildLabel(
+                                                            guest.children
+                                                        )
+                                                    }}
+
+                                                </span>
 
 
                                                 @if (guest.childrenUnder5) {
+
                                                     <span>
-                            sub 5 ani:
-                            <strong>
-                              {{ guest.childrenUnder5 }}
-                            </strong>
-                          </span>
+                                                        sub 5 ani:
+                                                        <strong>
+                                                            {{ guest.childrenUnder5 }}
+                                                        </strong>
+                                                    </span>
+
                                                 }
 
 
                                                 @if (guest.children5To8) {
+
                                                     <span>
-                            5–8 ani:
-                            <strong>
-                              {{ guest.children5To8 }}
-                            </strong>
-                          </span>
+                                                        5–8 ani:
+                                                        <strong>
+                                                            {{ guest.children5To8 }}
+                                                        </strong>
+                                                    </span>
+
                                                 }
 
 
                                                 @if (guest.children8To12) {
+
                                                     <span>
-                            8–12 ani:
-                            <strong>
-                              {{ guest.children8To12 }}
-                            </strong>
-                          </span>
+                                                        8–12 ani:
+                                                        <strong>
+                                                            {{ guest.children8To12 }}
+                                                        </strong>
+                                                    </span>
+
                                                 }
 
 
                                                 @if (guest.children13To17) {
+
                                                     <span>
-                            13–17 ani:
-                            <strong>
-                              {{ guest.children13To17 }}
-                            </strong>
-                          </span>
+                                                        13–17 ani:
+                                                        <strong>
+                                                            {{ guest.children13To17 }}
+                                                        </strong>
+                                                    </span>
+
                                                 }
 
 
                                                 @if (getUnspecifiedChildrenForGuest(guest)) {
+
                                                     <span class="child-age-warning">
-                            ⚠
-                                                        {{ getUnspecifiedChildrenForGuest(guest) }}
-                                                        {{ getChildLabel(
-                                                        getUnspecifiedChildrenForGuest(guest)
-                                                    ) }}
+
+                                                        ⚠
+                                                        {{
+                                                            getUnspecifiedChildrenForGuest(
+                                                                guest
+                                                            )
+                                                        }}
+                                                        {{
+                                                            getChildLabel(
+                                                                getUnspecifiedChildrenForGuest(
+                                                                    guest
+                                                                )
+                                                            )
+                                                        }}
                                                         fără vârstă
-                          </span>
+
+                                                    </span>
+
                                                 }
 
-                      </small>
+                                            </small>
+
                                         }
 
-                  </span>
+                                    </span>
 
 
                                     <span class="name-meta">
 
-                    @if (guest.tableNumber) {
-                        Masa {{ guest.tableNumber }}
-                    } @else {
-                        Fără masă
-                    }
+                                        @if (guest.tableNumber) {
+                                            Masa {{ guest.tableNumber }}
+                                        } @else {
+                                            Fără masă
+                                        }
 
-                  </span>
+                                    </span>
 
 
                                     <span class="chevron">
-                    ›
-                  </span>
+                                        ›
+                                    </span>
 
                                 </button>
 
@@ -763,41 +1175,58 @@
 
                                     <div class="quick-details">
 
-                    <span>
-                      <strong>Meniu:</strong>
-                        {{ getCalculatedMenus(guest) }}
-                        ·
-                        {{ getGuestMenuTotal(guest) }}
-                        EUR
-                    </span>
+                                        <span>
+
+                                            <strong>
+                                                Meniu:
+                                            </strong>
+
+                                            {{ getCalculatedMenus(guest) }}
+                                            ·
+                                            {{ getGuestMenuTotal(guest) }}
+                                            EUR
+
+                                        </span>
 
 
                                         <span>
-                      <strong>Cazare:</strong>
+
+                                            <strong>
+                                                Cazare:
+                                            </strong>
+
                                             {{
                                                 getAccommodationLabel(
                                                     guest.accommodationStatus ??
                                                     'unknown'
                                                 )
                                             }}
-                    </span>
+
+                                        </span>
 
 
                                         <span>
-                      <strong>Invitație:</strong>
+
+                                            <strong>
+                                                Invitație:
+                                            </strong>
+
                                             {{
                                                 getInvitationLabel(
                                                     guest.invitationStatus
                                                 )
                                             }}
-                    </span>
+
+                                        </span>
 
 
                                         @if (guest.children) {
 
                                             <span class="quick-children">
 
-                        <strong>Copii:</strong>
+                                                <strong>
+                                                    Copii:
+                                                </strong>
 
                                                 {{ guest.children }}
                                                 {{ getChildLabel(guest.children) }}
@@ -827,29 +1256,38 @@
                                                 }
 
 
-                                                @if (
-                                                    getUnspecifiedChildrenForGuest(guest)
-                                                        ) {
+                                                @if (getUnspecifiedChildrenForGuest(guest)) {
+
                                                     ·
+
                                                     <strong class="warning-text">
-                            {{
+                                                        {{
                                                             getUnspecifiedChildrenForGuest(
                                                                 guest
                                                             )
                                                         }}
                                                         fără vârstă
-                          </strong>
+                                                    </strong>
+
                                                 }
 
-                      </span>
+                                            </span>
+
                                         }
 
 
                                         @if (guest.phone) {
+
                                             <span>
-                        <strong>Telefon:</strong>
+
+                                                <strong>
+                                                    Telefon:
+                                                </strong>
+
                                                 {{ guest.phone }}
-                      </span>
+
+                                            </span>
+
                                         }
 
 
@@ -862,6 +1300,7 @@
                                         </button>
 
                                     </div>
+
                                 }
 
                             }
@@ -897,9 +1336,10 @@
                             ← Înapoi la lista de invitați
                         </button>
 
+
                         <span>
-              Editezi un singur rând
-            </span>
+                            Editezi un singur rând
+                        </span>
 
                     </div>
 
@@ -918,17 +1358,20 @@
                                     {{ guest.name }}
                                 </h3>
 
+
                                 <div class="badges">
 
-                  <span class="badge">
-                    {{ getSideLabel(guest.side) }}
-                  </span>
+                                    <span class="badge">
+                                        {{ getSideLabel(guest.side) }}
+                                    </span>
 
 
                                     @if (guest.groupName) {
+
                                         <span class="badge soft">
-                      {{ guest.groupName }}
-                    </span>
+                                            {{ guest.groupName }}
+                                        </span>
+
                                     }
 
 
@@ -937,12 +1380,12 @@
                                             [class.confirmed]="guest.attendanceStatus === 'confirmed'"
                                             [class.declined]="guest.attendanceStatus === 'declined'"
                                     >
-                    {{
+                                        {{
                                             getAttendanceLabel(
                                                 guest.attendanceStatus
                                             )
                                         }}
-                  </span>
+                                    </span>
 
                                 </div>
 
@@ -950,15 +1393,17 @@
 
 
                             <div class="menu-summary">
+
                                 <strong>
                                     {{ getCalculatedMenus(guest) }}
                                     meniuri
                                 </strong>
 
                                 <span>
-                  {{ getGuestMenuTotal(guest) }}
+                                    {{ getGuestMenuTotal(guest) }}
                                     {{ menuCurrency }}
-                </span>
+                                </span>
+
                             </div>
 
                         </div>
@@ -967,6 +1412,7 @@
                         <div class="guest-edit-grid">
 
                             <label>
+
                                 Nume
 
                                 <input
@@ -974,10 +1420,12 @@
                                         [(ngModel)]="guest.name"
                                         (ngModelChange)="queueGuestSave(guest)"
                                 />
+
                             </label>
 
 
                             <label>
+
                                 Grup
 
                                 <input
@@ -985,26 +1433,37 @@
                                         [(ngModel)]="guest.groupName"
                                         (ngModelChange)="queueGuestSave(guest)"
                                 />
+
                             </label>
 
 
                             <label>
+
                                 Partea
 
                                 <select
                                         [(ngModel)]="guest.side"
                                         (ngModelChange)="queueGuestSave(guest)"
                                 >
-                                    @for (o of sideOptions; track o.value) {
+
+                                    @for (
+                                        o of sideOptions;
+                                        track o.value
+                                            ) {
+
                                         <option [value]="o.value">
                                             {{ o.label }}
                                         </option>
+
                                     }
+
                                 </select>
+
                             </label>
 
 
                             <label>
+
                                 Adulți
 
                                 <input
@@ -1013,6 +1472,7 @@
                                         [(ngModel)]="guest.adults"
                                         (ngModelChange)="queueGuestSave(guest)"
                                 />
+
                             </label>
 
 
@@ -1027,9 +1487,11 @@
                                     Poți seta orice grupă la 0 pentru a șterge copilul din acea categorie.
                                 </p>
 
+
                                 <div class="children-grid">
 
                                     <label>
+
                                         Sub 5 ani
 
                                         <input
@@ -1038,10 +1500,12 @@
                                                 [(ngModel)]="guest.childrenUnder5"
                                                 (ngModelChange)="onChildCountChange(guest)"
                                         />
+
                                     </label>
 
 
                                     <label>
+
                                         5–8 ani
 
                                         <input
@@ -1050,10 +1514,12 @@
                                                 [(ngModel)]="guest.children5To8"
                                                 (ngModelChange)="onChildCountChange(guest)"
                                         />
+
                                     </label>
 
 
                                     <label>
+
                                         8–12 ani
 
                                         <input
@@ -1062,10 +1528,12 @@
                                                 [(ngModel)]="guest.children8To12"
                                                 (ngModelChange)="onChildCountChange(guest)"
                                         />
+
                                     </label>
 
 
                                     <label>
+
                                         13–17 ani
 
                                         <input
@@ -1074,15 +1542,19 @@
                                                 [(ngModel)]="guest.children13To17"
                                                 (ngModelChange)="onChildCountChange(guest)"
                                         />
+
                                     </label>
 
                                 </div>
 
 
                                 @if (guest.children) {
+
                                     <div class="children-edit-actions">
 
+
                                         @if (getUnspecifiedChildrenForGuest(guest)) {
+
                                             <button
                                                     type="button"
                                                     class="secondary-button child-action-button"
@@ -1095,7 +1567,9 @@
                                                         : 'copiii fără vârstă'
                                                 }}
                                             </button>
+
                                         }
+
 
                                         <button
                                                 type="button"
@@ -1110,6 +1584,7 @@
                                         </button>
 
                                     </div>
+
                                 }
 
 
@@ -1120,83 +1595,125 @@
                                     !guest.children8To12 &&
                                     !guest.children13To17
                                         ) {
+
                                     <p class="field-hint">
+
                                         Înregistrarea are
                                         {{ guest.children }}
                                         {{ getChildLabel(guest.children) }}
                                         fără vârstă.
+
                                         Completează grupele pentru un cost exact.
+
                                     </p>
+
                                 }
 
                             </fieldset>
 
 
                             <label>
+
                                 Invitație
 
                                 <select
                                         [(ngModel)]="guest.invitationStatus"
                                         (ngModelChange)="queueGuestSave(guest)"
                                 >
-                                    @for (o of invitationOptions; track o.value) {
+
+                                    @for (
+                                        o of invitationOptions;
+                                        track o.value
+                                            ) {
+
                                         <option [value]="o.value">
                                             {{ o.label }}
                                         </option>
+
                                     }
+
                                 </select>
+
                             </label>
 
 
                             <label>
+
                                 Confirmare
 
                                 <select
                                         [(ngModel)]="guest.attendanceStatus"
                                         (ngModelChange)="queueGuestSave(guest)"
                                 >
-                                    @for (o of attendanceOptions; track o.value) {
+
+                                    @for (
+                                        o of attendanceOptions;
+                                        track o.value
+                                            ) {
+
                                         <option [value]="o.value">
                                             {{ o.label }}
                                         </option>
+
                                     }
+
                                 </select>
+
                             </label>
 
 
                             <label>
+
                                 Cazare
 
                                 <select
                                         [(ngModel)]="guest.accommodationStatus"
                                         (ngModelChange)="queueGuestSave(guest)"
                                 >
-                                    @for (o of accommodationOptions; track o.value) {
+
+                                    @for (
+                                        o of accommodationOptions;
+                                        track o.value
+                                            ) {
+
                                         <option [value]="o.value">
                                             {{ o.label }}
                                         </option>
+
                                     }
+
                                 </select>
+
                             </label>
 
 
                             <label>
+
                                 Meniu adulți
 
                                 <select
                                         [(ngModel)]="guest.menuType"
                                         (ngModelChange)="queueGuestSave(guest)"
                                 >
-                                    @for (o of menuOptions; track o.value) {
+
+                                    @for (
+                                        o of menuOptions;
+                                        track o.value
+                                            ) {
+
                                         <option [value]="o.value">
                                             {{ o.label }}
                                         </option>
+
                                     }
+
                                 </select>
+
                             </label>
 
 
                             <label>
+
                                 Nr. masă
 
                                 <input
@@ -1205,10 +1722,12 @@
                                         [(ngModel)]="guest.tableNumber"
                                         (ngModelChange)="queueGuestSave(guest)"
                                 />
+
                             </label>
 
 
                             <label>
+
                                 Telefon
 
                                 <input
@@ -1216,10 +1735,12 @@
                                         [(ngModel)]="guest.phone"
                                         (ngModelChange)="queueGuestSave(guest)"
                                 />
+
                             </label>
 
 
                             <label>
+
                                 Email
 
                                 <input
@@ -1227,10 +1748,12 @@
                                         [(ngModel)]="guest.email"
                                         (ngModelChange)="queueGuestSave(guest)"
                                 />
+
                             </label>
 
 
                             <label>
+
                                 Alergii / restricții
 
                                 <input
@@ -1238,6 +1761,7 @@
                                         [(ngModel)]="guest.allergies"
                                         (ngModelChange)="queueGuestSave(guest)"
                                 />
+
                             </label>
 
 
@@ -1255,6 +1779,7 @@
 
 
                             <label class="wide-field">
+
                                 Observații
 
                                 <textarea
@@ -1262,6 +1787,7 @@
                                         [(ngModel)]="guest.notes"
                                         (ngModelChange)="queueGuestSave(guest)"
                                 ></textarea>
+
                             </label>
 
                         </div>
@@ -1297,15 +1823,15 @@
 
                 </div>
 
-
             } @else {
 
                 <article class="card detail-picker">
 
                     <div>
-            <span class="section-kicker">
-              Editare individuală
-            </span>
+
+                        <span class="section-kicker">
+                            Editare individuală
+                        </span>
 
                         <h3>
                             Alege invitatul pe care vrei să îl modifici
@@ -1315,6 +1841,7 @@
                             Formularul se va deschide doar pentru persoana
                             sau familia selectată.
                         </p>
+
                     </div>
 
 
@@ -1331,32 +1858,34 @@
                                     (click)="openGuestEditor(guest.id)"
                             >
 
-                <span>
-                  <strong>
-                    {{ guest.name }}
-                  </strong>
+                                <span>
 
-                  <small>
-                    {{ guest.groupName || 'Fără categorie' }}
-                      ·
-                      {{ getPeople(guest) }}
-                      persoane
-                  </small>
-                </span>
+                                    <strong>
+                                        {{ guest.name }}
+                                    </strong>
+
+                                    <small>
+                                        {{ guest.groupName || 'Fără categorie' }}
+                                        ·
+                                        {{ getPeople(guest) }}
+                                        persoane
+                                    </small>
+
+                                </span>
 
 
                                 <span class="edit-picker-status">
-                  {{
+                                    {{
                                         getAttendanceLabel(
                                             guest.attendanceStatus
                                         )
                                     }}
-                </span>
+                                </span>
 
 
                                 <span class="edit-picker-action">
-                  Editează ›
-                </span>
+                                    Editează ›
+                                </span>
 
                             </button>
 
