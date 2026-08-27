@@ -1,10 +1,8 @@
 import { Routes } from '@angular/router';
 
-import { DashboardComponent } from './pages/dashboard/dashboard.component';
 import { VendorsComponent } from './pages/vendors/vendors.component';
 import { PaymentsComponent } from './pages/payments/payments.component';
 import { DocumentsComponent } from './pages/documents/documents.component';
-import { GuestsComponent } from './pages/guests/guests.component';
 import { TasksComponent } from './pages/tasks/tasks.component';
 import { PreparationsComponent } from './pages/preparations/preparations.component';
 import { RingsComponent } from './pages/rings/rings.component';
@@ -12,26 +10,32 @@ import { AccommodationsComponent } from './pages/accommodations/accommodations.c
 import { SeatingPlannerComponent } from './pages/seating-planner/seating-planner.component';
 import { CalendarTimelineComponent } from './pages/calendar-timeline/calendar-timeline.component';
 import { ExportBackupComponent } from './pages/export-backup/export-backup.component';
-import { WeddingDayComponent } from './pages/wedding-day/wedding-day.component';
 import { AlertCenterComponent } from './pages/alert-center/alert-center.component';
+
+import { DashboardAccessComponent } from './pages/dashboard/dashboard-access.component';
+import { GuestsAccessComponent } from './pages/guests/guests-access.component';
+import { WeddingDayAccessComponent } from './pages/wedding-day/wedding-day-access.component';
 
 import { adminGuard } from './core/auth/admin.guard';
 
 export const routes: Routes = [
   /*
    * VIEWER + ADMIN
+   *
+   * Aceste rute decid singure ce componentă afișează
+   * în funcție de rol.
    */
   {
     path: 'dashboard',
-    component: DashboardComponent
+    component: DashboardAccessComponent
   },
   {
     path: 'guests',
-    component: GuestsComponent
+    component: GuestsAccessComponent
   },
   {
     path: 'ziua-nuntii',
-    component: WeddingDayComponent
+    component: WeddingDayAccessComponent
   },
 
   /*
@@ -98,7 +102,6 @@ export const routes: Routes = [
     redirectTo: 'dashboard',
     pathMatch: 'full'
   },
-
   {
     path: '**',
     redirectTo: 'dashboard'

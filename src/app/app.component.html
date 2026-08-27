@@ -1,150 +1,167 @@
 <div class="app-shell">
-    <aside class="sidebar">
-        <div class="brand">
-            <div class="brand-icon">D&D</div>
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="brand-icon">D&D</div>
 
-            <div>
-                <h1>Wedding Planner</h1>
-                <p>05 Septembrie 2026</p>
+      <div>
+        <h1>Wedding Planner</h1>
+        <p>05 Septembrie 2026, ora 16:00</p>
+      </div>
+    </div>
+
+    @if (role$ | async; as role) {
+      <nav>
+        @for (item of navigation; track item.route) {
+          @if (!item.adminOnly || role === 'admin') {
+            <a
+              [routerLink]="item.route"
+              routerLinkActive="active"
+            >
+              @if (item.icon) {
+                <span class="nav-special-icon">
+                  {{ item.icon }}
+                </span>
+              }
+
+              <span>
+                {{ item.label }}
+              </span>
+            </a>
+          } @else {
+            <div
+              class="nav-disabled"
+              title="Disponibil doar administratorului"
+              aria-disabled="true"
+            >
+              <span>
+                {{ item.label }}
+              </span>
+
+              <span
+                class="nav-lock"
+                aria-hidden="true"
+              >
+                🔒
+              </span>
             </div>
-        </div>
+          }
+        }
+      </nav>
+    }
 
-        <nav>
-            @for (item of navigation; track item.route) {
-
-                @if (!item.adminOnly || isAdmin()) {
-                    <a
-                            [routerLink]="item.route"
-                            routerLinkActive="active"
-                    >
-        <span class="nav-icon">
-          {{ item.icon }}
+    <div class="auth-card">
+      @if (user$ | async; as user) {
+        <span class="auth-label">
+          Logată ca
         </span>
 
-                        {{ item.label }}
-                    </a>
-                } @else {
-                    <div
-                            class="nav-disabled"
-                            title="Disponibil doar administratorului"
-                            aria-disabled="true"
-                    >
-        <span class="nav-icon">
-          {{ item.icon }}
+        <strong>
+          {{ user.displayName || user.email }}
+        </strong>
+
+        @if (role$ | async; as role) {
+          <span
+            class="access-badge"
+            [class.admin]="role === 'admin'"
+          >
+            {{
+              role === 'admin'
+                ? 'Administrator'
+                : 'Acces vizualizare'
+            }}
+          </span>
+        }
+
+        <button
+          type="button"
+          (click)="logout()"
+        >
+          Logout
+        </button>
+      } @else {
+        <span class="auth-label">
+          Acces public
         </span>
 
-                        <span>
-          {{ item.label }}
+        <strong>
+          Vizualizare
+        </strong>
+
+        <span class="public-access-copy">
+          Dashboard, invitați și Ziua nunții sunt disponibile fără autentificare.
         </span>
 
-                        <span class="nav-lock">
-          🔒
-        </span>
-                    </div>
-                }
+        <button
+          type="button"
+          (click)="login()"
+        >
+          Login administrator
+        </button>
+      }
+    </div>
 
-            }
-        </nav>
+    <div class="sidebar-note">
+      <strong>Important</strong>
 
-        <div class="auth-card">
-            @if (user$ | async; as user) {
-                <span class="auth-label">
-          Logata ca
-        </span>
-
-                <strong>
-                    {{ user.displayName || user.email }}
-                </strong>
-
-                <button
-                        type="button"
-                        (click)="logout()"
-                >
-                    Logout
-                </button>
-            } @else {
-                <span class="auth-label">
-          Firebase
-        </span>
-
-                <strong>
-                    Documente private
-                </strong>
-
-                <button
-                        type="button"
-                        (click)="login()"
-                >
-                    Login cu Google
-                </button>
-            }
-        </div>
-
-        <div class="sidebar-note">
-            <strong>Important</strong>
-
-            <span>
-        Contractele sunt salvate în Google Drive,
-        iar accesul se poate face din aplicatie.
+      <span>
+        Modificarea datelor și informațiile private sunt disponibile doar administratorului.
       </span>
-        </div>
-    </aside>
+    </div>
+  </aside>
 
-    <main class="content">
-        <div class="page-content">
-            <router-outlet></router-outlet>
-        </div>
+  <main class="content">
+    <div class="page-content">
+      <router-outlet></router-outlet>
+    </div>
 
-        <footer class="app-footer">
-            <div class="footer-inner">
+    <footer class="app-footer">
+      <div class="footer-inner">
+        <div class="footer-brand">
+          <span class="footer-mark">D</span>
 
-                <div class="footer-brand">
-                    <span class="footer-mark">D</span>
-
-                    <div>
+          <div>
             <span class="footer-label">
               Designed & developed by
             </span>
 
-                        <strong>
-                            Diana Radu
-                        </strong>
+            <strong>
+              Diana Radu
+            </strong>
 
-                        <span class="footer-role">
+            <span class="footer-role">
               Software Engineer
             </span>
-                    </div>
-                </div>
+          </div>
+        </div>
 
-                <a
-                        class="linkedin-link"
-                        href="https://www.linkedin.com/in/diana-elena-horincar/"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        aria-label="Profil LinkedIn Diana Radu"
-                >
+        <a
+          class="linkedin-link"
+          href="https://www.linkedin.com/in/diana-elena-horincar/"
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label="Profil LinkedIn Diana Radu"
+        >
           <span class="linkedin-icon">
             in
           </span>
 
-                    <span>
+          <span>
             LinkedIn
           </span>
-                </a>
+        </a>
+      </div>
 
-            </div>
-
-            <div class="footer-bottom">
+      <div class="footer-bottom">
         <span>
           Wedding Planner · 2026
         </span>
 
-                <span class="footer-heart">
+        <span class="footer-heart">
           ♡
         </span>
-            </div>
-        </footer>
-    </main>
+      </div>
+    </footer>
+  </main>
 </div>
 
 <app-edit-safety></app-edit-safety>
