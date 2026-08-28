@@ -1,8 +1,19 @@
-<button type="button" class="save-indicator" [attr.data-state]="editSafety.state()" (click)="editSafety.toggleHistory()">
-  <span class="status-dot"></span>
-  <span>{{ editSafety.statusMessage() }}</span>
-  @if (editSafety.pendingCount()) { <strong>{{ editSafety.pendingCount() }}</strong> }
-</button>
+@if (editSafety.state() !== 'idle') {
+    <button
+            type="button"
+            class="save-indicator"
+            [attr.data-state]="editSafety.state()"
+            (click)="editSafety.toggleHistory()"
+    >
+        <span class="status-dot"></span>
+
+        <span>{{ editSafety.statusMessage() }}</span>
+
+        @if (editSafety.pendingCount()) {
+            <strong>{{ editSafety.pendingCount() }}</strong>
+        }
+    </button>
+}
 
 @if (editSafety.confirmation(); as confirmation) {
   <div class="dialog-backdrop" (click)="editSafety.answerConfirmation(false)"></div>

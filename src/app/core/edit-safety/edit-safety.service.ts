@@ -23,7 +23,7 @@ interface ConfirmRequest {
 @Injectable({ providedIn: 'root' })
 export class EditSafetyService {
   readonly state = signal<SaveState>('idle');
-  readonly statusMessage = signal('Toate modificările sunt salvate');
+  readonly statusMessage = signal('');
   readonly pendingCount = signal(0);
   readonly history = signal<ChangeHistoryEntry[]>(this.readHistory());
   readonly confirmation = signal<ConfirmRequest | null>(null);
@@ -48,14 +48,27 @@ export class EditSafetyService {
       this.pendingCount.update(value => Math.max(0, value - 1));
       if (this.pendingCount() === 0) {
         this.state.set('saved');
-        this.statusMessage.set('Toate modificările sunt salvate');
-        this.resetTimer = setTimeout(() => this.state.set('idle'), 2500);
+        this.statusMessage.set('Modificările au fost salvate');
+
+        this.resetTimer = setTimeout(() => {
+          this.state.set('idle');
+          this.statusMessage.set('');
+        }, 2500);
       }
       return result;
     } catch (error) {
       this.pendingCount.update(value => Math.max(0, value - 1));
+
       this.state.set('error');
       this.statusMessage.set(this.friendlyError(error));
+
+      clearTimeout(this.resetTimer);
+
+      this.resetTimer = setTimeout(() => {
+        this.state.set('idle');
+        this.statusMessage.set('');
+      }, 5000);
+
       throw error;
     }
   }
@@ -68,9 +81,8 @@ export class EditSafetyService {
     delay = 850
   ): void {
     const existing = this.autosaveTimers.get(key);
-    if (existing) clearTimeout(existing);
     this.state.set('saving');
-    this.statusMessage.set('Modificare în așteptare…');
+    this.statusMessage.set('Se salvează modificarea…');
     this.autosaveTimers.set(key, setTimeout(() => {
       this.autosaveTimers.delete(key);
       void this.run(label, action, history).catch(() => undefined);
