@@ -1,9 +1,22 @@
-<section>
+<section class="payments-page">
+
+    <!-- ======================================
+         HEADER
+    ======================================= -->
+
     <div class="page-title page-title-actions">
         <div>
-            <div class="eyebrow">Firestore · editabil</div>
-            <h2>Plăți și cheltuieli</h2>
-            <p>Adaugă, modifică și urmărește bugetul direct din aplicație.</p>
+            <div class="eyebrow">
+                Organizare financiară
+            </div>
+
+            <h2>
+                Plăți și cheltuieli
+            </h2>
+
+            <p>
+                Vezi rapid ce ai achitat, ce mai ai de plătit și care sunt următoarele termene.
+            </p>
         </div>
 
         <div class="top-actions">
@@ -26,25 +39,62 @@
         </div>
     </div>
 
+
+    <!-- ======================================
+         EDITOR
+    ======================================= -->
+
     @if (expenseForm) {
         <article class="card editor-card">
-            <h3>
-                {{ isNewExpense ? 'Cheltuială nouă' : 'Editează cheltuiala' }}
-            </h3>
+            <div class="editor-heading">
+                <div>
+          <span class="eyebrow">
+            {{
+                  isNewExpense
+                      ? 'Cheltuială nouă'
+                      : 'Editare'
+              }}
+          </span>
+
+                    <h3>
+                        {{
+                            isNewExpense
+                                ? 'Adaugă o cheltuială'
+                                : expenseForm.name
+                        }}
+                    </h3>
+                </div>
+
+                <button
+                        class="editor-close"
+                        type="button"
+                        (click)="cancelExpense()"
+                        aria-label="Închide formularul"
+                >
+                    ×
+                </button>
+            </div>
 
             <div class="editor-grid">
                 <label>
                     Nume
-                    <input [(ngModel)]="expenseForm.name" />
+
+                    <input
+                            [(ngModel)]="expenseForm.name"
+                    />
                 </label>
 
                 <label>
                     Categorie
-                    <input [(ngModel)]="expenseForm.category" />
+
+                    <input
+                            [(ngModel)]="expenseForm.category"
+                    />
                 </label>
 
                 <label>
                     Total
+
                     <input
                             type="number"
                             [(ngModel)]="expenseForm.total"
@@ -54,6 +104,7 @@
 
                 <label>
                     Avans plătit
+
                     <input
                             type="number"
                             [(ngModel)]="expenseForm.advancePaid"
@@ -63,14 +114,23 @@
 
                 <label>
                     Monedă
-                    <select [(ngModel)]="expenseForm.currency">
-                        <option value="RON">RON</option>
-                        <option value="EUR">EUR</option>
+
+                    <select
+                            [(ngModel)]="expenseForm.currency"
+                    >
+                        <option value="RON">
+                            RON
+                        </option>
+
+                        <option value="EUR">
+                            EUR
+                        </option>
                     </select>
                 </label>
 
                 <label>
                     Furnizor asociat
+
                     <select
                             [(ngModel)]="expenseForm.vendorId"
                             (ngModelChange)="onVendorChange()"
@@ -79,7 +139,10 @@
                             Fără furnizor asociat
                         </option>
 
-                        @for (vendor of vendors; track vendor.id) {
+                        @for (
+                            vendor of vendors;
+                            track vendor.id
+                                ) {
                             <option [value]="vendor.id">
                                 {{ vendor.name }}
                             </option>
@@ -89,11 +152,15 @@
 
                 <label>
                     Momentul plății
+
                     <select
                             [(ngModel)]="expenseForm.paymentMoment"
                             (ngModelChange)="onPaymentMomentChange()"
                     >
-                        @for (option of paymentMomentOptions; track option.value) {
+                        @for (
+                            option of paymentMomentOptions;
+                            track option.value
+                                ) {
                             <option [value]="option.value">
                                 {{ option.label }}
                             </option>
@@ -103,11 +170,15 @@
 
                 <label>
                     Tip termen
+
                     <select
                             [(ngModel)]="expenseForm.deadlineType"
                             (ngModelChange)="onDeadlineTypeChange()"
                     >
-                        @for (option of deadlineTypeOptions; track option.value) {
+                        @for (
+                            option of deadlineTypeOptions;
+                            track option.value
+                                ) {
                             <option [value]="option.value">
                                 {{ option.label }}
                             </option>
@@ -115,9 +186,13 @@
                     </select>
                 </label>
 
-                @if (expenseForm.deadlineType === 'exact') {
+                @if (
+                    expenseForm.deadlineType ===
+                    'exact'
+                        ) {
                     <label>
                         Data exactă
+
                         <input
                                 type="date"
                                 [(ngModel)]="expenseForm.dueDate"
@@ -125,9 +200,13 @@
                     </label>
                 }
 
-                @if (expenseForm.deadlineType === 'relative') {
+                @if (
+                    expenseForm.deadlineType ===
+                    'relative'
+                        ) {
                     <label class="span-2">
                         Termen relativ
+
                         <input
                                 [(ngModel)]="expenseForm.relativeDeadline"
                                 placeholder="Ex.: în maximum 48 h după eveniment"
@@ -137,7 +216,10 @@
 
                 <label>
                     Sursă
-                    <select [(ngModel)]="expenseForm.source">
+
+                    <select
+                            [(ngModel)]="expenseForm.source"
+                    >
                         <option>Manual</option>
                         <option>Excel</option>
                         <option>Contract</option>
@@ -147,8 +229,14 @@
 
                 <label>
                     Status
-                    <select [(ngModel)]="expenseForm.status">
-                        @for (option of expenseStatusOptions; track option.value) {
+
+                    <select
+                            [(ngModel)]="expenseForm.status"
+                    >
+                        @for (
+                            option of expenseStatusOptions;
+                            track option.value
+                                ) {
                             <option [value]="option.value">
                                 {{ option.label }}
                             </option>
@@ -158,6 +246,7 @@
 
                 <label class="wide">
                     Observații
+
                     <textarea
                             rows="3"
                             [(ngModel)]="expenseForm.notes"
@@ -172,6 +261,7 @@
                                 [(ngModel)]="expenseForm.payAfterWedding"
                                 (ngModelChange)="onPayAfterWeddingChange()"
                         />
+
                         Se plătește după eveniment
                     </label>
 
@@ -180,6 +270,7 @@
                                 type="checkbox"
                                 [(ngModel)]="expenseForm.includeInTotals"
                         />
+
                         Include în totaluri
                     </label>
                 </div>
@@ -206,115 +297,655 @@
         </article>
     }
 
-    @if (!expenses.length) {
-        <article class="card empty-state">
-            <h3>Nu există încă plăți în Firestore</h3>
-            <p>
-                Apasă „Importă datele existente” sau adaugă manual o cheltuială.
-            </p>
+
+    <!-- ======================================
+         SUMMARY
+    ======================================= -->
+
+    <section class="financial-summary">
+
+        <article class="summary-card">
+      <span>
+        Total
+      </span>
+
+            <strong>
+                {{ formatMoney(totalRon, 'RON') }}
+            </strong>
+
+            <small>
+                {{ formatMoney(totalEur, 'EUR') }}
+            </small>
         </article>
-    }
 
-    <div class="category-list">
-        @for (category of categories; track category) {
-            <article class="card category-card">
-                <div class="category-header">
-                    <div>
-            <span class="badge">
-              {{ category }}
-            </span>
+        <article class="summary-card paid">
+      <span>
+        Achitat
+      </span>
 
-                        <h3>
-                            {{ category }}
-                        </h3>
-                    </div>
+            <strong>
+                {{ formatMoney(paidRon, 'RON') }}
+            </strong>
 
-                    <div class="category-total">
-            <span>
-              {{ formatMoney(getCategoryTotal(category, 'RON'), 'RON') }}
-            </span>
+            <small>
+                {{ formatMoney(paidEur, 'EUR') }}
+            </small>
+        </article>
 
-                        <span>
-              {{ formatMoney(getCategoryTotal(category, 'EUR'), 'EUR') }}
-            </span>
-                    </div>
-                </div>
+        <article class="summary-card remaining">
+      <span>
+        Rest de plată
+      </span>
 
-                <div class="expense-table">
-                    <div class="expense-row expense-head">
-                        <span>Serviciu</span>
-                        <span>Furnizor</span>
-                        <span>Moment / termen</span>
-                        <span>Total</span>
-                        <span>Avans</span>
-                        <span>Rest</span>
-                        <span>Status</span>
-                        <span>Acțiuni</span>
-                    </div>
+            <strong>
+                {{ formatMoney(remainingRon, 'RON') }}
+            </strong>
 
-                    @for (expense of getExpensesByCategory(category); track expense.id) {
-                        <div class="expense-row">
-                            <div>
-                                <strong>
-                                    {{ expense.name }}
-                                </strong>
+            <small>
+                {{ formatMoney(remainingEur, 'EUR') }}
+            </small>
+        </article>
 
-                                <small>
-                                    {{ expense.notes || 'Fără observații' }}
-                                </small>
-                            </div>
+        <article class="summary-card upcoming">
+      <span>
+        Următoarea plată
+      </span>
 
-                            <span>
-                {{ expense.vendorName || '—' }}
-              </span>
-
-                            <span class="payment-timing">
+            @if (upcomingPayment) {
                 <strong>
-                  {{ getPaymentMomentLabel(expense) }}
+                    {{
+                        formatMoney(
+                            upcomingPayment.remainingPayment,
+                            upcomingPayment.currency
+                        )
+                    }}
                 </strong>
 
                 <small>
-                  {{ getDeadlineLabel(expense) }}
+                    {{
+                        getShortDeadlineLabel(
+                            upcomingPayment
+                        )
+                    }}
+                    ·
+                    {{ upcomingPayment.name }}
                 </small>
+            } @else {
+                <strong>
+                    —
+                </strong>
+
+                <small>
+                    Niciun termen apropiat
+                </small>
+            }
+        </article>
+
+    </section>
+
+
+    <!-- ======================================
+         PAYMENT FOCUS
+    ======================================= -->
+
+    @if (unpaidExpenses.length) {
+        <section class="payment-focus">
+            <div class="section-heading">
+                <div>
+          <span class="eyebrow">
+            De plătit
+          </span>
+
+                    <h3>
+                        Următoarele plăți
+                    </h3>
+                </div>
+            </div>
+
+            <div class="payment-focus-grid">
+
+                <!-- NEXT 7 DAYS -->
+
+                <article class="focus-column urgent-column">
+                    <div class="focus-heading">
+                        <div>
+              <span>
+                Următoarele 7 zile
               </span>
 
-                            <span>
-                {{ formatMoney(expense.total, expense.currency) }}
-              </span>
+                            <strong>
+                                {{ paymentsNextSevenDays.length }}
+                            </strong>
+                        </div>
+                    </div>
 
-                            <span>
-                {{ formatMoney(expense.advancePaid, expense.currency) }}
-              </span>
+                    @if (
+                        !paymentsNextSevenDays.length
+                            ) {
+                        <div class="focus-empty">
+                            Nicio plată în următoarele 7 zile.
+                        </div>
+                    } @else {
+                        <div class="focus-list">
+                            @for (
+                                expense of paymentsNextSevenDays;
+                                track expense.id
+                                    ) {
+                                <button
+                                        type="button"
+                                        class="focus-payment"
+                                        (click)="startEditExpense(expense)"
+                                >
+                  <span class="focus-date">
+                    {{
+                          getShortDeadlineLabel(
+                              expense
+                          )
+                      }}
+                  </span>
 
-                            <span>
-                {{ formatMoney(expense.remainingPayment, expense.currency) }}
-              </span>
+                                    <span class="focus-main">
+                    <strong>
+                      {{ expense.name }}
+                    </strong>
 
-                            <span class="status-pill">
-                {{ getStatusLabel(expense.status) }}
-              </span>
+                    <small>
+                      {{ expense.category }}
+                    </small>
+                  </span>
 
-                            <span class="row-actions">
-                <button
-                        class="mini secondary"
-                        type="button"
-                        (click)="startEditExpense(expense)"
-                >
-                  Editează
-                </button>
-
-                <button
-                        class="mini danger"
-                        type="button"
-                        (click)="deleteExpense(expense)"
-                >
-                  Șterge
-                </button>
-              </span>
+                                    <span class="focus-money">
+                    {{
+                                            formatMoney(
+                                                expense.remainingPayment,
+                                                expense.currency
+                                            )
+                                        }}
+                  </span>
+                                </button>
+                            }
                         </div>
                     }
-                </div>
+                </article>
+
+
+                <!-- WEDDING DAY -->
+
+                <article class="focus-column wedding-column">
+                    <div class="focus-heading">
+                        <div>
+              <span>
+                În ziua nunții
+              </span>
+
+                            <strong>
+                                {{ weddingDayPayments.length }}
+                            </strong>
+                        </div>
+                    </div>
+
+                    @if (
+                        !weddingDayPayments.length
+                            ) {
+                        <div class="focus-empty">
+                            Nicio plată în ziua nunții.
+                        </div>
+                    } @else {
+                        <div class="focus-list">
+                            @for (
+                                expense of weddingDayPayments;
+                                track expense.id
+                                    ) {
+                                <button
+                                        type="button"
+                                        class="focus-payment"
+                                        (click)="startEditExpense(expense)"
+                                >
+                  <span class="focus-date">
+                    05 sept.
+                  </span>
+
+                                    <span class="focus-main">
+                    <strong>
+                      {{ expense.name }}
+                    </strong>
+
+                    <small>
+                      {{ expense.category }}
+                    </small>
+                  </span>
+
+                                    <span class="focus-money">
+                    {{
+                                            formatMoney(
+                                                expense.remainingPayment,
+                                                expense.currency
+                                            )
+                                        }}
+                  </span>
+                                </button>
+                            }
+                        </div>
+                    }
+                </article>
+
+
+                <!-- AFTER WEDDING -->
+
+                <article class="focus-column after-column">
+                    <div class="focus-heading">
+                        <div>
+              <span>
+                După nuntă
+              </span>
+
+                            <strong>
+                                {{ afterWeddingPayments.length }}
+                            </strong>
+                        </div>
+                    </div>
+
+                    @if (
+                        !afterWeddingPayments.length
+                            ) {
+                        <div class="focus-empty">
+                            Nicio plată după nuntă.
+                        </div>
+                    } @else {
+                        <div class="focus-list">
+                            @for (
+                                expense of afterWeddingPayments;
+                                track expense.id
+                                    ) {
+                                <button
+                                        type="button"
+                                        class="focus-payment"
+                                        (click)="startEditExpense(expense)"
+                                >
+                  <span class="focus-date">
+                    {{
+                          getShortDeadlineLabel(
+                              expense
+                          )
+                      }}
+                  </span>
+
+                                    <span class="focus-main">
+                    <strong>
+                      {{ expense.name }}
+                    </strong>
+
+                    <small>
+                      {{ expense.category }}
+                    </small>
+                  </span>
+
+                                    <span class="focus-money">
+                    {{
+                                            formatMoney(
+                                                expense.remainingPayment,
+                                                expense.currency
+                                            )
+                                        }}
+                  </span>
+                                </button>
+                            }
+                        </div>
+                    }
+                </article>
+
+            </div>
+        </section>
+    }
+
+
+    <!-- ======================================
+         ALL EXPENSES
+    ======================================= -->
+
+    <section class="all-expenses">
+
+        <div class="section-heading">
+            <div>
+        <span class="eyebrow">
+          Evidență completă
+        </span>
+
+                <h3>
+                    Toate cheltuielile
+                </h3>
+            </div>
+        </div>
+
+
+        <!-- FILTERS -->
+
+        <div class="expense-toolbar">
+            <label class="search-field">
+        <span>
+          Caută
+        </span>
+
+                <input
+                        [(ngModel)]="searchTerm"
+                        placeholder="Furnizor, categorie, observații..."
+                />
+            </label>
+
+            <label>
+        <span>
+          Categorie
+        </span>
+
+                <select
+                        [(ngModel)]="selectedCategory"
+                >
+                    <option value="all">
+                        Toate categoriile
+                    </option>
+
+                    @for (
+                        category of categories;
+                        track category
+                            ) {
+                        <option [value]="category">
+                            {{ category }}
+                        </option>
+                    }
+                </select>
+            </label>
+
+            <label>
+        <span>
+          Status
+        </span>
+
+                <select
+                        [(ngModel)]="selectedStatus"
+                >
+                    <option value="all">
+                        Toate statusurile
+                    </option>
+
+                    @for (
+                        option of expenseStatusOptions;
+                        track option.value
+                            ) {
+                        <option [value]="option.value">
+                            {{ option.label }}
+                        </option>
+                    }
+                </select>
+            </label>
+
+            <button
+                    class="clear-filter-button"
+                    type="button"
+                    (click)="clearFilters()"
+            >
+                Șterge filtre
+            </button>
+        </div>
+
+
+        <!-- EMPTY -->
+
+        @if (!expenses.length) {
+            <article class="card empty-state">
+                <h3>
+                    Nu există încă plăți
+                </h3>
+
+                <p>
+                    Adaugă prima cheltuială pentru a începe evidența.
+                </p>
             </article>
         }
-    </div>
+
+
+        <!-- CATEGORY LIST -->
+
+        <div class="category-list">
+
+            @for (
+                category of visibleCategories;
+                track category
+                    ) {
+                <article class="category-card">
+
+                    <button
+                            type="button"
+                            class="category-header"
+                            (click)="toggleCategory(category)"
+                    >
+                        <div class="category-heading">
+                            <div>
+                <span class="category-name">
+                  {{ category }}
+                </span>
+
+                                <span class="category-count">
+                  {{
+                                        getFilteredExpensesByCategory(
+                                            category
+                                        ).length
+                                    }}
+                                    cheltuieli
+                </span>
+                            </div>
+
+                            <div class="category-summary-line">
+                <span>
+                  Total
+                  <strong>
+                    {{
+                          formatMoney(
+                              getCategoryTotal(
+                                  category,
+                                  'RON'
+                              ),
+                              'RON'
+                          )
+                      }}
+                  </strong>
+                </span>
+
+                                <span>
+                  Achitat
+                  <strong>
+                    {{
+                          formatMoney(
+                              getCategoryPaid(
+                                  category,
+                                  'RON'
+                              ),
+                              'RON'
+                          )
+                      }}
+                  </strong>
+                </span>
+
+                                <span class="remaining-copy">
+                  Rest
+                  <strong>
+                    {{
+                          formatMoney(
+                              getCategoryRemaining(
+                                  category,
+                                  'RON'
+                              ),
+                              'RON'
+                          )
+                      }}
+                  </strong>
+                </span>
+
+                                @if (
+                                    getCategoryTotal(
+                                        category,
+                                        'EUR'
+                                    ) > 0
+                                        ) {
+                                    <span>
+                    EUR
+                    <strong>
+                      {{
+                            formatMoney(
+                                getCategoryRemaining(
+                                    category,
+                                    'EUR'
+                                ),
+                                'EUR'
+                            )
+                        }}
+                        rest
+                    </strong>
+                  </span>
+                                }
+                            </div>
+                        </div>
+
+                        <span
+                                class="category-chevron"
+                                [class.open]="isCategoryExpanded(category)"
+                        >
+              ⌄
+            </span>
+                    </button>
+
+
+                    @if (
+                        isCategoryExpanded(category)
+                            ) {
+                        <div class="expense-list">
+
+                            @for (
+                                expense of getFilteredExpensesByCategory(category);
+                                track expense.id
+                                    ) {
+                                <article class="expense-item">
+
+                                    <div class="expense-main">
+                                        <div class="expense-title-row">
+                                            <div>
+                                                <h4>
+                                                    {{ expense.name }}
+                                                </h4>
+
+                                                <div class="expense-meta">
+                                                    @if (expense.vendorName) {
+                                                        <span>
+                              {{ expense.vendorName }}
+                            </span>
+                                                    }
+
+                                                    <span>
+                            {{
+                                                            getPaymentMomentLabel(
+                                                                expense
+                                                            )
+                                                        }}
+                          </span>
+
+                                                    <span>
+                            {{
+                                                            getDeadlineLabel(
+                                                                expense
+                                                            )
+                                                        }}
+                          </span>
+                                                </div>
+                                            </div>
+
+                                            <span
+                                                    class="status-pill"
+                                                    [ngClass]="getStatusClass(expense.status)"
+                                            >
+                        {{
+                                                    getStatusLabel(
+                                                        expense.status
+                                                    )
+                                                }}
+                      </span>
+                                        </div>
+
+                                        @if (expense.notes) {
+                                            <p class="expense-notes">
+                                                {{ expense.notes }}
+                                            </p>
+                                        }
+
+                                        <div class="money-breakdown">
+                      <span>
+                        Total
+
+                        <strong>
+                          {{
+                                formatMoney(
+                                    expense.total,
+                                    expense.currency
+                                )
+                            }}
+                        </strong>
+                      </span>
+
+                                            <span>
+                        Achitat
+
+                        <strong>
+                          {{
+                                formatMoney(
+                                    expense.advancePaid,
+                                    expense.currency
+                                )
+                            }}
+                        </strong>
+                      </span>
+
+                                            <span class="remaining-value">
+                        Rest de plată
+
+                        <strong>
+                          {{
+                                formatMoney(
+                                    expense.remainingPayment,
+                                    expense.currency
+                                )
+                            }}
+                        </strong>
+                      </span>
+                                        </div>
+                                    </div>
+
+                                    <div class="expense-actions">
+                                        <button
+                                                class="secondary mini"
+                                                type="button"
+                                                (click)="startEditExpense(expense)"
+                                        >
+                                            Editează
+                                        </button>
+
+                                        <button
+                                                class="danger mini"
+                                                type="button"
+                                                (click)="deleteExpense(expense)"
+                                        >
+                                            Șterge
+                                        </button>
+                                    </div>
+
+                                </article>
+                            }
+
+                        </div>
+                    }
+
+                </article>
+            }
+
+        </div>
+
+    </section>
+
 </section>
