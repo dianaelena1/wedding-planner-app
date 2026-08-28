@@ -615,35 +615,39 @@ export class SeatingPlannerComponent {
       return;
     }
 
-    const index = this.floorElements.findIndex(
+    const currentIndex = this.floorElements.findIndex(
         element => element.id === this.selectedElementId
     );
 
-    if (index === -1) {
+    if (currentIndex === -1) {
       return;
     }
 
-    const current = this.floorElements[index];
+    const current = this.floorElements[currentIndex];
     const draft = this.selectedElementDraft;
 
     this.errorMessage = '';
     this.successMessage = '';
+
+    const oldTableNumber =
+        current.type === 'table'
+            ? Number(current.tableNumber)
+            : undefined;
 
     const updated: FloorElement = {
       ...current,
       ...draft
     };
 
+    let didSwap = false;
+
+    // ============================================================
+    // TABLE
+    // ============================================================
+
     if (updated.type === 'table') {
-      const oldTableNumber = current.tableNumber;
-
-      const newTableNumber = Number(
-          draft.tableNumber
-      );
-
-      const newCapacity = Number(
-          draft.capacity
-      );
+      const newTableNumber = Number(draft.tableNumber);
+      const newCapacity = Number(draft.capacity);
 
       if (
           !Number.isInteger(newTableNumber) ||
@@ -663,48 +667,142 @@ export class SeatingPlannerComponent {
         return;
       }
 
-      const duplicate = this.floorElements.some(
-          element =>
-              element.type === 'table' &&
-              element.id !== current.id &&
-              element.tableNumber === newTableNumber
-      );
-
-      if (duplicate) {
-        this.errorMessage =
-            `Există deja masa ${newTableNumber}.`;
-        return;
-      }
-
-      if (
-          oldTableNumber !== undefined &&
-          oldTableNumber !== newTableNumber
-      ) {
-        const guests =
-            await firstValueFrom(this.guests$);
-
-        const guestsAtOldTable =
-            guests.filter(
-                guest =>
-                    guest.tableNumber === oldTableNumber
+      // Numărul nu s-a schimbat
+      if (oldTableNumber === newTableNumber) {
+        updated.tableNumber = newTableNumber;
+        updated.capacity = newCapacity;
+        updated.label = `Masa ${newTableNumber}`;
+      } else {
+        const conflictingTableIndex =
+            this.floorElements.findIndex(
+                element =>
+                    element.type === 'table' &&
+                    element.id !== current.id &&
+                    element.tableNumber === newTableNumber
             );
 
-        for (const guest of guestsAtOldTable) {
-          await this.guestsService.saveGuest({
-            ...guest,
-            tableNumber: newTableNumber
-          });
+        // ==========================================================
+        // EXISTĂ DEJA MASA NOUĂ -> SWAP
+        // ==========================================================
+
+        if (
+            conflictingTableIndex !== -1 &&
+            oldTableNumber !== undefined
+        ) {
+          const conflictingTable =
+              this.floorElements[conflictingTableIndex];
+
+          const guests =
+              await firstValueFrom(this.guests$);
+
+          const guestsAtCurrentTable =
+              guests.filter(
+                  guest =>
+                      guest.tableNumber === oldTableNumber
+              );
+
+          const guestsAtConflictingTable =
+              guests.filter(
+                  guest =>
+                      guest.tableNumber === newTableNumber
+              );
+
+          try {
+            for (const guest of guestsAtCurrentTable) {
+              await this.guestsService.saveGuest({
+                ...guest,
+                tableNumber: newTableNumber
+              });
+            }
+
+            for (const guest of guestsAtConflictingTable) {
+              await this.guestsService.saveGuest({
+                ...guest,
+                tableNumber: oldTableNumber
+              });
+            }
+          } catch (error) {
+            console.error(error);
+
+            this.errorMessage =
+                'Nu am putut inversa mesele. Verifică permisiunile Firestore.';
+            return;
+          }
+
+          const swappedOtherTable: FloorElement = {
+            ...conflictingTable,
+            tableNumber: oldTableNumber,
+            label: `Masa ${oldTableNumber}`
+          };
+
+          updated.tableNumber = newTableNumber;
+          updated.capacity = newCapacity;
+          updated.label = `Masa ${newTableNumber}`;
+
+          const newElements = [
+            ...this.floorElements
+          ];
+
+          newElements[currentIndex] = updated;
+          newElements[conflictingTableIndex] =
+              swappedOtherTable;
+
+          this.floorElements = newElements;
+
+          didSwap = true;
+        }
+
+            // ==========================================================
+            // NUMĂRUL NOU ESTE LIBER -> RENAME NORMAL
+        // ==========================================================
+
+        else {
+          const guests =
+              await firstValueFrom(this.guests$);
+
+          const guestsAtOldTable =
+              oldTableNumber !== undefined
+                  ? guests.filter(
+                      guest =>
+                          guest.tableNumber === oldTableNumber
+                  )
+                  : [];
+
+          try {
+            for (const guest of guestsAtOldTable) {
+              await this.guestsService.saveGuest({
+                ...guest,
+                tableNumber: newTableNumber
+              });
+            }
+          } catch (error) {
+            console.error(error);
+
+            this.errorMessage =
+                'Nu am putut modifica numărul mesei. Verifică permisiunile Firestore.';
+            return;
+          }
+
+          updated.tableNumber = newTableNumber;
+          updated.capacity = newCapacity;
+          updated.label = `Masa ${newTableNumber}`;
         }
       }
+    }
 
-      updated.tableNumber = newTableNumber;
-      updated.capacity = newCapacity;
-      updated.label = `Masa ${newTableNumber}`;
-    } else {
+        // ============================================================
+        // OTHER ELEMENTS
+    // ============================================================
+
+    else {
       updated.label =
           String(draft.label ?? '').trim() ||
           'Element';
     }
+
+    // ============================================================
+    // DIMENSIONS
+    // ============================================================
 
     const minimumWidth =
         updated.type === 'table'
@@ -726,25 +824,64 @@ export class SeatingPlannerComponent {
         Number(draft.height) || minimumHeight
     );
 
+    // păstrăm poziția
     updated.x = current.x;
     updated.y = current.y;
 
-    this.floorElements = [
-      ...this.floorElements.slice(0, index),
-      updated,
-      ...this.floorElements.slice(index + 1)
-    ];
+    // Dacă nu am făcut swap mai sus, actualizăm normal elementul
+    if (!didSwap) {
+      this.floorElements =
+          this.floorElements.map(
+              element =>
+                  element.id === current.id
+                      ? updated
+                      : element
+          );
+    } else {
+      // la swap trebuie doar să aplicăm și eventualele
+      // modificări de dimensiune/capacitate mesei selectate
+      this.floorElements =
+          this.floorElements.map(
+              element =>
+                  element.id === current.id
+                      ? {
+                        ...element,
+                        capacity: updated.capacity,
+                        width: updated.width,
+                        height: updated.height,
+                        label: updated.label
+                      }
+                      : element
+          );
+    }
 
-    this.selectedElementDraft = {
-      ...updated
-    };
+    const savedElement =
+        this.floorElements.find(
+            element => element.id === current.id
+        );
+
+    if (savedElement) {
+      this.selectedElementDraft = {
+        ...savedElement
+      };
+    }
 
     this.saveFloorPlan();
 
-    this.successMessage =
-        updated.type === 'table'
-            ? `${updated.label} a fost salvată.`
-            : 'Modificările au fost salvate.';
+    if (
+        updated.type === 'table' &&
+        oldTableNumber !== undefined &&
+        oldTableNumber !== Number(draft.tableNumber)
+    ) {
+      this.successMessage = didSwap
+          ? `Mesele ${oldTableNumber} și ${Number(draft.tableNumber)} au fost inversate.`
+          : `${updated.label} a fost salvată.`;
+    } else {
+      this.successMessage =
+          updated.type === 'table'
+              ? `${updated.label} a fost salvată.`
+              : 'Modificările au fost salvate.';
+    }
   }
 
   // ============================================================
