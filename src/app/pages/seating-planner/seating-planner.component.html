@@ -33,35 +33,26 @@
         </div>
     }
 
-    <!-- =====================================================
-         STATS
-    ====================================================== -->
-
     <section class="stats-grid">
 
         <article>
             <span>Nr. total de persoane</span>
-            <strong>
-                {{ getTotalPeople(guests) }}
-            </strong>
+            <strong>{{ getTotalPeople(guests) }}</strong>
         </article>
 
         <article>
             <span>Persoane așezate</span>
-            <strong>
-                {{ getAssignedPeople(guests) }}
-            </strong>
+            <strong>{{ getAssignedPeople(guests) }}</strong>
         </article>
 
         <article>
             <span>Persoane fără masă</span>
-            <strong>
-                {{ getUnassignedPeople(guests) }}
-            </strong>
+            <strong>{{ getUnassignedPeople(guests) }}</strong>
         </article>
 
         <article>
             <span>Locuri neocupate</span>
+
             <strong>
                 {{
                     getTotalCapacity() -
@@ -72,15 +63,9 @@
 
     </section>
 
-    <!-- =====================================================
-         MAIN
-    ====================================================== -->
-
     <div class="planner-layout">
 
-        <!-- ===================================================
-             LEFT - GUEST LIST
-        ==================================================== -->
+        <!-- LEFT -->
 
         <aside
                 class="unassigned-panel"
@@ -91,10 +76,7 @@
             <div class="panel-title">
 
                 <div>
-          <span class="eyebrow">
-            LISTĂ
-          </span>
-
+                    <span class="eyebrow">LISTĂ</span>
                     <h2>Fără masă</h2>
                 </div>
 
@@ -127,9 +109,7 @@
                     >
 
                         <div>
-                            <strong>
-                                {{ guest.name }}
-                            </strong>
+                            <strong>{{ guest.name }}</strong>
 
                             <span>
                 {{ guest.side }}
@@ -169,28 +149,17 @@
 
         </aside>
 
-        <!-- ===================================================
-             RIGHT
-        ==================================================== -->
+        <!-- RIGHT -->
 
         <section class="floor-editor">
-
-            <!-- =================================================
-                 TOOLBAR
-            ================================================== -->
 
             <div class="floor-toolbar">
 
                 <div class="toolbar-title">
 
                     <div>
-            <span class="eyebrow">
-              EDITOR
-            </span>
-
-                        <strong>
-                            Planul sălii
-                        </strong>
+                        <span class="eyebrow">EDITOR</span>
+                        <strong>Planul sălii</strong>
                     </div>
 
                     <span class="toolbar-hint">
@@ -206,9 +175,7 @@
                             class="tool-button primary"
                             (click)="addTable()"
                     >
-            <span class="tool-icon table-icon">
-            </span>
-
+                        <span class="tool-icon table-icon"></span>
                         Masă
                     </button>
 
@@ -217,9 +184,7 @@
                             class="tool-button"
                             (click)="addRectangle()"
                     >
-            <span class="tool-icon rectangle-icon">
-            </span>
-
+                        <span class="tool-icon rectangle-icon"></span>
                         Dreptunghi
                     </button>
 
@@ -228,9 +193,7 @@
                             class="tool-button"
                             (click)="addSquare()"
                     >
-            <span class="tool-icon square-icon">
-            </span>
-
+                        <span class="tool-icon square-icon"></span>
                         Pătrat
                     </button>
 
@@ -239,10 +202,7 @@
                             class="tool-button"
                             (click)="addArrow()"
                     >
-            <span class="arrow-tool-icon">
-              →
-            </span>
-
+                        <span class="arrow-tool-icon">→</span>
                         Săgeată
                     </button>
 
@@ -251,10 +211,7 @@
                             class="tool-button"
                             (click)="addText()"
                     >
-            <span class="text-tool-icon">
-              T
-            </span>
-
+                        <span class="text-tool-icon">T</span>
                         Text
                     </button>
 
@@ -262,9 +219,7 @@
 
             </div>
 
-            <!-- =================================================
-                 SETTINGS
-            ================================================== -->
+            <!-- SETTINGS -->
 
             @if (selectedElementDraft; as selected) {
 
@@ -273,15 +228,13 @@
                     <div class="settings-heading">
 
                         <div>
-              <span class="eyebrow">
-                SELECTAT
-              </span>
+                            <span class="eyebrow">SELECTAT</span>
 
                             <strong>
                                 {{
                                     selected.type === 'table'
-                                        ? selected.label
-                                        : selected.label || 'Element'
+                                        ? 'Masa ' + selected.tableNumber
+                                        : selected.label
                                 }}
                             </strong>
                         </div>
@@ -296,71 +249,84 @@
 
                     </div>
 
-                    <div class="settings-fields">
+                    <div class="settings-row">
 
-                        @if (selected.type !== 'table') {
+                        <div class="settings-fields">
+
+                            @if (selected.type !== 'table') {
+
+                                <label>
+                                    <span>Text</span>
+
+                                    <input
+                                            type="text"
+                                            [(ngModel)]="selected.label"
+                                    />
+                                </label>
+
+                            }
+
+                            @if (selected.type === 'table') {
+
+                                <label>
+                                    <span>Nr. masă</span>
+
+                                    <input
+                                            type="number"
+                                            min="1"
+                                            [(ngModel)]="selected.tableNumber"
+                                    />
+                                </label>
+
+                                <label>
+                                    <span>Capacitate</span>
+
+                                    <input
+                                            type="number"
+                                            min="1"
+                                            [(ngModel)]="selected.capacity"
+                                    />
+                                </label>
+
+                            }
 
                             <label>
-                                <span>Text</span>
-
-                                <input
-                                        type="text"
-                                        [(ngModel)]="selected.label"
-                                />
-                            </label>
-
-                        }
-
-                        @if (selected.type === 'table') {
-
-                            <label>
-                                <span>Nr. masă</span>
+                                <span>Lățime</span>
 
                                 <input
                                         type="number"
-                                        min="1"
-                                        [ngModel]="selected.tableNumber"
-                                        (ngModelChange)="
-      changeTableNumber(
-        selected,
-        selected.tableNumber,
-        $event
-      )
-    "
+                                        [min]="
+                    selected.type === 'table'
+                      ? 190
+                      : 60
+                  "
+                                        [(ngModel)]="selected.width"
                                 />
                             </label>
 
                             <label>
-                                <span>Capacitate</span>
+                                <span>Înălțime</span>
 
                                 <input
                                         type="number"
-                                        min="1"
-                                        [(ngModel)]="selected.capacity"
+                                        [min]="
+                    selected.type === 'table'
+                      ? 150
+                      : 40
+                  "
+                                        [(ngModel)]="selected.height"
                                 />
                             </label>
 
-                        }
+                        </div>
 
-                        <label>
-                            <span>Lățime</span>
-
-                            <input
-                                    type="number"
-                                    min="60"
-                                    [(ngModel)]="selected.width"
-                            />
-                        </label>
-
-                        <label>
-                            <span>Înălțime</span>
-
-                            <input
-                                    type="number"
-                                    min="40"
-                                    [(ngModel)]="selected.height"
-                            />
-                        </label>
+                        <button
+                                class="save-element-button"
+                                type="button"
+                                (click)="saveSelectedElement()"
+                        >
+                            Salvează modificările
+                        </button>
 
                     </div>
 
@@ -368,9 +334,7 @@
 
             }
 
-            <!-- =================================================
-                 CANVAS WRAPPER
-            ================================================== -->
+            <!-- CANVAS -->
 
             <div class="canvas-scroll">
 
@@ -385,9 +349,7 @@
 
                         <div class="canvas-empty">
 
-                            <div class="empty-icon">
-                                +
-                            </div>
+                            <div class="empty-icon">+</div>
 
                             <strong>
                                 Planul este gol
@@ -401,7 +363,10 @@
 
                             <button
                                     type="button"
-                                    (click)="addTable(); $event.stopPropagation()"
+                                    (click)="
+                  addTable();
+                  $event.stopPropagation()
+                "
                             >
                                 + Adaugă prima masă
                             </button>
@@ -415,9 +380,7 @@
                         track element.id
                             ) {
 
-                        <!-- ==========================================
-                             TABLE
-                        =========================================== -->
+                        <!-- TABLE -->
 
                         @if (element.type === 'table') {
 
@@ -425,14 +388,27 @@
                                     class="canvas-element table-element"
                                     [class.selected]="isSelected(element)"
                                     [class.over-capacity]="
-                  getRemainingSeats(guests, element) < 0
+                  getRemainingSeats(
+                    guests,
+                    element
+                  ) < 0
                 "
                                     [style.left.px]="element.x"
                                     [style.top.px]="element.y"
                                     [style.width.px]="element.width"
                                     [style.height.px]="element.height"
-                                    (mousedown)="startElementDrag($event, element)"
-                                    (click)="selectElement($event, element)"
+                                    (mousedown)="
+                  startElementDrag(
+                    $event,
+                    element
+                  )
+                "
+                                    (click)="
+                  selectElement(
+                    $event,
+                    element
+                  )
+                "
                                     (dragover)="allowDrop($event)"
                                     (drop)="
                   dropOnTable(
@@ -451,16 +427,9 @@
                       {{ element.tableNumber }}
                     </span>
 
-                                        <div>
-                                            <strong>
-                                                {{ element.label }}
-                                            </strong>
-
-                                            <span>
-                        Capacitate:
-                                                {{ element.capacity }}
-                      </span>
-                                        </div>
+                                        <strong>
+                                            {{ element.label }}
+                                        </strong>
 
                                     </div>
 
@@ -489,7 +458,7 @@
                                                     element
                                                 )
                                             }}
-                                            locuri libere
+                                            libere
                     </span>
                                     </div>
 
@@ -508,9 +477,15 @@
                                         <article
                                                 class="guest-card compact"
                                                 draggable="true"
-                                                (mousedown)="$event.stopPropagation()"
-                                                (dragstart)="dragStart(guest)"
-                                                (dragend)="dragEnd()"
+                                                (mousedown)="
+                        $event.stopPropagation()
+                      "
+                                                (dragstart)="
+                        dragStart(guest)
+                      "
+                                                (dragend)="
+                        dragEnd()
+                      "
                                                 [class.saving]="
                         savingGuestId === guest.id
                       "
@@ -522,7 +497,9 @@
                                                 </strong>
 
                                                 <span>
-                          {{ getPeopleCount(guest) }}
+                          {{
+                                                        getPeopleCount(guest)
+                                                    }}
                                                     pers.
                           ·
                                                     {{ guest.side }}
@@ -564,16 +541,13 @@
                       element
                     )
                   "
-                                >
-                </span>
+                                ></span>
 
                             </article>
 
                         }
 
-                        <!-- ==========================================
-                             RECTANGLE
-                        =========================================== -->
+                        <!-- RECTANGLE -->
 
                         @if (element.type === 'rectangle') {
 
@@ -584,27 +558,37 @@
                                     [style.top.px]="element.y"
                                     [style.width.px]="element.width"
                                     [style.height.px]="element.height"
-                                    (mousedown)="startElementDrag($event, element)"
-                                    (click)="selectElement($event, element)"
+                                    (mousedown)="
+                  startElementDrag(
+                    $event,
+                    element
+                  )
+                "
+                                    (click)="
+                  selectElement(
+                    $event,
+                    element
+                  )
+                "
                             >
 
-                <span>
-                  {{ element.label }}
-                </span>
+                                <span>{{ element.label }}</span>
 
                                 <span
                                         class="resize-handle"
-                                        (mousedown)="startResize($event, element)"
-                                >
-                </span>
+                                        (mousedown)="
+                    startResize(
+                      $event,
+                      element
+                    )
+                  "
+                                ></span>
 
                             </div>
 
                         }
 
-                        <!-- ==========================================
-                             SQUARE
-                        =========================================== -->
+                        <!-- SQUARE -->
 
                         @if (element.type === 'square') {
 
@@ -615,8 +599,18 @@
                                     [style.top.px]="element.y"
                                     [style.width.px]="element.width"
                                     [style.height.px]="element.height"
-                                    (mousedown)="startElementDrag($event, element)"
-                                    (click)="selectElement($event, element)"
+                                    (mousedown)="
+                  startElementDrag(
+                    $event,
+                    element
+                  )
+                "
+                                    (click)="
+                  selectElement(
+                    $event,
+                    element
+                  )
+                "
                             >
 
                 <span>
@@ -625,17 +619,19 @@
 
                                 <span
                                         class="resize-handle"
-                                        (mousedown)="startResize($event, element)"
-                                >
-                </span>
+                                        (mousedown)="
+                    startResize(
+                      $event,
+                      element
+                    )
+                  "
+                                ></span>
 
                             </div>
 
                         }
 
-                        <!-- ==========================================
-                             ARROW
-                        =========================================== -->
+                        <!-- ARROW -->
 
                         @if (element.type === 'arrow') {
 
@@ -646,8 +642,18 @@
                                     [style.top.px]="element.y"
                                     [style.width.px]="element.width"
                                     [style.height.px]="element.height"
-                                    (mousedown)="startElementDrag($event, element)"
-                                    (click)="selectElement($event, element)"
+                                    (mousedown)="
+                  startElementDrag(
+                    $event,
+                    element
+                  )
+                "
+                                    (click)="
+                  selectElement(
+                    $event,
+                    element
+                  )
+                "
                             >
 
                                 <div class="arrow-label">
@@ -655,28 +661,25 @@
                                 </div>
 
                                 <div class="arrow-graphic">
-
-                  <span class="arrow-line">
-                  </span>
-
-                                    <span class="arrow-head">
-                  </span>
-
+                                    <span class="arrow-line"></span>
+                                    <span class="arrow-head"></span>
                                 </div>
 
                                 <span
                                         class="resize-handle"
-                                        (mousedown)="startResize($event, element)"
-                                >
-                </span>
+                                        (mousedown)="
+                    startResize(
+                      $event,
+                      element
+                    )
+                  "
+                                ></span>
 
                             </div>
 
                         }
 
-                        <!-- ==========================================
-                             TEXT
-                        =========================================== -->
+                        <!-- TEXT -->
 
                         @if (element.type === 'text') {
 
@@ -687,17 +690,31 @@
                                     [style.top.px]="element.y"
                                     [style.width.px]="element.width"
                                     [style.height.px]="element.height"
-                                    (mousedown)="startElementDrag($event, element)"
-                                    (click)="selectElement($event, element)"
+                                    (mousedown)="
+                  startElementDrag(
+                    $event,
+                    element
+                  )
+                "
+                                    (click)="
+                  selectElement(
+                    $event,
+                    element
+                  )
+                "
                             >
 
                                 {{ element.label }}
 
                                 <span
                                         class="resize-handle"
-                                        (mousedown)="startResize($event, element)"
-                                >
-                </span>
+                                        (mousedown)="
+                    startResize(
+                      $event,
+                      element
+                    )
+                  "
+                                ></span>
 
                             </div>
 
@@ -709,14 +726,11 @@
 
             </div>
 
-            <!-- =================================================
-                 BOTTOM ACTIONS
-            ================================================== -->
-
             <div class="editor-footer">
 
         <span>
-          Planul se salvează automat în browser.
+          Planul se salvează automat
+          în browser.
         </span>
 
                 <button
@@ -738,13 +752,5 @@
     <div class="loading">
         Se încarcă așezarea...
     </div>
-
-    <button
-            type="button"
-            class="save-element-button"
-            (click)="saveSelectedElement()"
-    >
-        Salvează modificările
-    </button>
 
 }

@@ -5,6 +5,7 @@ import {
   getDocs
 } from '@angular/fire/firestore';
 import * as XLSX from 'xlsx';
+import { jsPDF } from 'jspdf';
 
 import {
   WeddingExpense,
@@ -41,6 +42,28 @@ interface WorkbookSheet {
   name: string;
   rows: Record<string, unknown>[];
   widths: number[];
+}
+
+interface SeatingFloorElement {
+  id: string;
+
+  type:
+      | 'table'
+      | 'rectangle'
+      | 'square'
+      | 'arrow'
+      | 'text';
+
+  label: string;
+
+  x: number;
+  y: number;
+
+  width: number;
+  height: number;
+
+  tableNumber?: number;
+  capacity?: number;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -97,24 +120,636 @@ export class ExportBackupService {
     );
   }
 
-  async exportSeatingExcel(): Promise<void> {
-    const guests = await this.readCollection<ExtendedWeddingGuest>('weddingGuests');
+  async exportSeatingPdf(): Promise<void> {
+    const guests =
+        await this.readCollection<ExtendedWeddingGuest>(
+            'weddingGuests'
+        );
 
-    this.downloadWorkbook(
-      [
-        {
-          name: 'Plan mese',
-          rows: this.seatingRows(guests),
-          widths: [12, 28, 10, 10, 10, 13, 18, 22, 30]
-        },
-        {
-          name: 'Sumar mese',
-          rows: this.seatingSummaryRows(guests),
-          widths: [14, 18, 18, 18]
-        }
-      ],
-      `plan-mese-${this.fileDate()}.xlsx`
+    const rawLayout =
+        localStorage.getItem(
+            'wedding-seating-floor-plan-v1'
+        );
+
+    if (!rawLayout) {
+      throw new Error(
+          'no-seating-layout'
+      );
+    }
+
+    const elements =
+        JSON.parse(
+            rawLayout
+        ) as SeatingFloorElement[];
+
+    if (
+        !Array.isArray(elements) ||
+        elements.length === 0
+    ) {
+      throw new Error(
+          'no-seating-layout'
+      );
+    }
+
+    const pdf = new jsPDF({
+      orientation: 'landscape',
+      unit: 'mm',
+      format: 'a3'
+    });
+
+    const pageWidth =
+        pdf.internal.pageSize.getWidth();
+
+    const pageHeight =
+        pdf.internal.pageSize.getHeight();
+
+    const canvasWidth = 1500;
+    const canvasHeight = 920;
+
+    const marginX = 10;
+    const top = 19;
+    const bottom = 9;
+
+    const usableWidth =
+        pageWidth - marginX * 2;
+
+    const usableHeight =
+        pageHeight - top - bottom;
+
+    const scale = Math.min(
+        usableWidth / canvasWidth,
+        usableHeight / canvasHeight
     );
+
+    const planWidth =
+        canvasWidth * scale;
+
+    const planHeight =
+        canvasHeight * scale;
+
+    const offsetX =
+        (pageWidth - planWidth) / 2;
+
+    const offsetY = top;
+
+    // ============================================================
+    // TITLE
+    // ============================================================
+
+    pdf.setTextColor(
+        70,
+        55,
+        43
+    );
+
+    pdf.setFont(
+        'helvetica',
+        'bold'
+    );
+
+    pdf.setFontSize(17);
+
+    pdf.text(
+        'Planul meselor',
+        marginX,
+        10
+    );
+
+    pdf.setFont(
+        'helvetica',
+        'normal'
+    );
+
+    pdf.setFontSize(8);
+
+    pdf.setTextColor(
+        130,
+        110,
+        90
+    );
+
+    pdf.text(
+        `Generat la ${new Date().toLocaleString('ro-RO')}`,
+        marginX,
+        15
+    );
+
+    // ============================================================
+    // PLAN BACKGROUND
+    // ============================================================
+
+    pdf.setFillColor(
+        252,
+        248,
+        241
+    );
+
+    pdf.setDrawColor(
+        226,
+        214,
+        198
+    );
+
+    pdf.roundedRect(
+        offsetX,
+        offsetY,
+        planWidth,
+        planHeight,
+        2,
+        2,
+        'FD'
+    );
+
+    // ============================================================
+    // ELEMENTS
+    // ============================================================
+
+    for (const element of elements) {
+      const x =
+          offsetX +
+          element.x * scale;
+
+      const y =
+          offsetY +
+          element.y * scale;
+
+      const width =
+          element.width * scale;
+
+      const height =
+          element.height * scale;
+
+      if (element.type === 'table') {
+        this.drawPdfTable(
+            pdf,
+            element,
+            guests,
+            x,
+            y,
+            width,
+            height
+        );
+
+        continue;
+      }
+
+      if (
+          element.type === 'rectangle' ||
+          element.type === 'square'
+      ) {
+        pdf.setFillColor(
+            220,
+            232,
+            242
+        );
+
+        pdf.setDrawColor(
+            142,
+            163,
+            181
+        );
+
+        pdf.roundedRect(
+            x,
+            y,
+            width,
+            height,
+            2,
+            2,
+            'FD'
+        );
+
+        pdf.setTextColor(
+            51,
+            72,
+            86
+        );
+
+        pdf.setFont(
+            'helvetica',
+            'bold'
+        );
+
+        pdf.setFontSize(7);
+
+        const label =
+            this.pdfShortText(
+                pdf,
+                element.label,
+                Math.max(5, width - 4)
+            );
+
+        pdf.text(
+            label,
+            x + width / 2,
+            y + height / 2 + 1,
+            {
+              align: 'center'
+            }
+        );
+
+        continue;
+      }
+
+      if (element.type === 'text') {
+        pdf.setFont(
+            'helvetica',
+            'bold'
+        );
+
+        pdf.setFontSize(8);
+
+        pdf.setTextColor(
+            90,
+            73,
+            57
+        );
+
+        pdf.text(
+            this.pdfShortText(
+                pdf,
+                element.label,
+                Math.max(5, width)
+            ),
+            x + width / 2,
+            y + height / 2,
+            {
+              align: 'center'
+            }
+        );
+
+        continue;
+      }
+
+      if (element.type === 'arrow') {
+        pdf.setDrawColor(
+            120,
+            146,
+            164
+        );
+
+        pdf.setFillColor(
+            120,
+            146,
+            164
+        );
+
+        pdf.setLineWidth(1);
+
+        const arrowY =
+            y + height * 0.62;
+
+        const startX =
+            x + width * 0.1;
+
+        const endX =
+            x + width * 0.86;
+
+        pdf.line(
+            startX,
+            arrowY,
+            endX,
+            arrowY
+        );
+
+        const headSize = Math.min(
+            4,
+            height * 0.18
+        );
+
+        pdf.triangle(
+            endX,
+            arrowY - headSize,
+            endX,
+            arrowY + headSize,
+            endX + headSize * 1.5,
+            arrowY,
+            'F'
+        );
+
+        pdf.setTextColor(
+            84,
+            106,
+            120
+        );
+
+        pdf.setFont(
+            'helvetica',
+            'bold'
+        );
+
+        pdf.setFontSize(6);
+
+        pdf.text(
+            this.pdfShortText(
+                pdf,
+                element.label,
+                Math.max(5, width)
+            ),
+            x + width / 2,
+            y + height * 0.3,
+            {
+              align: 'center'
+            }
+        );
+      }
+    }
+
+    pdf.save(
+        `plan-mese-${this.fileDate()}.pdf`
+    );
+  }
+
+  private drawPdfTable(
+      pdf: jsPDF,
+      table: SeatingFloorElement,
+      guests: ExtendedWeddingGuest[],
+      x: number,
+      y: number,
+      width: number,
+      height: number
+  ): void {
+    const tableNumber =
+        Number(table.tableNumber);
+
+    const capacity =
+        Number(table.capacity) || 0;
+
+    const tableGuests =
+        guests
+            .filter(
+                guest =>
+                    guest.attendanceStatus !== 'declined' &&
+                    guest.tableNumber === tableNumber
+            )
+            .sort(
+                (a, b) =>
+                    a.name.localeCompare(
+                        b.name,
+                        'ro'
+                    )
+            );
+
+    const occupied =
+        tableGuests.reduce(
+            (sum, guest) =>
+                sum +
+                this.number(guest.adults) +
+                this.number(guest.children),
+            0
+        );
+
+    pdf.setFillColor(
+        255,
+        255,
+        255
+    );
+
+    pdf.setDrawColor(
+        199,
+        170,
+        136
+    );
+
+    pdf.setLineWidth(0.35);
+
+    pdf.setLineDashPattern(
+        [1.4, 1.2],
+        0
+    );
+
+    pdf.roundedRect(
+        x,
+        y,
+        width,
+        height,
+        2.2,
+        2.2,
+        'FD'
+    );
+
+    pdf.setLineDashPattern(
+        [],
+        0
+    );
+
+    // HEADER
+
+    pdf.setFillColor(
+        185,
+        155,
+        114
+    );
+
+    const badgeSize =
+        Math.min(
+            7,
+            height * 0.12
+        );
+
+    pdf.circle(
+        x + 5,
+        y + 5.5,
+        badgeSize / 2,
+        'F'
+    );
+
+    pdf.setTextColor(
+        255,
+        255,
+        255
+    );
+
+    pdf.setFont(
+        'helvetica',
+        'bold'
+    );
+
+    pdf.setFontSize(6);
+
+    pdf.text(
+        String(tableNumber),
+        x + 5,
+        y + 6.2,
+        {
+          align: 'center'
+        }
+    );
+
+    pdf.setTextColor(
+        70,
+        55,
+        43
+    );
+
+    pdf.setFontSize(7);
+
+    const titleWidth =
+        Math.max(
+            5,
+            width - 20
+        );
+
+    pdf.text(
+        this.pdfShortText(
+            pdf,
+            `Masa ${tableNumber}`,
+            titleWidth
+        ),
+        x + 9,
+        y + 5
+    );
+
+    pdf.setFontSize(6);
+
+    pdf.text(
+        `${occupied}/${capacity}`,
+        x + width - 3,
+        y + 5,
+        {
+          align: 'right'
+        }
+    );
+
+    pdf.setFont(
+        'helvetica',
+        'normal'
+    );
+
+    pdf.setTextColor(
+        135,
+        115,
+        95
+    );
+
+    pdf.setFontSize(4.7);
+
+    pdf.text(
+        `${capacity - occupied} locuri libere`,
+        x + width - 3,
+        y + 8,
+        {
+          align: 'right'
+        }
+    );
+
+    // GUESTS
+
+    const contentTop =
+        y + 12;
+
+    const contentBottom =
+        y + height - 3;
+
+    const lineHeight = 4.2;
+
+    const maxLines =
+        Math.max(
+            0,
+            Math.floor(
+                (contentBottom - contentTop) /
+                lineHeight
+            )
+        );
+
+    pdf.setFontSize(5);
+
+    pdf.setTextColor(
+        70,
+        62,
+        54
+    );
+
+    let lineIndex = 0;
+
+    for (const guest of tableGuests) {
+      if (lineIndex >= maxLines) {
+        break;
+      }
+
+      const people =
+          this.number(guest.adults) +
+          this.number(guest.children);
+
+      const text =
+          `${guest.name} · ${people} pers.`;
+
+      pdf.text(
+          this.pdfShortText(
+              pdf,
+              text,
+              Math.max(
+                  5,
+                  width - 6
+              )
+          ),
+          x + 3,
+          contentTop +
+          lineIndex * lineHeight
+      );
+
+      lineIndex++;
+    }
+
+    const hidden =
+        tableGuests.length -
+        lineIndex;
+
+    if (
+        hidden > 0 &&
+        maxLines > 0
+    ) {
+      const lastY =
+          contentTop +
+          (maxLines - 1) *
+          lineHeight;
+
+      pdf.setFont(
+          'helvetica',
+          'bold'
+      );
+
+      pdf.text(
+          `+ ${hidden} grupuri`,
+          x + 3,
+          lastY
+      );
+
+      pdf.setFont(
+          'helvetica',
+          'normal'
+      );
+    }
+  }
+
+  private pdfShortText(
+      pdf: jsPDF,
+      text: string,
+      maxWidth: number
+  ): string {
+    const clean =
+        String(text ?? '');
+
+    if (
+        pdf.getTextWidth(clean) <=
+        maxWidth
+    ) {
+      return clean;
+    }
+
+    let result = clean;
+
+    while (
+        result.length > 1 &&
+        pdf.getTextWidth(
+            `${result}...`
+        ) > maxWidth
+        ) {
+      result =
+          result.slice(0, -1);
+    }
+
+    return `${result}...`;
   }
 
   async exportChecklistExcel(): Promise<void> {

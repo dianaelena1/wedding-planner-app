@@ -16,7 +16,6 @@ type FloorElementType =
 interface FloorElement {
   id: string;
   type: FloorElementType;
-
   label: string;
 
   x: number;
@@ -31,16 +30,20 @@ interface FloorElement {
 
 interface DragState {
   elementId: string;
+
   startMouseX: number;
   startMouseY: number;
+
   startX: number;
   startY: number;
 }
 
 interface ResizeState {
   elementId: string;
+
   startMouseX: number;
   startMouseY: number;
+
   startWidth: number;
   startHeight: number;
 }
@@ -57,9 +60,11 @@ export class SeatingPlannerComponent {
 
   readonly guests$ = this.guestsService.getGuests();
 
-  private readonly layoutStorageKey = 'wedding-seating-floor-plan-v1';
+  private readonly layoutStorageKey =
+      'wedding-seating-floor-plan-v1';
 
-  selectedElementDraft: FloorElement | null = null;
+  readonly canvasWidth = 1500;
+  readonly canvasHeight = 920;
 
   searchTerm = '';
 
@@ -73,12 +78,10 @@ export class SeatingPlannerComponent {
   floorElements: FloorElement[] = [];
 
   selectedElementId: string | null = null;
+  selectedElementDraft: FloorElement | null = null;
 
   private dragState: DragState | null = null;
   private resizeState: ResizeState | null = null;
-
-  readonly canvasWidth = 1500;
-  readonly canvasHeight = 920;
 
   constructor() {
     this.loadFloorPlan();
@@ -166,7 +169,8 @@ export class SeatingPlannerComponent {
         guests,
         tableNumber
     ).reduce(
-        (sum, guest) => sum + this.getPeopleCount(guest),
+        (sum, guest) =>
+            sum + this.getPeopleCount(guest),
         0
     );
   }
@@ -271,24 +275,27 @@ export class SeatingPlannerComponent {
 
     const guest = this.draggedGuest;
 
-    const occupied = this.getOccupiedSeats(
-        guests,
-        table.tableNumber
-    );
+    const occupied =
+        this.getOccupiedSeats(
+            guests,
+            table.tableNumber
+        );
 
-    const guestPeople = this.getPeopleCount(guest);
+    const people =
+        this.getPeopleCount(guest);
 
-    const alreadyAtThisTable =
+    const alreadyAtTable =
         guest.tableNumber === table.tableNumber
-            ? guestPeople
+            ? people
             : 0;
 
     const newOccupied =
         occupied -
-        alreadyAtThisTable +
-        guestPeople;
+        alreadyAtTable +
+        people;
 
-    const capacity = table.capacity ?? 0;
+    const capacity =
+        Number(table.capacity) || 0;
 
     if (newOccupied > capacity) {
       this.errorMessage =
@@ -374,9 +381,8 @@ export class SeatingPlannerComponent {
       return;
     }
 
-    const tableNumber = Number(
-        tableNumberInput.trim()
-    );
+    const tableNumber =
+        Number(tableNumberInput.trim());
 
     if (
         !Number.isInteger(tableNumber) ||
@@ -395,6 +401,7 @@ export class SeatingPlannerComponent {
     ) {
       this.errorMessage =
           `Există deja masa ${tableNumber}.`;
+
       return;
     }
 
@@ -407,9 +414,8 @@ export class SeatingPlannerComponent {
       return;
     }
 
-    const capacity = Number(
-        capacityInput.trim()
-    );
+    const capacity =
+        Number(capacityInput.trim());
 
     if (
         !Number.isInteger(capacity) ||
@@ -420,7 +426,8 @@ export class SeatingPlannerComponent {
       return;
     }
 
-    const position = this.getNextElementPosition();
+    const position =
+        this.getNextElementPosition();
 
     const table: FloorElement = {
       id: this.createId(),
@@ -434,18 +441,11 @@ export class SeatingPlannerComponent {
       x: position.x,
       y: position.y,
 
-      width: 240,
-      height: 240
+      width: 230,
+      height: 220
     };
 
-    this.floorElements = [
-      ...this.floorElements,
-      table
-    ];
-
-    this.selectedElementId = table.id;
-
-    this.saveFloorPlan();
+    this.addFloorElement(table);
 
     this.errorMessage = '';
     this.successMessage =
@@ -459,14 +459,17 @@ export class SeatingPlannerComponent {
             'DJ'
         )?.trim() || 'Dreptunghi';
 
-    const position = this.getNextElementPosition();
+    const position =
+        this.getNextElementPosition();
 
     this.addFloorElement({
       id: this.createId(),
       type: 'rectangle',
       label,
+
       x: position.x,
       y: position.y,
+
       width: 300,
       height: 110
     });
@@ -479,14 +482,17 @@ export class SeatingPlannerComponent {
             'Element'
         )?.trim() || 'Element';
 
-    const position = this.getNextElementPosition();
+    const position =
+        this.getNextElementPosition();
 
     this.addFloorElement({
       id: this.createId(),
       type: 'square',
       label,
+
       x: position.x,
       y: position.y,
+
       width: 150,
       height: 150
     });
@@ -499,14 +505,17 @@ export class SeatingPlannerComponent {
             'INTRARE'
         )?.trim() || '';
 
-    const position = this.getNextElementPosition();
+    const position =
+        this.getNextElementPosition();
 
     this.addFloorElement({
       id: this.createId(),
       type: 'arrow',
       label,
+
       x: position.x,
       y: position.y,
+
       width: 220,
       height: 90
     });
@@ -522,14 +531,19 @@ export class SeatingPlannerComponent {
       return;
     }
 
-    const position = this.getNextElementPosition();
+    const position =
+        this.getNextElementPosition();
 
     this.addFloorElement({
       id: this.createId(),
       type: 'text',
-      label: label.trim() || 'Text',
+
+      label:
+          label.trim() || 'Text',
+
       x: position.x,
       y: position.y,
+
       width: 180,
       height: 60
     });
@@ -545,11 +559,15 @@ export class SeatingPlannerComponent {
 
     this.selectedElementId = element.id;
 
+    this.selectedElementDraft = {
+      ...element
+    };
+
     this.saveFloorPlan();
   }
 
   // ============================================================
-  // SELECT ELEMENT
+  // SELECTION
   // ============================================================
 
   selectElement(
@@ -570,119 +588,6 @@ export class SeatingPlannerComponent {
     this.selectedElementDraft = null;
   }
 
-  async saveSelectedElement(): Promise<void> {
-    const selected = this.getSelectedElement();
-    const draft = this.selectedElementDraft;
-
-    if (!selected || !draft) {
-      return;
-    }
-
-    this.errorMessage = '';
-    this.successMessage = '';
-
-    const oldTableNumber = selected.tableNumber;
-
-    if (draft.type === 'table') {
-      const newTableNumber = Number(draft.tableNumber);
-      const newCapacity = Number(draft.capacity);
-
-      if (
-          !Number.isInteger(newTableNumber) ||
-          newTableNumber <= 0
-      ) {
-        this.errorMessage =
-            'Numărul mesei trebuie să fie un număr întreg mai mare decât 0.';
-        return;
-      }
-
-      if (
-          !Number.isInteger(newCapacity) ||
-          newCapacity <= 0
-      ) {
-        this.errorMessage =
-            'Capacitatea trebuie să fie un număr întreg mai mare decât 0.';
-        return;
-      }
-
-      const duplicate = this.getTables().some(
-          table =>
-              table.id !== selected.id &&
-              table.tableNumber === newTableNumber
-      );
-
-      if (duplicate) {
-        this.errorMessage =
-            `Există deja masa ${newTableNumber}.`;
-        return;
-      }
-
-      if (
-          oldTableNumber !== undefined &&
-          oldTableNumber !== newTableNumber
-      ) {
-        const guests = await firstValueFrom(
-            this.guests$
-        );
-
-        const guestsAtOldTable = guests.filter(
-            guest =>
-                guest.tableNumber === oldTableNumber
-        );
-
-        for (const guest of guestsAtOldTable) {
-          await this.guestsService.saveGuest({
-            ...guest,
-            tableNumber: newTableNumber
-          });
-        }
-      }
-
-      selected.tableNumber = newTableNumber;
-      selected.capacity = newCapacity;
-      selected.label = `Masa ${newTableNumber}`;
-    } else {
-      selected.label = draft.label;
-    }
-
-    selected.width = Math.max(
-        60,
-        Number(draft.width) || 60
-    );
-
-    selected.height = Math.max(
-        40,
-        Number(draft.height) || 40
-    );
-
-    selected.x = Math.max(
-        0,
-        Math.min(
-            Number(draft.x) || 0,
-            this.canvasWidth - selected.width
-        )
-    );
-
-    selected.y = Math.max(
-        0,
-        Math.min(
-            Number(draft.y) || 0,
-            this.canvasHeight - selected.height
-        )
-    );
-
-    this.selectedElementDraft = {
-      ...selected
-    };
-
-    this.saveFloorPlan();
-
-    this.successMessage =
-        selected.type === 'table'
-            ? `${selected.label} a fost salvată.`
-            : 'Modificările au fost salvate.';
-  }
-
   getSelectedElement():
       | FloorElement
       | undefined {
@@ -696,12 +601,159 @@ export class SeatingPlannerComponent {
       element: FloorElement
   ): boolean {
     return (
-        element.id === this.selectedElementId
+        element.id ===
+        this.selectedElementId
     );
   }
 
   // ============================================================
-  // MOVE ELEMENT
+  // SAVE SELECTED ELEMENT
+  // ============================================================
+
+  async saveSelectedElement(): Promise<void> {
+    const selected =
+        this.getSelectedElement();
+
+    const draft =
+        this.selectedElementDraft;
+
+    if (!selected || !draft) {
+      return;
+    }
+
+    this.errorMessage = '';
+    this.successMessage = '';
+
+    const oldTableNumber =
+        selected.tableNumber;
+
+    if (draft.type === 'table') {
+      const newTableNumber =
+          Number(draft.tableNumber);
+
+      const newCapacity =
+          Number(draft.capacity);
+
+      if (
+          !Number.isInteger(newTableNumber) ||
+          newTableNumber <= 0
+      ) {
+        this.errorMessage =
+            'Numărul mesei trebuie să fie un număr întreg mai mare decât 0.';
+
+        return;
+      }
+
+      if (
+          !Number.isInteger(newCapacity) ||
+          newCapacity <= 0
+      ) {
+        this.errorMessage =
+            'Capacitatea trebuie să fie un număr întreg mai mare decât 0.';
+
+        return;
+      }
+
+      const duplicate =
+          this.getTables().some(
+              table =>
+                  table.id !== selected.id &&
+                  table.tableNumber ===
+                  newTableNumber
+          );
+
+      if (duplicate) {
+        this.errorMessage =
+            `Există deja masa ${newTableNumber}.`;
+
+        return;
+      }
+
+      if (
+          oldTableNumber !== undefined &&
+          oldTableNumber !== newTableNumber
+      ) {
+        const guests =
+            await firstValueFrom(
+                this.guests$
+            );
+
+        const guestsAtOldTable =
+            guests.filter(
+                guest =>
+                    guest.tableNumber ===
+                    oldTableNumber
+            );
+
+        for (
+            const guest of guestsAtOldTable
+            ) {
+          await this.guestsService.saveGuest({
+            ...guest,
+            tableNumber: newTableNumber
+          });
+        }
+      }
+
+      selected.tableNumber =
+          newTableNumber;
+
+      selected.capacity =
+          newCapacity;
+
+      selected.label =
+          `Masa ${newTableNumber}`;
+    } else {
+      selected.label =
+          draft.label.trim() || 'Element';
+    }
+
+    const minimumWidth =
+        selected.type === 'table'
+            ? 190
+            : 60;
+
+    const minimumHeight =
+        selected.type === 'table'
+            ? 150
+            : 40;
+
+    selected.width = Math.max(
+        minimumWidth,
+        Number(draft.width) ||
+        minimumWidth
+    );
+
+    selected.height = Math.max(
+        minimumHeight,
+        Number(draft.height) ||
+        minimumHeight
+    );
+
+    selected.width = Math.min(
+        selected.width,
+        this.canvasWidth - selected.x
+    );
+
+    selected.height = Math.min(
+        selected.height,
+        this.canvasHeight - selected.y
+    );
+
+    this.selectedElementDraft = {
+      ...selected
+    };
+
+    this.saveFloorPlan();
+
+    this.successMessage =
+        selected.type === 'table'
+            ? `${selected.label} a fost actualizată.`
+            : 'Elementul a fost actualizat.';
+  }
+
+  // ============================================================
+  // MOVE
   // ============================================================
 
   startElementDrag(
@@ -712,7 +764,8 @@ export class SeatingPlannerComponent {
       return;
     }
 
-    const target = event.target as HTMLElement;
+    const target =
+        event.target as HTMLElement;
 
     if (
         target.closest('.resize-handle') ||
@@ -726,7 +779,12 @@ export class SeatingPlannerComponent {
     event.preventDefault();
     event.stopPropagation();
 
-    this.selectedElementId = element.id;
+    this.selectedElementId =
+        element.id;
+
+    this.selectedElementDraft = {
+      ...element
+    };
 
     this.dragState = {
       elementId: element.id,
@@ -740,7 +798,7 @@ export class SeatingPlannerComponent {
   }
 
   // ============================================================
-  // RESIZE ELEMENT
+  // RESIZE
   // ============================================================
 
   startResize(
@@ -750,7 +808,12 @@ export class SeatingPlannerComponent {
     event.preventDefault();
     event.stopPropagation();
 
-    this.selectedElementId = element.id;
+    this.selectedElementId =
+        element.id;
+
+    this.selectedElementDraft = {
+      ...element
+    };
 
     this.resizeState = {
       elementId: element.id,
@@ -788,9 +851,12 @@ export class SeatingPlannerComponent {
     this.dragState = null;
     this.resizeState = null;
 
-    if (changed) {
-      this.saveFloorPlan();
+    if (!changed) {
+      return;
     }
+
+    this.syncDraftFromSelected();
+    this.saveFloorPlan();
   }
 
   private moveElementWithMouse(
@@ -819,25 +885,23 @@ export class SeatingPlannerComponent {
         event.clientY -
         this.dragState.startMouseY;
 
-    const newX =
-        this.dragState.startX + deltaX;
-
-    const newY =
-        this.dragState.startY + deltaY;
-
     element.x = Math.max(
         0,
         Math.min(
-            newX,
-            this.canvasWidth - element.width
+            this.dragState.startX +
+            deltaX,
+            this.canvasWidth -
+            element.width
         )
     );
 
     element.y = Math.max(
         0,
         Math.min(
-            newY,
-            this.canvasHeight - element.height
+            this.dragState.startY +
+            deltaY,
+            this.canvasHeight -
+            element.height
         )
     );
   }
@@ -869,14 +933,18 @@ export class SeatingPlannerComponent {
         this.resizeState.startMouseY;
 
     const minimumWidth =
-        element.type === 'text'
-            ? 80
-            : 100;
+        element.type === 'table'
+            ? 190
+            : element.type === 'text'
+                ? 80
+                : 90;
 
     const minimumHeight =
-        element.type === 'text'
-            ? 40
-            : 60;
+        element.type === 'table'
+            ? 150
+            : element.type === 'text'
+                ? 40
+                : 55;
 
     element.width = Math.max(
         minimumWidth,
@@ -897,129 +965,17 @@ export class SeatingPlannerComponent {
     );
   }
 
-  // ============================================================
-  // EDIT ELEMENT
-  // ============================================================
-
-  onElementSettingsChanged(): void {
-    const element =
+  private syncDraftFromSelected(): void {
+    const selected =
         this.getSelectedElement();
 
-    if (!element) {
+    if (!selected) {
       return;
     }
 
-    element.width = Math.max(
-        60,
-        Number(element.width) || 60
-    );
-
-    element.height = Math.max(
-        40,
-        Number(element.height) || 40
-    );
-
-    element.x = Math.max(
-        0,
-        Math.min(
-            Number(element.x) || 0,
-            this.canvasWidth - element.width
-        )
-    );
-
-    element.y = Math.max(
-        0,
-        Math.min(
-            Number(element.y) || 0,
-            this.canvasHeight - element.height
-        )
-    );
-
-    if (element.type === 'table') {
-      element.capacity = Math.max(
-          1,
-          Number(element.capacity) || 1
-      );
-
-      if (element.tableNumber) {
-        element.label =
-            `Masa ${element.tableNumber}`;
-      }
-    }
-
-    this.saveFloorPlan();
-  }
-
-  async changeTableNumber(
-      element: FloorElement,
-      oldTableNumber: number | undefined,
-      value: number | string
-  ): Promise<void> {
-    if (element.type !== 'table') {
-      return;
-    }
-
-    const newNumber = Number(value);
-
-    if (
-        !Number.isInteger(newNumber) ||
-        newNumber <= 0
-    ) {
-      this.errorMessage =
-          'Numărul mesei trebuie să fie un număr întreg mai mare decât 0.';
-
-      return;
-    }
-
-    const duplicate =
-        this.getTables().some(
-            table =>
-                table.id !== element.id &&
-                table.tableNumber === newNumber
-        );
-
-    if (duplicate) {
-      this.errorMessage =
-          `Există deja masa ${newNumber}.`;
-
-      return;
-    }
-
-    if (
-        oldTableNumber !== undefined &&
-        oldTableNumber !== newNumber
-    ) {
-      const guests =
-          await firstValueFrom(
-              this.guests$
-          );
-
-      const guestsAtOldTable =
-          guests.filter(
-              guest =>
-                  guest.tableNumber ===
-                  oldTableNumber
-          );
-
-      for (
-          const guest of guestsAtOldTable
-          ) {
-        await this.guestsService.saveGuest({
-          ...guest,
-          tableNumber: newNumber
-        });
-      }
-    }
-
-    element.tableNumber = newNumber;
-    element.label = `Masa ${newNumber}`;
-
-    this.errorMessage = '';
-
-    this.saveFloorPlan();
-
-    this.successMessage =
-        `Masa a fost redenumită în Masa ${newNumber}.`;
+    this.selectedElementDraft = {
+      ...selected
+    };
   }
 
   // ============================================================
@@ -1034,11 +990,12 @@ export class SeatingPlannerComponent {
       return;
     }
 
-    const confirmed = window.confirm(
-        element.type === 'table'
-            ? `Sigur vrei să ștergi ${element.label}? Invitații de la această masă vor reveni în lista "Fără masă".`
-            : `Sigur vrei să ștergi "${element.label}"?`
-    );
+    const confirmed =
+        window.confirm(
+            element.type === 'table'
+                ? `Sigur vrei să ștergi ${element.label}? Invitații de la această masă vor reveni în lista "Fără masă".`
+                : `Sigur vrei să ștergi "${element.label}"?`
+        );
 
     if (!confirmed) {
       return;
@@ -1074,6 +1031,7 @@ export class SeatingPlannerComponent {
         );
 
     this.selectedElementId = null;
+    this.selectedElementDraft = null;
 
     this.saveFloorPlan();
 
@@ -1082,13 +1040,14 @@ export class SeatingPlannerComponent {
   }
 
   // ============================================================
-  // RESET GUEST ASSIGNMENTS
+  // RESET
   // ============================================================
 
   async clearAllAssignments(): Promise<void> {
-    const confirmed = window.confirm(
-        'Sigur vrei să scoți toți invitații de la mese?'
-    );
+    const confirmed =
+        window.confirm(
+            'Sigur vrei să scoți toți invitații de la mese?'
+        );
 
     if (!confirmed) {
       return;
@@ -1116,16 +1075,19 @@ export class SeatingPlannerComponent {
   }
 
   clearFloorPlan(): void {
-    const confirmed = window.confirm(
-        'Sigur vrei să ștergi toate elementele din planul sălii?'
-    );
+    const confirmed =
+        window.confirm(
+            'Sigur vrei să ștergi toate elementele din planul sălii?'
+        );
 
     if (!confirmed) {
       return;
     }
 
     this.floorElements = [];
+
     this.selectedElementId = null;
+    this.selectedElementDraft = null;
 
     this.saveFloorPlan();
 
@@ -1141,11 +1103,13 @@ export class SeatingPlannerComponent {
     try {
       localStorage.setItem(
           this.layoutStorageKey,
-          JSON.stringify(this.floorElements)
+          JSON.stringify(
+              this.floorElements
+          )
       );
     } catch (error) {
       console.error(
-          'Nu am putut salva planul în localStorage.',
+          'Nu am putut salva planul.',
           error
       );
     }
@@ -1153,16 +1117,18 @@ export class SeatingPlannerComponent {
 
   private loadFloorPlan(): void {
     try {
-      const raw = localStorage.getItem(
-          this.layoutStorageKey
-      );
+      const raw =
+          localStorage.getItem(
+              this.layoutStorageKey
+          );
 
       if (!raw) {
         this.floorElements = [];
         return;
       }
 
-      const parsed = JSON.parse(raw);
+      const parsed =
+          JSON.parse(raw);
 
       if (!Array.isArray(parsed)) {
         this.floorElements = [];
@@ -1170,10 +1136,29 @@ export class SeatingPlannerComponent {
       }
 
       this.floorElements =
-          parsed as FloorElement[];
+          parsed.map(
+              element => {
+                const item =
+                    element as FloorElement;
+
+                if (item.type === 'table') {
+                  item.width = Math.max(
+                      190,
+                      Number(item.width) || 230
+                  );
+
+                  item.height = Math.max(
+                      150,
+                      Number(item.height) || 220
+                  );
+                }
+
+                return item;
+              }
+          );
     } catch (error) {
       console.error(
-          'Nu am putut încărca planul sălii.',
+          'Nu am putut încărca planul.',
           error
       );
 
@@ -1182,13 +1167,16 @@ export class SeatingPlannerComponent {
   }
 
   // ============================================================
-  // GENERAL HELPERS
+  // HELPERS
   // ============================================================
 
   private getNextTableNumber(): number {
     const usedNumbers =
         this.getTables()
-            .map(table => table.tableNumber)
+            .map(
+                table =>
+                    table.tableNumber
+            )
             .filter(
                 (
                     number
@@ -1215,8 +1203,8 @@ export class SeatingPlannerComponent {
         this.floorElements.length;
 
     return {
-      x: 35 + (index % 5) * 35,
-      y: 35 + (index % 7) * 35
+      x: 35 + (index % 6) * 40,
+      y: 35 + (index % 7) * 40
     };
   }
 
@@ -1228,19 +1216,5 @@ export class SeatingPlannerComponent {
             .toString(36)
             .slice(2, 9)
     );
-  }
-
-  trackGuest(
-      _: number,
-      guest: WeddingGuest
-  ): string {
-    return guest.id;
-  }
-
-  trackElement(
-      _: number,
-      element: FloorElement
-  ): string {
-    return element.id;
   }
 }

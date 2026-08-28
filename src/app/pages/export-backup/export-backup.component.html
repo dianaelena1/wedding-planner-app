@@ -56,17 +56,42 @@
     </button>
   </article>
 
-  <article class="export-card">
-    <div class="card-icon">MS</div>
-    <div>
-      <span class="eyebrow">EXCEL</span>
-      <h2>Plan mese</h2>
-      <p>Invitații ordonați pe mese și o foaie separată cu ocuparea, capacitatea și locurile libere.</p>
-    </div>
-    <button type="button" [disabled]="runningAction !== null" (click)="exportSeating()">
-      {{ isRunning('seating') ? 'Se exportă...' : 'Descarcă planul meselor' }}
-    </button>
-  </article>
+    <article class="export-card">
+
+        <div class="card-icon">
+            MS
+        </div>
+
+        <div>
+    <span class="eyebrow">
+      PDF
+    </span>
+
+            <h2>
+                Plan mese
+            </h2>
+
+            <p>
+                Planul vizual al sălii,
+                cu mesele, capacitățile,
+                invitații și elementele
+                poziționate în editor.
+            </p>
+        </div>
+
+        <button
+                type="button"
+                [disabled]="runningAction !== null"
+                (click)="exportSeating()"
+        >
+            {{
+                isRunning('seating')
+                    ? 'Se generează PDF...'
+                    : 'Descarcă planul PDF'
+            }}
+        </button>
+
+    </article>
 
   <article class="export-card">
     <div class="card-icon">CK</div>

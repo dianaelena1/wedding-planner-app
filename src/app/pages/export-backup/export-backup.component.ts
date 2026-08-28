@@ -35,7 +35,12 @@ export class ExportBackupComponent {
   }
 
   async exportSeating(): Promise<void> {
-    await this.run('seating', () => this.exportService.exportSeatingExcel(), 'Planul meselor a fost exportat în Excel.');
+    await this.run(
+        'seating',
+        () =>
+            this.exportService.exportSeatingPdf(),
+        'Planul meselor a fost exportat în PDF.'
+    );
   }
 
   async exportChecklist(): Promise<void> {
