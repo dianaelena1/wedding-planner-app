@@ -323,7 +323,11 @@
                         <button
                                 class="save-element-button"
                                 type="button"
-                                (click)="saveSelectedElement()"
+                                (mousedown)="$event.stopPropagation()"
+                                (click)="
+    $event.stopPropagation();
+    saveSelectedElement()
+  "
                         >
                             Salvează modificările
                         </button>
