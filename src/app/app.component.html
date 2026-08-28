@@ -1,156 +1,172 @@
 <div class="app-shell">
-  <aside class="sidebar">
-    <div class="brand">
-      <div class="brand-icon">D&D</div>
+    <aside class="sidebar">
+        <div class="brand">
+            <div class="brand-icon">D&D</div>
 
-      <div>
-        <h1>Wedding Planner</h1>
-        <p>05 Septembrie 2026, ora 16:00</p>
-      </div>
-    </div>
+            <div>
+                <h1>Wedding Planner</h1>
+                <p>05 Septembrie 2026, ora 16:00</p>
+            </div>
+        </div>
 
-    @if (role$ | async; as role) {
-      <nav>
-        @for (item of navigation; track item.route) {
-          @if (!item.adminOnly || role === 'admin') {
-            <a
-              [routerLink]="item.route"
-              routerLinkActive="active"
-            >
-              @if (item.icon) {
-                <span class="nav-special-icon">
+        @if (role$ | async; as role) {
+            <nav>
+                @for (item of navigation; track item.route) {
+                    @if (!item.adminOnly || role === 'admin') {
+                        <a
+                                [routerLink]="item.route"
+                                routerLinkActive="active"
+                        >
+                            @if (item.icon) {
+                                <span class="nav-special-icon">
                   {{ item.icon }}
                 </span>
-              }
+                            }
 
+                            <span>
+                {{ item.label }}
+              </span>
+                        </a>
+                    } @else {
+                        <div
+                                class="nav-disabled"
+                                title="Disponibil doar administratorului"
+                                aria-disabled="true"
+                        >
               <span>
                 {{ item.label }}
               </span>
-            </a>
-          } @else {
-            <div
-              class="nav-disabled"
-              title="Disponibil doar administratorului"
-              aria-disabled="true"
-            >
-              <span>
-                {{ item.label }}
-              </span>
 
-              <span
-                class="nav-lock"
-                aria-hidden="true"
-              >
+                            <span
+                                    class="nav-lock"
+                                    aria-hidden="true"
+                            >
                 🔒
               </span>
-            </div>
-          }
+                        </div>
+                    }
+                }
+            </nav>
         }
-      </nav>
-    }
 
-    <div class="auth-card">
-      @if (user$ | async; as user) {
-        <span class="auth-label">
+        <div class="auth-card">
+            @if (user$ | async; as user) {
+                <span class="auth-label">
           Logată ca
         </span>
 
-        <strong>
-          {{ user.displayName || user.email }}
-        </strong>
+                <strong>
+                    {{ user.displayName || user.email }}
+                </strong>
 
-        @if (role$ | async; as role) {
-          <span
-            class="access-badge"
-            [class.admin]="role === 'admin'"
-          >
+                @if (role$ | async; as role) {
+                    <span
+                            class="access-badge"
+                            [class.admin]="role === 'admin'"
+                    >
             {{
-              role === 'admin'
-                ? 'Admin'
-                : 'Acces vizualizare'
-            }}
+                            role === 'admin'
+                                ? 'Admin'
+                                : 'Acces vizualizare'
+                        }}
           </span>
-        }
+                }
 
-        <button
-          type="button"
-          (click)="logout()"
-        >
-          Logout
-        </button>
-      } @else {
-        <span class="auth-label">
+                <button
+                        type="button"
+                        (click)="logout()"
+                >
+                    Logout
+                </button>
+            } @else {
+                <span class="auth-label">
           Acces public
         </span>
 
-        <strong>
-          Vizualizare
-        </strong>
+                <strong>
+                    Vizualizare
+                </strong>
 
-        <span class="public-access-copy">
+                <span class="public-access-copy">
           Dashboard, invitați și Ziua nunții sunt disponibile fără autentificare.
         </span>
 
-        <button
-          type="button"
-          (click)="login()"
-        >
-          Login administrator
-        </button>
-      }
-    </div>
-  </aside>
+                <button
+                        type="button"
+                        (click)="login()"
+                >
+                    Login administrator
+                </button>
+            }
+        </div>
+    </aside>
 
-  <main class="content">
-    <div class="page-content">
-      <router-outlet></router-outlet>
-    </div>
-
-    <footer class="app-footer">
-      <div class="footer-inner">
-        <div class="footer-brand">
-          <span class="footer-mark">D</span>
-
-          <div>
-
-            <strong>
-              Diana Radu
-            </strong>
-
-            <span class="footer-role">
-              Software Engineer
-            </span>
-          </div>
+    <main class="content">
+        <div class="page-content">
+            <router-outlet></router-outlet>
         </div>
 
-        <a
-          class="linkedin-link"
-          href="https://www.linkedin.com/in/diana-elena-horincar/"
-          target="_blank"
-          rel="noopener noreferrer"
-          aria-label="Profil LinkedIn Diana Radu"
-        >
-          <span class="linkedin-icon">
-            in
-          </span>
+        <footer class="app-footer">
+            <div class="footer-main">
+                <div class="footer-profile">
+                    <a
+                            class="footer-avatar-link"
+                            href="https://www.linkedin.com/in/diana-elena-horincar/"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            aria-label="Profil LinkedIn Diana Radu"
+                    >
+                        <img
+                                class="footer-avatar"
+                                src="../assets/diana-profile.png"
+                                alt="Diana Radu"
+                        />
+                    </a>
 
-          <span>
-            LinkedIn
-          </span>
-        </a>
-      </div>
+                    <div class="footer-profile-copy">
+            <span class="footer-eyebrow">
+              Created & maintained by
+            </span>
 
-      <div class="footer-bottom">
-        <span>
-          Wedding Planner · 2026
-        </span>
+                        <strong>
+                            Diana Radu
+                        </strong>
 
-        <span class="footer-heart">
-          ♡
-        </span>
-      </div>
-    </footer>
-  </main>
+                        <span class="footer-role">
+              Software Engineer
+            </span>
+                    </div>
+                </div>
+
+                <div class="footer-actions">
+                </div>
+            </div>
+
+            <div class="footer-divider"></div>
+
+            <div class="footer-bottom">
+                <div class="footer-copyright">
+                    <strong>Wedding Planner App</strong>
+                    <span>© 2026 Diana Radu</span>
+                </div>
+
+                <nav
+                        class="footer-legal"
+                        aria-label="Linkuri legale"
+                >
+                    <a routerLink="/terms">
+                        Termeni și condiții
+                    </a>
+
+                    <span aria-hidden="true">·</span>
+
+                    <a routerLink="/privacy">
+                        Confidențialitate
+                    </a>
+                </nav>
+            </div>
+        </footer>
+    </main>
 </div>
 
 <app-edit-safety></app-edit-safety>

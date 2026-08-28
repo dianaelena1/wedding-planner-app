@@ -21,9 +21,6 @@ import { adminGuard } from './core/auth/admin.guard';
 export const routes: Routes = [
   /*
    * VIEWER + ADMIN
-   *
-   * Aceste rute decid singure ce componentă afișează
-   * în funcție de rol.
    */
   {
     path: 'dashboard',
@@ -36,6 +33,22 @@ export const routes: Routes = [
   {
     path: 'ziua-nuntii',
     component: WeddingDayAccessComponent
+  },
+
+  /*
+   * LEGAL - PUBLIC
+   */
+  {
+    path: 'terms',
+    loadComponent: () =>
+        import('./pages/legal/terms.component')
+            .then(m => m.TermsComponent)
+  },
+  {
+    path: 'privacy',
+    loadComponent: () =>
+        import('./pages/legal/privacy.component')
+            .then(m => m.PrivacyComponent)
   },
 
   /*
