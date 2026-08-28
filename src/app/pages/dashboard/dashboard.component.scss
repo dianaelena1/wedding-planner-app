@@ -27,8 +27,8 @@
   padding: 42px;
   border-radius: 30px;
   background:
-    radial-gradient(circle at 92% 15%, rgba(255, 255, 255, 0.32), transparent 32%),
-    linear-gradient(135deg, #6d513c, #a47d5c 58%, #c6a27d);
+          radial-gradient(circle at 92% 15%, rgba(255, 255, 255, 0.32), transparent 32%),
+          linear-gradient(135deg, #6d513c, #a47d5c 58%, #c6a27d);
   color: #fff;
 }
 
@@ -569,6 +569,7 @@
 
 
 /* Dashboard upgrade */
+
 .priority-stats {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -789,27 +790,58 @@
   }
 }
 
-/* Sprint 1: dashboard financiar + taskuri până la nuntă */
+
+/* ==========================================
+   SPRINT 1
+   DASHBOARD FINANCIAR + TASKURI
+========================================== */
+
 .sprint-one-grid {
-  grid-template-columns: minmax(0, 1.45fr) minmax(340px, 0.75fr);
-  align-items: start;
+  grid-template-columns:
+    minmax(0, 1.45fr)
+    minmax(340px, 0.75fr);
+
+  /* IMPORTANT:
+     makes both outer panels the same height */
+  align-items: stretch;
 }
+
+.sprint-one-grid > .panel {
+  height: 100%;
+}
+
+
+/* ==========================================
+   PAYMENT PANEL
+========================================== */
 
 .payment-overview-panel {
   min-width: 0;
+
+  display: flex;
+  flex-direction: column;
 }
 
 .payment-columns {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
+
   gap: 14px;
+
+  flex: 1;
+  align-items: stretch;
 }
 
 .payment-group {
   min-width: 0;
+
+  height: 100%;
+
   padding: 16px;
+
   border: 1px solid #eadfd3;
   border-radius: 18px;
+
   background: #fffcf8;
 }
 
@@ -825,50 +857,66 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
+
   gap: 12px;
+
   margin-bottom: 14px;
 }
 
 .payment-group__heading > div {
   display: grid;
+
   gap: 3px;
 }
 
 .payment-group__heading small {
   color: #a48365;
+
   font-size: 10px;
   font-weight: 900;
+
   letter-spacing: 0.12em;
 }
 
 .payment-group__heading strong {
   color: #49392d;
+
   font-family: Georgia, serif;
   font-size: 17px;
 }
 
 .payment-group__heading > span {
-  display: grid;
-  place-items: center;
   min-width: 30px;
   height: 30px;
+
+  display: grid;
+  place-items: center;
+
   padding: 0 8px;
+
   border-radius: 999px;
+
   background: #efe2d4;
+
   color: #79593e;
+
   font-size: 12px;
   font-weight: 900;
 }
 
 .payments-list.compact .payment-row {
   display: grid;
+
   gap: 10px;
+
   padding: 12px;
 }
 
 .payments-list.compact .payment-value {
   grid-template-columns: 1fr auto;
+
   align-items: center;
+
   justify-items: start;
 }
 
@@ -878,52 +926,83 @@
 
 .compact-empty {
   padding: 18px 10px;
+
   color: #988574;
+
   font-size: 13px;
   line-height: 1.45;
+
   text-align: center;
+}
+
+
+/* ==========================================
+   TASK PANEL
+========================================== */
+
+.task-focus-panel {
+  min-width: 0;
+
+  display: flex;
+  flex-direction: column;
 }
 
 .task-summary {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
+
   gap: 10px;
+
   margin-bottom: 16px;
 }
 
 .task-summary > div {
   display: grid;
+
   gap: 3px;
+
   padding: 12px;
+
   border-radius: 14px;
+
   background: #f6eee5;
+
   text-align: center;
 }
 
 .task-summary strong {
   color: #503b2b;
+
   font-size: 24px;
 }
 
 .task-summary span {
   color: #8e7865;
+
   font-size: 11px;
   font-weight: 800;
+
   text-transform: uppercase;
 }
 
 .next-seven-days {
   margin-top: 22px;
+
   padding-top: 18px;
+
   border-top: 1px solid #eadfd3;
 }
 
 .subsection-title {
   margin-bottom: 12px;
+
   color: #72553e;
+
   font-size: 12px;
   font-weight: 900;
+
   letter-spacing: 0.1em;
+
   text-transform: uppercase;
 }
 
@@ -937,15 +1016,28 @@
   color: #8a5d18;
 }
 
+
+/* ==========================================
+   RESPONSIVE SPRINT
+========================================== */
+
 @media (max-width: 1280px) {
   .sprint-one-grid {
     grid-template-columns: 1fr;
+  }
+
+  .sprint-one-grid > .panel {
+    height: auto;
   }
 }
 
 @media (max-width: 980px) {
   .payment-columns {
     grid-template-columns: 1fr;
+  }
+
+  .payment-group {
+    height: auto;
   }
 }
 
