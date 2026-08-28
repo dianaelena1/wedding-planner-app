@@ -1,198 +1,750 @@
 @if (guests$ | async; as guests) {
-  <section class="page-header">
-    <div>
-      <span class="eyebrow">AȘEZARE SALĂ</span>
-      <h1>Seating planner</h1>
-      <p>Trage un invitat sau o familie dintr-o zonă în alta. Modificările se salvează imediat în Firestore.</p>
+
+    <section class="page-header">
+        <div>
+            <span class="eyebrow">AȘEZARE SALĂ</span>
+
+            <h1>Seating planner</h1>
+
+            <p>
+                Construiește planul sălii, poziționează mesele și trage invitații
+                direct la masa dorită.
+            </p>
+        </div>
+
+        <button
+                class="danger-button"
+                type="button"
+                (click)="clearAllAssignments()"
+        >
+            Resetează așezarea invitaților
+        </button>
+    </section>
+
+    @if (errorMessage) {
+        <div class="message error">
+            {{ errorMessage }}
+        </div>
+    }
+
+    @if (successMessage) {
+        <div class="message success">
+            {{ successMessage }}
+        </div>
+    }
+
+    <!-- =====================================================
+         STATS
+    ====================================================== -->
+
+    <section class="stats-grid">
+
+        <article>
+            <span>Nr. total de persoane</span>
+            <strong>
+                {{ getTotalPeople(guests) }}
+            </strong>
+        </article>
+
+        <article>
+            <span>Persoane așezate</span>
+            <strong>
+                {{ getAssignedPeople(guests) }}
+            </strong>
+        </article>
+
+        <article>
+            <span>Persoane fără masă</span>
+            <strong>
+                {{ getUnassignedPeople(guests) }}
+            </strong>
+        </article>
+
+        <article>
+            <span>Locuri neocupate</span>
+            <strong>
+                {{
+                    getTotalCapacity() -
+                    getAssignedPeople(guests)
+                }}
+            </strong>
+        </article>
+
+    </section>
+
+    <!-- =====================================================
+         MAIN
+    ====================================================== -->
+
+    <div class="planner-layout">
+
+        <!-- ===================================================
+             LEFT - GUEST LIST
+        ==================================================== -->
+
+        <aside
+                class="unassigned-panel"
+                (dragover)="allowDrop($event)"
+                (drop)="dropUnassigned($event)"
+        >
+
+            <div class="panel-title">
+
+                <div>
+          <span class="eyebrow">
+            LISTĂ
+          </span>
+
+                    <h2>Fără masă</h2>
+                </div>
+
+                <span class="count-badge">
+          {{ getUnassignedGuests(guests).length }}
+        </span>
+
+            </div>
+
+            <input
+                    class="search-input"
+                    type="search"
+                    [(ngModel)]="searchTerm"
+                    placeholder="Caută după nume, telefon sau note"
+            />
+
+            <div class="guest-list">
+
+                @for (
+                    guest of getUnassignedGuests(guests);
+                    track guest.id
+                        ) {
+
+                    <article
+                            class="guest-card"
+                            draggable="true"
+                            (dragstart)="dragStart(guest)"
+                            (dragend)="dragEnd()"
+                            [class.saving]="savingGuestId === guest.id"
+                    >
+
+                        <div>
+                            <strong>
+                                {{ guest.name }}
+                            </strong>
+
+                            <span>
+                {{ guest.side }}
+                                ·
+                                {{ getPeopleCount(guest) }}
+                                pers.
+              </span>
+                        </div>
+
+                        <span
+                                class="status"
+                                [class.confirmed]="
+                guest.attendanceStatus === 'confirmed'
+              "
+                        >
+              {{
+                                guest.attendanceStatus === 'confirmed'
+                                    ? 'Confirmat'
+                                    : guest.attendanceStatus === 'maybe'
+                                        ? 'Poate'
+                                        : 'În așteptare'
+                            }}
+            </span>
+
+                    </article>
+
+                } @empty {
+
+                    <div class="empty-state">
+                        Toți invitații sunt așezați
+                        sau nu există rezultate.
+                    </div>
+
+                }
+
+            </div>
+
+        </aside>
+
+        <!-- ===================================================
+             RIGHT
+        ==================================================== -->
+
+        <section class="floor-editor">
+
+            <!-- =================================================
+                 TOOLBAR
+            ================================================== -->
+
+            <div class="floor-toolbar">
+
+                <div class="toolbar-title">
+
+                    <div>
+            <span class="eyebrow">
+              EDITOR
+            </span>
+
+                        <strong>
+                            Planul sălii
+                        </strong>
+                    </div>
+
+                    <span class="toolbar-hint">
+            Adaugă elemente și mută-le liber
+          </span>
+
+                </div>
+
+                <div class="toolbar-actions">
+
+                    <button
+                            type="button"
+                            class="tool-button primary"
+                            (click)="addTable()"
+                    >
+            <span class="tool-icon table-icon">
+            </span>
+
+                        Masă
+                    </button>
+
+                    <button
+                            type="button"
+                            class="tool-button"
+                            (click)="addRectangle()"
+                    >
+            <span class="tool-icon rectangle-icon">
+            </span>
+
+                        Dreptunghi
+                    </button>
+
+                    <button
+                            type="button"
+                            class="tool-button"
+                            (click)="addSquare()"
+                    >
+            <span class="tool-icon square-icon">
+            </span>
+
+                        Pătrat
+                    </button>
+
+                    <button
+                            type="button"
+                            class="tool-button"
+                            (click)="addArrow()"
+                    >
+            <span class="arrow-tool-icon">
+              →
+            </span>
+
+                        Săgeată
+                    </button>
+
+                    <button
+                            type="button"
+                            class="tool-button"
+                            (click)="addText()"
+                    >
+            <span class="text-tool-icon">
+              T
+            </span>
+
+                        Text
+                    </button>
+
+                </div>
+
+            </div>
+
+            <!-- =================================================
+                 SETTINGS
+            ================================================== -->
+
+            @if (selectedElementDraft; as selected) {
+
+                <div class="element-settings">
+
+                    <div class="settings-heading">
+
+                        <div>
+              <span class="eyebrow">
+                SELECTAT
+              </span>
+
+                            <strong>
+                                {{
+                                    selected.type === 'table'
+                                        ? selected.label
+                                        : selected.label || 'Element'
+                                }}
+                            </strong>
+                        </div>
+
+                        <button
+                                class="delete-element-button"
+                                type="button"
+                                (click)="deleteSelectedElement()"
+                        >
+                            Șterge
+                        </button>
+
+                    </div>
+
+                    <div class="settings-fields">
+
+                        @if (selected.type !== 'table') {
+
+                            <label>
+                                <span>Text</span>
+
+                                <input
+                                        type="text"
+                                        [(ngModel)]="selected.label"
+                                />
+                            </label>
+
+                        }
+
+                        @if (selected.type === 'table') {
+
+                            <label>
+                                <span>Nr. masă</span>
+
+                                <input
+                                        type="number"
+                                        min="1"
+                                        [ngModel]="selected.tableNumber"
+                                        (ngModelChange)="
+      changeTableNumber(
+        selected,
+        selected.tableNumber,
+        $event
+      )
+    "
+                                />
+                            </label>
+
+                            <label>
+                                <span>Capacitate</span>
+
+                                <input
+                                        type="number"
+                                        min="1"
+                                        [(ngModel)]="selected.capacity"
+                                />
+                            </label>
+
+                        }
+
+                        <label>
+                            <span>Lățime</span>
+
+                            <input
+                                    type="number"
+                                    min="60"
+                                    [(ngModel)]="selected.width"
+                            />
+                        </label>
+
+                        <label>
+                            <span>Înălțime</span>
+
+                            <input
+                                    type="number"
+                                    min="40"
+                                    [(ngModel)]="selected.height"
+                            />
+                        </label>
+
+                    </div>
+
+                </div>
+
+            }
+
+            <!-- =================================================
+                 CANVAS WRAPPER
+            ================================================== -->
+
+            <div class="canvas-scroll">
+
+                <main
+                        class="room-canvas"
+                        [style.width.px]="canvasWidth"
+                        [style.height.px]="canvasHeight"
+                        (mousedown)="clearSelection()"
+                >
+
+                    @if (floorElements.length === 0) {
+
+                        <div class="canvas-empty">
+
+                            <div class="empty-icon">
+                                +
+                            </div>
+
+                            <strong>
+                                Planul este gol
+                            </strong>
+
+                            <span>
+                Începe prin a adăuga mesele,
+                apoi DJ-ul, bufetul, intrarea
+                sau orice alt element al sălii.
+              </span>
+
+                            <button
+                                    type="button"
+                                    (click)="addTable(); $event.stopPropagation()"
+                            >
+                                + Adaugă prima masă
+                            </button>
+
+                        </div>
+
+                    }
+
+                    @for (
+                        element of floorElements;
+                        track element.id
+                            ) {
+
+                        <!-- ==========================================
+                             TABLE
+                        =========================================== -->
+
+                        @if (element.type === 'table') {
+
+                            <article
+                                    class="canvas-element table-element"
+                                    [class.selected]="isSelected(element)"
+                                    [class.over-capacity]="
+                  getRemainingSeats(guests, element) < 0
+                "
+                                    [style.left.px]="element.x"
+                                    [style.top.px]="element.y"
+                                    [style.width.px]="element.width"
+                                    [style.height.px]="element.height"
+                                    (mousedown)="startElementDrag($event, element)"
+                                    (click)="selectElement($event, element)"
+                                    (dragover)="allowDrop($event)"
+                                    (drop)="
+                  dropOnTable(
+                    $event,
+                    element,
+                    guests
+                  )
+                "
+                            >
+
+                                <header class="table-header">
+
+                                    <div class="table-title">
+
+                    <span class="table-number">
+                      {{ element.tableNumber }}
+                    </span>
+
+                                        <div>
+                                            <strong>
+                                                {{ element.label }}
+                                            </strong>
+
+                                            <span>
+                        Capacitate:
+                                                {{ element.capacity }}
+                      </span>
+                                        </div>
+
+                                    </div>
+
+                                    <div
+                                            class="capacity"
+                                            [class.full]="
+                      getRemainingSeats(
+                        guests,
+                        element
+                      ) === 0
+                    "
+                                    >
+                                        <strong>
+                                            {{
+                                                getOccupiedSeats(
+                                                    guests,
+                                                    element.tableNumber!
+                                                )
+                                            }}/{{ element.capacity }}
+                                        </strong>
+
+                                        <span>
+                      {{
+                                                getRemainingSeats(
+                                                    guests,
+                                                    element
+                                                )
+                                            }}
+                                            locuri libere
+                    </span>
+                                    </div>
+
+                                </header>
+
+                                <div class="table-guests">
+
+                                    @for (
+                                        guest of getGuestsAtTable(
+                                            guests,
+                                            element.tableNumber!
+                                        );
+                                        track guest.id
+                                            ) {
+
+                                        <article
+                                                class="guest-card compact"
+                                                draggable="true"
+                                                (mousedown)="$event.stopPropagation()"
+                                                (dragstart)="dragStart(guest)"
+                                                (dragend)="dragEnd()"
+                                                [class.saving]="
+                        savingGuestId === guest.id
+                      "
+                                        >
+
+                                            <div>
+                                                <strong>
+                                                    {{ guest.name }}
+                                                </strong>
+
+                                                <span>
+                          {{ getPeopleCount(guest) }}
+                                                    pers.
+                          ·
+                                                    {{ guest.side }}
+                        </span>
+                                            </div>
+
+                                            <button
+                                                    type="button"
+                                                    title="Scoate de la masă"
+                                                    (click)="
+                          moveGuest(
+                            guest,
+                            undefined
+                          );
+                          $event.stopPropagation()
+                        "
+                                            >
+                                                ×
+                                            </button>
+
+                                        </article>
+
+                                    } @empty {
+
+                                        <div class="drop-hint">
+                                            Trage invitații aici
+                                        </div>
+
+                                    }
+
+                                </div>
+
+                                <span
+                                        class="resize-handle"
+                                        title="Redimensionează"
+                                        (mousedown)="
+                    startResize(
+                      $event,
+                      element
+                    )
+                  "
+                                >
+                </span>
+
+                            </article>
+
+                        }
+
+                        <!-- ==========================================
+                             RECTANGLE
+                        =========================================== -->
+
+                        @if (element.type === 'rectangle') {
+
+                            <div
+                                    class="canvas-element shape-element rectangle-element"
+                                    [class.selected]="isSelected(element)"
+                                    [style.left.px]="element.x"
+                                    [style.top.px]="element.y"
+                                    [style.width.px]="element.width"
+                                    [style.height.px]="element.height"
+                                    (mousedown)="startElementDrag($event, element)"
+                                    (click)="selectElement($event, element)"
+                            >
+
+                <span>
+                  {{ element.label }}
+                </span>
+
+                                <span
+                                        class="resize-handle"
+                                        (mousedown)="startResize($event, element)"
+                                >
+                </span>
+
+                            </div>
+
+                        }
+
+                        <!-- ==========================================
+                             SQUARE
+                        =========================================== -->
+
+                        @if (element.type === 'square') {
+
+                            <div
+                                    class="canvas-element shape-element square-element"
+                                    [class.selected]="isSelected(element)"
+                                    [style.left.px]="element.x"
+                                    [style.top.px]="element.y"
+                                    [style.width.px]="element.width"
+                                    [style.height.px]="element.height"
+                                    (mousedown)="startElementDrag($event, element)"
+                                    (click)="selectElement($event, element)"
+                            >
+
+                <span>
+                  {{ element.label }}
+                </span>
+
+                                <span
+                                        class="resize-handle"
+                                        (mousedown)="startResize($event, element)"
+                                >
+                </span>
+
+                            </div>
+
+                        }
+
+                        <!-- ==========================================
+                             ARROW
+                        =========================================== -->
+
+                        @if (element.type === 'arrow') {
+
+                            <div
+                                    class="canvas-element arrow-element"
+                                    [class.selected]="isSelected(element)"
+                                    [style.left.px]="element.x"
+                                    [style.top.px]="element.y"
+                                    [style.width.px]="element.width"
+                                    [style.height.px]="element.height"
+                                    (mousedown)="startElementDrag($event, element)"
+                                    (click)="selectElement($event, element)"
+                            >
+
+                                <div class="arrow-label">
+                                    {{ element.label }}
+                                </div>
+
+                                <div class="arrow-graphic">
+
+                  <span class="arrow-line">
+                  </span>
+
+                                    <span class="arrow-head">
+                  </span>
+
+                                </div>
+
+                                <span
+                                        class="resize-handle"
+                                        (mousedown)="startResize($event, element)"
+                                >
+                </span>
+
+                            </div>
+
+                        }
+
+                        <!-- ==========================================
+                             TEXT
+                        =========================================== -->
+
+                        @if (element.type === 'text') {
+
+                            <div
+                                    class="canvas-element text-element"
+                                    [class.selected]="isSelected(element)"
+                                    [style.left.px]="element.x"
+                                    [style.top.px]="element.y"
+                                    [style.width.px]="element.width"
+                                    [style.height.px]="element.height"
+                                    (mousedown)="startElementDrag($event, element)"
+                                    (click)="selectElement($event, element)"
+                            >
+
+                                {{ element.label }}
+
+                                <span
+                                        class="resize-handle"
+                                        (mousedown)="startResize($event, element)"
+                                >
+                </span>
+
+                            </div>
+
+                        }
+
+                    }
+
+                </main>
+
+            </div>
+
+            <!-- =================================================
+                 BOTTOM ACTIONS
+            ================================================== -->
+
+            <div class="editor-footer">
+
+        <span>
+          Planul se salvează automat în browser.
+        </span>
+
+                <button
+                        type="button"
+                        class="clear-plan-button"
+                        (click)="clearFloorPlan()"
+                >
+                    Golește planul
+                </button>
+
+            </div>
+
+        </section>
+
     </div>
 
-    <button class="danger-button" type="button" (click)="clearAllAssignments()">
-      Resetează toate mesele
-    </button>
-  </section>
-
-  @if (errorMessage) {
-    <div class="message error">{{ errorMessage }}</div>
-  }
-
-  @if (successMessage) {
-    <div class="message success">{{ successMessage }}</div>
-  }
-
-  <section class="stats-grid">
-    <article>
-      <span>Nr. total de persoane</span>
-      <strong>{{ getTotalCapacity() }}</strong>
-    </article>
-    <article>
-      <span>Persoane așezate</span>
-      <strong>{{ getAssignedPeople(guests) }}</strong>
-    </article>
-    <article>
-      <span>Persoane fără masă</span>
-      <strong>{{ getUnassignedPeople(guests) }}</strong>
-    </article>
-    <article>
-      <span>Locuri neocupate</span>
-      <strong>{{ getTotalCapacity() - getAssignedPeople(guests) }}</strong>
-    </article>
-  </section>
-
-  <div class="planner-layout">
-    <aside
-      class="unassigned-panel"
-      (dragover)="allowDrop($event)"
-      (drop)="dropUnassigned($event)"
-    >
-      <div class="panel-title">
-        <div>
-          <span class="eyebrow">LISTĂ</span>
-          <h2>Fără masă</h2>
-        </div>
-        <span class="count-badge">{{ getUnassignedGuests(guests).length }}</span>
-      </div>
-
-      <input
-        class="search-input"
-        type="search"
-        [(ngModel)]="searchTerm"
-        placeholder="Caută după nume, telefon sau note"
-      />
-
-      <div class="guest-list">
-        @for (guest of getUnassignedGuests(guests); track guest.id) {
-          <article
-            class="guest-card"
-            draggable="true"
-            (dragstart)="dragStart(guest)"
-            (dragend)="dragEnd()"
-            [class.saving]="savingGuestId === guest.id"
-          >
-            <div>
-              <strong>{{ guest.name }}</strong>
-              <span>{{ guest.side }} · {{ getPeopleCount(guest) }} pers.</span>
-            </div>
-            <span class="status" [class.confirmed]="guest.attendanceStatus === 'confirmed'">
-              {{ guest.attendanceStatus === 'confirmed' ? 'Confirmat' : guest.attendanceStatus === 'maybe' ? 'Poate' : 'În așteptare' }}
-            </span>
-          </article>
-        } @empty {
-          <div class="empty-state">Toți invitații sunt așezați sau nu există rezultate.</div>
-        }
-      </div>
-    </aside>
-
-      <main class="room-plan">
-
-          <!-- ZONA DE SUS -->
-          <div class="venue-block staff-zone">
-              STAFF
-              <strong>5 pers.</strong>
-          </div>
-
-          <div class="venue-block dj-zone">
-              DJ
-          </div>
-
-          <div class="venue-block photobooth-zone">
-              PHOTOBOOTH
-          </div>
-
-          <div class="venue-block fridge-zone">
-              FRIGIDER
-          </div>
-
-          <div class="venue-block candy-zone">
-              CANDY BAR
-          </div>
-
-
-          <!-- MESE -->
-          @for (table of tables; track table.number) {
-              <article
-                      class="table-card"
-                      [ngClass]="'table-' + table.number"
-                      [class.over-capacity]="getRemainingSeats(guests, table) < 0"
-                      (dragover)="allowDrop($event)"
-                      (drop)="dropOnTable($event, table, guests)"
-              >
-                  <header>
-                      <div>
-                          <span class="table-number">{{ table.number }}</span>
-                          <h3>{{ table.label }}</h3>
-                      </div>
-
-                      <div
-                              class="capacity"
-                              [class.full]="getRemainingSeats(guests, table) === 0"
-                      >
-                          <strong>
-                              {{ getOccupiedSeats(guests, table.number) }}/{{ table.capacity }}
-                          </strong>
-
-                          <span>
-            {{ getRemainingSeats(guests, table) }} locuri libere
-          </span>
-                      </div>
-                  </header>
-
-                  <div class="table-guests">
-                      @for (guest of getGuestsAtTable(guests, table.number); track guest.id) {
-                          <article
-                                  class="guest-card compact"
-                                  draggable="true"
-                                  (dragstart)="dragStart(guest)"
-                                  (dragend)="dragEnd()"
-                                  [class.saving]="savingGuestId === guest.id"
-                          >
-                              <div>
-                                  <strong>{{ guest.name }}</strong>
-                                  <span>
-                {{ getPeopleCount(guest) }} pers. · {{ guest.side }}
-              </span>
-                              </div>
-
-                              <button
-                                      type="button"
-                                      title="Scoate de la masă"
-                                      (click)="moveGuest(guest, undefined)"
-                              >
-                                  ×
-                              </button>
-                          </article>
-                      } @empty {
-                          <div class="drop-hint">
-                              Trage invitații aici
-                          </div>
-                      }
-                  </div>
-              </article>
-          }
-
-
-          <!-- PREZIDIU -->
-          <div class="venue-block presidium-zone">
-              <span>PREZIDIU</span>
-              <strong>7 pers.</strong>
-          </div>
-
-
-          <!-- ZONA DE JOS -->
-          <div class="venue-block buffet-zone">
-              BUFET
-          </div>
-
-          <div class="venue-block jamon-zone">
-              JAMON BAR
-          </div>
-
-          <div class="venue-block entrance-zone">
-              INTRARE
-          </div>
-
-      </main>
-
-  </div>
 } @else {
-  <div class="loading">Se încarcă așezarea...</div>
+
+    <div class="loading">
+        Se încarcă așezarea...
+    </div>
+
+    <button
+            type="button"
+            class="save-element-button"
+            (click)="saveSelectedElement()"
+    >
+        Salvează modificările
+    </button>
+
 }
