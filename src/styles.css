@@ -1,64 +1,406 @@
-* { box-sizing: border-box; }
+/* ==========================================
+   WEDDING PLANNER - GLOBAL DESIGN SYSTEM
+========================================== */
+
+:root {
+  /* Brand */
+  --wp-primary: #8d4f3d;
+  --wp-primary-hover: #774235;
+  --wp-primary-active: #69392f;
+
+  /* Secondary */
+  --wp-secondary-bg: #f1e6da;
+  --wp-secondary-hover: #eadbcd;
+  --wp-secondary-text: #59463b;
+
+  /* Neutral */
+  --wp-text: #3f3129;
+  --wp-muted: #7b6f63;
+  --wp-border: #e8dcca;
+  --wp-background: #f7f0e8;
+  --wp-card: #fffaf3;
+
+  /* Danger */
+  --wp-danger-bg: #ffe7e1;
+  --wp-danger-hover: #fbd9d2;
+  --wp-danger-text: #a23a2c;
+
+  /* Success */
+  --wp-success: #2f8f46;
+  --wp-success-bg: #e9f7ec;
+
+  /* Shadows */
+  --wp-primary-shadow: rgba(117, 71, 63, 0.14);
+}
+
+
+/* ==========================================
+   RESET
+========================================== */
+
+* {
+  box-sizing: border-box;
+}
 
 body {
   margin: 0;
-  font-family: Georgia, 'Times New Roman', serif;
-  background: #f7f0e8;
+
+  font-family:
+          Georgia,
+          'Times New Roman',
+          serif;
+
+  background: var(--wp-background);
+
+  color: var(--wp-text);
 }
 
-button, input, select, textarea { font: inherit; }
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
 
-.page-title { margin-bottom: 24px; }
+
+/* ==========================================
+   PAGE TITLES
+========================================== */
+
+.page-title {
+  margin-bottom: 24px;
+}
+
 .page-title .eyebrow {
-  text-transform: uppercase;
-  letter-spacing: 0.16em;
-  font-size: 12px;
   color: #a8875d;
+
+  font-size: 12px;
   font-weight: 700;
+
+  letter-spacing: 0.16em;
+
+  text-transform: uppercase;
 }
+
 .page-title h2 {
   margin: 6px 0;
+
   font-size: 36px;
 }
+
 .page-title p {
   margin: 0;
-  color: #7b6f63;
+
+  color: var(--wp-muted);
 }
 
+
+/* ==========================================
+   CARDS
+========================================== */
+
 .card {
-  background: #fffaf3;
-  border: 1px solid #e8dcca;
-  border-radius: 22px;
   padding: 22px;
-  box-shadow: 0 16px 40px rgba(90, 70, 45, 0.08);
+
+  border: 1px solid var(--wp-border);
+  border-radius: 22px;
+
+  background: var(--wp-card);
+
+  box-shadow:
+          0 16px 40px rgba(90, 70, 45, 0.08);
 }
+
+
+/* ==========================================
+   GRID
+========================================== */
 
 .grid {
   display: grid;
+
   gap: 18px;
 }
 
-.grid-4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
-.grid-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.grid-4 {
+  grid-template-columns:
+    repeat(4, minmax(0, 1fr));
+}
+
+.grid-3 {
+  grid-template-columns:
+    repeat(3, minmax(0, 1fr));
+}
+
+
+/* ==========================================
+   BADGES
+========================================== */
 
 .badge {
-  display: inline-flex;
   width: fit-content;
+
+  display: inline-flex;
+
   padding: 6px 10px;
+
   border-radius: 999px;
+
   background: #eadfce;
+
   color: #6b553d;
+
   font-size: 12px;
   font-weight: 700;
 }
 
-.muted { color: #7b6f63; }
+.muted {
+  color: var(--wp-muted);
+}
+
+
+/* ==========================================
+   GLOBAL BUTTON BASE
+========================================== */
+
+button {
+  transition:
+          transform 0.18s ease,
+          background-color 0.18s ease,
+          border-color 0.18s ease,
+          box-shadow 0.18s ease,
+          color 0.18s ease;
+}
+
+button:not(:disabled):hover {
+  transform: translateY(-1px);
+}
+
+button:disabled {
+  opacity: 0.55;
+
+  cursor: not-allowed;
+}
+
+
+/* ==========================================
+   PRIMARY BUTTONS
+
+   IMPORTANT:
+   These selectors intentionally override
+   component-level brown colors so the entire
+   application uses one brand color.
+========================================== */
+
+button.primary,
+.primary,
+button.primary-button,
+.primary-button,
+button.page-add-button,
+.page-add-button {
+  border-color: var(--wp-primary) !important;
+
+  background: var(--wp-primary) !important;
+
+  color: #fff !important;
+
+  box-shadow:
+          0 8px 20px var(--wp-primary-shadow) !important;
+}
+
+button.primary:not(:disabled):hover,
+.primary:not(:disabled):hover,
+button.primary-button:not(:disabled):hover,
+.primary-button:not(:disabled):hover,
+button.page-add-button:not(:disabled):hover,
+.page-add-button:not(:disabled):hover {
+  border-color: var(--wp-primary-hover) !important;
+
+  background: var(--wp-primary-hover) !important;
+
+  color: #fff !important;
+
+  box-shadow:
+          0 10px 24px rgba(117, 71, 63, 0.18) !important;
+}
+
+
+/* ==========================================
+   SECONDARY BUTTONS
+========================================== */
+
+button.secondary,
+.secondary,
+button.secondary-button,
+.secondary-button {
+  border-color: transparent !important;
+
+  background: var(--wp-secondary-bg) !important;
+
+  color: var(--wp-secondary-text) !important;
+}
+
+button.secondary:not(:disabled):hover,
+.secondary:not(:disabled):hover,
+button.secondary-button:not(:disabled):hover,
+.secondary-button:not(:disabled):hover {
+  background: var(--wp-secondary-hover) !important;
+
+  color: var(--wp-secondary-text) !important;
+}
+
+
+/* ==========================================
+   DELETE / DANGER BUTTONS
+========================================== */
+
+button.danger,
+.danger,
+button.danger-button,
+.danger-button,
+button.delete-button,
+.delete-button,
+.danger-action {
+  background: var(--wp-danger-bg) !important;
+
+  color: var(--wp-danger-text) !important;
+}
+
+button.danger:not(:disabled):hover,
+.danger:not(:disabled):hover,
+button.danger-button:not(:disabled):hover,
+.danger-button:not(:disabled):hover,
+button.delete-button:not(:disabled):hover,
+.delete-button:not(:disabled):hover,
+.danger-action:not(:disabled):hover {
+  background: var(--wp-danger-hover) !important;
+
+  color: var(--wp-danger-text) !important;
+}
+
+
+/* ==========================================
+   DOCUMENTS
+========================================== */
+
+.filter-chips button.active {
+  border-color: var(--wp-primary) !important;
+
+  background: var(--wp-primary) !important;
+
+  color: #fff !important;
+}
+
+.document-actions .primary-link {
+  border-color: var(--wp-primary) !important;
+
+  background: var(--wp-primary) !important;
+
+  color: #fff !important;
+
+  box-shadow:
+          0 7px 18px var(--wp-primary-shadow);
+}
+
+.document-actions .primary-link:hover {
+  border-color: var(--wp-primary-hover) !important;
+
+  background: var(--wp-primary-hover) !important;
+
+  color: #fff !important;
+}
+
+
+/* ==========================================
+   VENDORS - CONTRACT LINKS
+
+   Previously almost black (#3f352c).
+========================================== */
+
+.contract-link {
+  border-color: var(--wp-primary) !important;
+
+  background: var(--wp-primary) !important;
+
+  color: #fff !important;
+
+  box-shadow:
+          0 8px 18px var(--wp-primary-shadow) !important;
+}
+
+.contract-link:hover {
+  background: var(--wp-primary-hover) !important;
+
+  color: #fff !important;
+}
+
+
+/* ==========================================
+   LINKS THAT BEHAVE LIKE PRIMARY BUTTONS
+========================================== */
+
+a.primary-button,
+a.primary,
+a.page-add-button {
+  border-color: var(--wp-primary) !important;
+
+  background: var(--wp-primary) !important;
+
+  color: #fff !important;
+
+  text-decoration: none;
+
+  box-shadow:
+          0 8px 20px var(--wp-primary-shadow) !important;
+}
+
+a.primary-button:hover,
+a.primary:hover,
+a.page-add-button:hover {
+  border-color: var(--wp-primary-hover) !important;
+
+  background: var(--wp-primary-hover) !important;
+
+  color: #fff !important;
+}
+
+
+/* ==========================================
+   FOCUS
+========================================== */
+
+button:focus-visible,
+a.primary-button:focus-visible,
+a.primary:focus-visible,
+a.page-add-button:focus-visible,
+.contract-link:focus-visible,
+.document-actions .primary-link:focus-visible {
+  outline: none;
+
+  box-shadow:
+          0 0 0 3px rgba(141, 79, 61, 0.18) !important;
+}
+
+
+/* ==========================================
+   RESPONSIVE
+========================================== */
 
 @media (max-width: 1100px) {
-  .grid-4, .grid-3 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .grid-4,
+  .grid-3 {
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
+  }
 }
 
 @media (max-width: 650px) {
-  .grid-4, .grid-3 { grid-template-columns: 1fr; }
-  .page-title h2 { font-size: 28px; }
+  .grid-4,
+  .grid-3 {
+    grid-template-columns: 1fr;
+  }
+
+  .page-title h2 {
+    font-size: 28px;
+  }
 }

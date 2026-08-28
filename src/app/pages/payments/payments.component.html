@@ -1,91 +1,320 @@
 <section>
-  <div class="page-title page-title-actions">
-    <div>
-      <div class="eyebrow">Firestore · editabil</div>
-      <h2>Plăți și cheltuieli</h2>
-      <p>Adaugă, modifică și urmărește bugetul direct din aplicație.</p>
-    </div>
-    <div class="top-actions">
-      <button class="secondary" type="button" (click)="importInitialData()" [disabled]="isSaving">Importă datele existente</button>
-      <button type="button" (click)="startAddExpense()">+ Cheltuială</button>
-    </div>
-  </div>
-
-
-  @if (expenseForm) {
-    <article class="card editor-card">
-      <h3>{{ isNewExpense ? 'Cheltuială nouă' : 'Editează cheltuiala' }}</h3>
-      <div class="editor-grid">
-        <label>Nume<input [(ngModel)]="expenseForm.name" /></label>
-        <label>Categorie<input [(ngModel)]="expenseForm.category" /></label>
-        <label>Total<input type="number" [(ngModel)]="expenseForm.total" (ngModelChange)="recalculateExpense()" /></label>
-        <label>Avans plătit<input type="number" [(ngModel)]="expenseForm.advancePaid" (ngModelChange)="recalculateExpense()" /></label>
-        <label>Monedă<select [(ngModel)]="expenseForm.currency"><option value="RON">RON</option><option value="EUR">EUR</option></select></label>
-        <label>Furnizor asociat
-          <select [(ngModel)]="expenseForm.vendorId" (ngModelChange)="onVendorChange()">
-            <option value="">Fără furnizor asociat</option>
-            @for (vendor of vendors; track vendor.id) { <option [value]="vendor.id">{{ vendor.name }}</option> }
-          </select>
-        </label>
-        <label>Momentul plății
-          <select [(ngModel)]="expenseForm.paymentMoment" (ngModelChange)="onPaymentMomentChange()">
-            @for (option of paymentMomentOptions; track option.value) { <option [value]="option.value">{{ option.label }}</option> }
-          </select>
-        </label>
-        <label>Tip termen
-          <select [(ngModel)]="expenseForm.deadlineType" (ngModelChange)="onDeadlineTypeChange()">
-            @for (option of deadlineTypeOptions; track option.value) { <option [value]="option.value">{{ option.label }}</option> }
-          </select>
-        </label>
-        @if (expenseForm.deadlineType === 'exact') {
-          <label>Data exactă<input type="date" [(ngModel)]="expenseForm.dueDate" /></label>
-        }
-        @if (expenseForm.deadlineType === 'relative') {
-          <label class="span-2">Termen relativ<input [(ngModel)]="expenseForm.relativeDeadline" placeholder="Ex.: în maximum 48 h după eveniment" /></label>
-        }
-        <label>Sursă<select [(ngModel)]="expenseForm.source"><option>Manual</option><option>Excel</option><option>Contract</option><option>Contract + Excel</option></select></label>
-        <label>Status<select [(ngModel)]="expenseForm.status">@for (option of expenseStatusOptions; track option.value) { <option [value]="option.value">{{ option.label }}</option> }</select></label>
-        <label class="wide">Observații<textarea rows="3" [(ngModel)]="expenseForm.notes" placeholder="Detalii din contract, condiții de plată sau alte informații importante"></textarea></label>
-        <div class="payment-flags wide">
-          <label class="checkbox"><input type="checkbox" [(ngModel)]="expenseForm.payAfterWedding" (ngModelChange)="onPayAfterWeddingChange()" /> Se plătește după eveniment</label>
-          <label class="checkbox"><input type="checkbox" [(ngModel)]="expenseForm.includeInTotals" /> Include în totaluri</label>
+    <div class="page-title page-title-actions">
+        <div>
+            <div class="eyebrow">Firestore · editabil</div>
+            <h2>Plăți și cheltuieli</h2>
+            <p>Adaugă, modifică și urmărește bugetul direct din aplicație.</p>
         </div>
-      </div>
-      <div class="form-actions"><button type="button" (click)="saveExpense()" [disabled]="isSaving">Salvează</button><button class="secondary" type="button" (click)="cancelExpense()">Renunță</button></div>
-    </article>
-  }
 
-<!--  <div class="grid grid-4 payment-summary">-->
-<!--    <article class="card stat-card"><span>Total lei</span><strong>{{ formatMoney(totalRon, 'RON') }}</strong></article>-->
-<!--    <article class="card stat-card"><span>Total euro</span><strong>{{ formatMoney(totalEur, 'EUR') }}</strong></article>-->
-<!--    <article class="card stat-card"><span>Rest lei</span><strong>{{ formatMoney(remainingRon, 'RON') }}</strong></article>-->
-<!--    <article class="card stat-card"><span>Rest euro</span><strong>{{ formatMoney(remainingEur, 'EUR') }}</strong></article>-->
-<!--  </div>-->
+        <div class="top-actions">
+            <button
+                    class="secondary"
+                    type="button"
+                    (click)="importInitialData()"
+                    [disabled]="isSaving"
+            >
+                Importă datele existente
+            </button>
 
-  @if (!expenses.length) {
-    <article class="card empty-state"><h3>Nu există încă plăți în Firestore</h3><p>Apasă „Importă datele existente” sau adaugă manual o cheltuială.</p></article>
-  }
+            <button
+                    class="primary"
+                    type="button"
+                    (click)="startAddExpense()"
+            >
+                + Cheltuială
+            </button>
+        </div>
+    </div>
 
-  <div class="category-list">
-    @for (category of categories; track category) {
-      <article class="card category-card">
-        <div class="category-header"><div><span class="badge">{{ category }}</span><h3>{{ category }}</h3></div><div class="category-total"><span>{{ formatMoney(getCategoryTotal(category, 'RON'), 'RON') }}</span><span>{{ formatMoney(getCategoryTotal(category, 'EUR'), 'EUR') }}</span></div></div>
-        <div class="expense-table">
-          <div class="expense-row expense-head"><span>Serviciu</span><span>Furnizor</span><span>Moment / termen</span><span>Total</span><span>Avans</span><span>Rest</span><span>Status</span><span>Acțiuni</span></div>
-          @for (expense of getExpensesByCategory(category); track expense.id) {
-            <div class="expense-row">
-              <div><strong>{{ expense.name }}</strong><small>{{ expense.notes || 'Fără observații' }}</small></div>
-              <span>{{ expense.vendorName || '—' }}</span>
-              <span class="payment-timing"><strong>{{ getPaymentMomentLabel(expense) }}</strong><small>{{ getDeadlineLabel(expense) }}</small></span>
-              <span>{{ formatMoney(expense.total, expense.currency) }}</span>
-              <span>{{ formatMoney(expense.advancePaid, expense.currency) }}</span>
-              <span>{{ formatMoney(expense.remainingPayment, expense.currency) }}</span>
-              <span class="status-pill">{{ getStatusLabel(expense.status) }}</span>
-              <span class="row-actions"><button class="mini" type="button" (click)="startEditExpense(expense)">Editează</button><button class="mini danger" type="button" (click)="deleteExpense(expense)">Șterge</button></span>
+    @if (expenseForm) {
+        <article class="card editor-card">
+            <h3>
+                {{ isNewExpense ? 'Cheltuială nouă' : 'Editează cheltuiala' }}
+            </h3>
+
+            <div class="editor-grid">
+                <label>
+                    Nume
+                    <input [(ngModel)]="expenseForm.name" />
+                </label>
+
+                <label>
+                    Categorie
+                    <input [(ngModel)]="expenseForm.category" />
+                </label>
+
+                <label>
+                    Total
+                    <input
+                            type="number"
+                            [(ngModel)]="expenseForm.total"
+                            (ngModelChange)="recalculateExpense()"
+                    />
+                </label>
+
+                <label>
+                    Avans plătit
+                    <input
+                            type="number"
+                            [(ngModel)]="expenseForm.advancePaid"
+                            (ngModelChange)="recalculateExpense()"
+                    />
+                </label>
+
+                <label>
+                    Monedă
+                    <select [(ngModel)]="expenseForm.currency">
+                        <option value="RON">RON</option>
+                        <option value="EUR">EUR</option>
+                    </select>
+                </label>
+
+                <label>
+                    Furnizor asociat
+                    <select
+                            [(ngModel)]="expenseForm.vendorId"
+                            (ngModelChange)="onVendorChange()"
+                    >
+                        <option value="">
+                            Fără furnizor asociat
+                        </option>
+
+                        @for (vendor of vendors; track vendor.id) {
+                            <option [value]="vendor.id">
+                                {{ vendor.name }}
+                            </option>
+                        }
+                    </select>
+                </label>
+
+                <label>
+                    Momentul plății
+                    <select
+                            [(ngModel)]="expenseForm.paymentMoment"
+                            (ngModelChange)="onPaymentMomentChange()"
+                    >
+                        @for (option of paymentMomentOptions; track option.value) {
+                            <option [value]="option.value">
+                                {{ option.label }}
+                            </option>
+                        }
+                    </select>
+                </label>
+
+                <label>
+                    Tip termen
+                    <select
+                            [(ngModel)]="expenseForm.deadlineType"
+                            (ngModelChange)="onDeadlineTypeChange()"
+                    >
+                        @for (option of deadlineTypeOptions; track option.value) {
+                            <option [value]="option.value">
+                                {{ option.label }}
+                            </option>
+                        }
+                    </select>
+                </label>
+
+                @if (expenseForm.deadlineType === 'exact') {
+                    <label>
+                        Data exactă
+                        <input
+                                type="date"
+                                [(ngModel)]="expenseForm.dueDate"
+                        />
+                    </label>
+                }
+
+                @if (expenseForm.deadlineType === 'relative') {
+                    <label class="span-2">
+                        Termen relativ
+                        <input
+                                [(ngModel)]="expenseForm.relativeDeadline"
+                                placeholder="Ex.: în maximum 48 h după eveniment"
+                        />
+                    </label>
+                }
+
+                <label>
+                    Sursă
+                    <select [(ngModel)]="expenseForm.source">
+                        <option>Manual</option>
+                        <option>Excel</option>
+                        <option>Contract</option>
+                        <option>Contract + Excel</option>
+                    </select>
+                </label>
+
+                <label>
+                    Status
+                    <select [(ngModel)]="expenseForm.status">
+                        @for (option of expenseStatusOptions; track option.value) {
+                            <option [value]="option.value">
+                                {{ option.label }}
+                            </option>
+                        }
+                    </select>
+                </label>
+
+                <label class="wide">
+                    Observații
+                    <textarea
+                            rows="3"
+                            [(ngModel)]="expenseForm.notes"
+                            placeholder="Detalii din contract, condiții de plată sau alte informații importante"
+                    ></textarea>
+                </label>
+
+                <div class="payment-flags wide">
+                    <label class="checkbox">
+                        <input
+                                type="checkbox"
+                                [(ngModel)]="expenseForm.payAfterWedding"
+                                (ngModelChange)="onPayAfterWeddingChange()"
+                        />
+                        Se plătește după eveniment
+                    </label>
+
+                    <label class="checkbox">
+                        <input
+                                type="checkbox"
+                                [(ngModel)]="expenseForm.includeInTotals"
+                        />
+                        Include în totaluri
+                    </label>
+                </div>
             </div>
-          }
-        </div>
-      </article>
+
+            <div class="form-actions">
+                <button
+                        class="primary"
+                        type="button"
+                        (click)="saveExpense()"
+                        [disabled]="isSaving"
+                >
+                    Salvează
+                </button>
+
+                <button
+                        class="secondary"
+                        type="button"
+                        (click)="cancelExpense()"
+                >
+                    Renunță
+                </button>
+            </div>
+        </article>
     }
-  </div>
+
+    @if (!expenses.length) {
+        <article class="card empty-state">
+            <h3>Nu există încă plăți în Firestore</h3>
+            <p>
+                Apasă „Importă datele existente” sau adaugă manual o cheltuială.
+            </p>
+        </article>
+    }
+
+    <div class="category-list">
+        @for (category of categories; track category) {
+            <article class="card category-card">
+                <div class="category-header">
+                    <div>
+            <span class="badge">
+              {{ category }}
+            </span>
+
+                        <h3>
+                            {{ category }}
+                        </h3>
+                    </div>
+
+                    <div class="category-total">
+            <span>
+              {{ formatMoney(getCategoryTotal(category, 'RON'), 'RON') }}
+            </span>
+
+                        <span>
+              {{ formatMoney(getCategoryTotal(category, 'EUR'), 'EUR') }}
+            </span>
+                    </div>
+                </div>
+
+                <div class="expense-table">
+                    <div class="expense-row expense-head">
+                        <span>Serviciu</span>
+                        <span>Furnizor</span>
+                        <span>Moment / termen</span>
+                        <span>Total</span>
+                        <span>Avans</span>
+                        <span>Rest</span>
+                        <span>Status</span>
+                        <span>Acțiuni</span>
+                    </div>
+
+                    @for (expense of getExpensesByCategory(category); track expense.id) {
+                        <div class="expense-row">
+                            <div>
+                                <strong>
+                                    {{ expense.name }}
+                                </strong>
+
+                                <small>
+                                    {{ expense.notes || 'Fără observații' }}
+                                </small>
+                            </div>
+
+                            <span>
+                {{ expense.vendorName || '—' }}
+              </span>
+
+                            <span class="payment-timing">
+                <strong>
+                  {{ getPaymentMomentLabel(expense) }}
+                </strong>
+
+                <small>
+                  {{ getDeadlineLabel(expense) }}
+                </small>
+              </span>
+
+                            <span>
+                {{ formatMoney(expense.total, expense.currency) }}
+              </span>
+
+                            <span>
+                {{ formatMoney(expense.advancePaid, expense.currency) }}
+              </span>
+
+                            <span>
+                {{ formatMoney(expense.remainingPayment, expense.currency) }}
+              </span>
+
+                            <span class="status-pill">
+                {{ getStatusLabel(expense.status) }}
+              </span>
+
+                            <span class="row-actions">
+                <button
+                        class="mini secondary"
+                        type="button"
+                        (click)="startEditExpense(expense)"
+                >
+                  Editează
+                </button>
+
+                <button
+                        class="mini danger"
+                        type="button"
+                        (click)="deleteExpense(expense)"
+                >
+                  Șterge
+                </button>
+              </span>
+                        </div>
+                    }
+                </div>
+            </article>
+        }
+    </div>
 </section>
