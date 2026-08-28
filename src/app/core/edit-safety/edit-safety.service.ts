@@ -35,7 +35,9 @@ export class EditSafetyService {
   async run<T>(
     label: string,
     action: () => Promise<T>,
-    history?: Omit<ChangeHistoryEntry, 'id' | 'timestamp'>
+    history?: Omit<ChangeHistoryEntry, 'id' | 'timestamp'>,
+    successMessage = 'Modificările au fost salvate.'
+
   ): Promise<T> {
     this.pendingCount.update(value => value + 1);
     this.state.set('saving');
@@ -48,7 +50,7 @@ export class EditSafetyService {
       this.pendingCount.update(value => Math.max(0, value - 1));
       if (this.pendingCount() === 0) {
         this.state.set('saved');
-        this.statusMessage.set('Modificările au fost salvate');
+        this.statusMessage.set(successMessage);
 
         this.resetTimer = setTimeout(() => {
           this.state.set('idle');
@@ -71,6 +73,45 @@ export class EditSafetyService {
 
       throw error;
     }
+  }
+
+  success(message: string, duration = 2500): void {
+    clearTimeout(this.resetTimer);
+
+    this.pendingCount.set(0);
+    this.state.set('saved');
+    this.statusMessage.set(message);
+
+    this.resetTimer = setTimeout(() => {
+      this.state.set('idle');
+      this.statusMessage.set('');
+    }, duration);
+  }
+
+  error(message: string, duration = 5000): void {
+    clearTimeout(this.resetTimer);
+
+    this.pendingCount.set(0);
+    this.state.set('error');
+    this.statusMessage.set(message);
+
+    this.resetTimer = setTimeout(() => {
+      this.state.set('idle');
+      this.statusMessage.set('');
+    }, duration);
+  }
+
+  info(message: string, duration = 3000): void {
+    clearTimeout(this.resetTimer);
+
+    this.pendingCount.set(0);
+    this.state.set('saving');
+    this.statusMessage.set(message);
+
+    this.resetTimer = setTimeout(() => {
+      this.state.set('idle');
+      this.statusMessage.set('');
+    }, duration);
   }
 
   schedule(
