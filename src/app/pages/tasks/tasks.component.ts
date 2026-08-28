@@ -216,16 +216,34 @@ export class TasksComponent {
     try {
       const { id, ...taskData } = this.formTask;
 
+      const taskTitle = this.formTask.title;
+
       if (this.isNewTask) {
-        await this.firebaseTasksService.addTask(taskData);
+        await this.editSafety.run(
+            'task',
+            () => this.firebaseTasksService.addTask(taskData),
+            {
+              action: 'create',
+              entityType: 'Task',
+              entityLabel: taskTitle,
+              details: 'Task adăugat'
+            }
+        );
       } else {
-        await this.firebaseTasksService.saveTask(this.formTask);
+        await this.editSafety.run(
+            'task',
+            () => this.firebaseTasksService.saveTask(this.formTask!),
+            {
+              action: 'update',
+              entityType: 'Task',
+              entityLabel: taskTitle,
+              details: 'Task modificat'
+            }
+        );
       }
 
       this.formTask = null;
       this.isNewTask = false;
-
-      this.message = 'Task-ul a fost salvat.';
     } catch (error) {
       this.errorMessage =
           this.firebaseErrorService.getMessage(error);
