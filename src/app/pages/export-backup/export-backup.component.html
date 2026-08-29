@@ -1,36 +1,230 @@
-<!-- =========================================================
-     PROGRAM ZIUA NUNȚII
-========================================================== -->
-
-<article class="export-card">
-    <div class="card-icon">
-        ZN
-    </div>
-
+<section class="page-header">
     <div>
+        <span class="eyebrow">SIGURANȚA DATELOR</span>
+
+        <h1>Export & backup</h1>
+    </div>
+</section>
+
+@if (successMessage) {
+    <div class="message success">
+        {{ successMessage }}
+    </div>
+}
+
+@if (errorMessage) {
+    <div class="message error">
+        {{ errorMessage }}
+    </div>
+}
+
+<section class="export-grid">
+
+    <!-- =========================================================
+         INVITAȚI
+    ========================================================== -->
+
+    <article class="export-card">
+        <div class="card-icon">
+            IG
+        </div>
+
+        <div>
+      <span class="eyebrow">
+        EXCEL
+      </span>
+
+            <h2>
+                Invitați
+            </h2>
+
+            <p>
+                Nume, confirmare, adulți, copii, masă, telefon,
+                cazare, meniu, alergii și observații.
+            </p>
+        </div>
+
+        <button
+                type="button"
+                [disabled]="runningAction !== null"
+                (click)="exportGuests()"
+        >
+            {{
+                isRunning('guests')
+                    ? 'Se exportă...'
+                    : 'Descarcă invitații'
+            }}
+        </button>
+    </article>
+
+
+    <!-- =========================================================
+        PROGRAM ZIUA NUNȚII
+   ========================================================== -->
+
+    <article class="export-card">
+        <div class="card-icon">
+            ZN
+        </div>
+
+        <div>
     <span class="eyebrow">
       PDF
     </span>
 
+            <h2>
+                Program ziua nunții
+            </h2>
+
+            <p>
+                Programul complet al zilei, cu ore, momente,
+                responsabili, locații și observații.
+            </p>
+        </div>
+
+        <button
+                type="button"
+                [disabled]="runningAction !== null"
+                (click)="exportWeddingDay()"
+        >
+            {{
+                isRunning('weddingDay')
+                    ? 'Se generează PDF...'
+                    : 'Descarcă programul PDF'
+            }}
+        </button>
+    </article>
+
+    <!-- =========================================================
+         PLAN MESE
+    ========================================================== -->
+
+    <article class="export-card">
+        <div class="card-icon">
+            MS
+        </div>
+
+        <div>
+      <span class="eyebrow">
+        PDF
+      </span>
+
+            <h2>
+                Plan mese
+            </h2>
+
+            <p>
+                Planul vizual al sălii, cu mesele, capacitățile,
+                invitații și elementele poziționate în editor.
+            </p>
+        </div>
+
+        <button
+                type="button"
+                [disabled]="runningAction !== null"
+                (click)="exportSeating()"
+        >
+            {{
+                isRunning('seating')
+                    ? 'Se generează PDF...'
+                    : 'Descarcă planul PDF'
+            }}
+        </button>
+    </article>
+
+
+    <!-- =========================================================
+         TASKURI
+    ========================================================== -->
+
+    <article class="export-card">
+        <div class="card-icon">
+            CK
+        </div>
+
+        <div>
+      <span class="eyebrow">
+        EXCEL
+      </span>
+
+            <h2>
+                Taskuri
+            </h2>
+
+            <p>
+                Task-uri ordonate după termen, cu categorie,
+                prioritate, status și observații.
+            </p>
+        </div>
+
+        <button
+                type="button"
+                [disabled]="runningAction !== null"
+                (click)="exportChecklist()"
+        >
+            {{
+                isRunning('checklist')
+                    ? 'Se exportă...'
+                    : 'Descarcă checklist-ul'
+            }}
+        </button>
+    </article>
+
+</section>
+
+
+<!-- =========================================================
+     FIRESTORE BACKUP
+========================================================== -->
+
+<section class="backup-card">
+
+    <div>
+    <span class="eyebrow">
+      BACKUP COMPLET
+    </span>
+
         <h2>
-            Program ziua nunții
+            Firestore JSON
         </h2>
 
         <p>
-            Programul complet al zilei, cu ore, momente,
-            responsabili, locații și observații.
+            Salvează toate colecțiile aplicației, ID-urile documentelor
+            și timestamp-urile într-un singur fișier JSON.
         </p>
+
+        <div class="collection-list">
+            <span>Invitați</span>
+            <span>Furnizori</span>
+            <span>Plăți</span>
+            <span>Documente</span>
+            <span>Task-uri</span>
+            <span>Program</span>
+            <span>Cazări</span>
+            <span>Pregătiri</span>
+            <span>Verighete</span>
+            <span>Acces</span>
+        </div>
+
+        @if (lastBackupSummary) {
+            <small>
+                Ultimul backup din această sesiune:
+                {{ lastBackupSummary }}
+            </small>
+        }
     </div>
 
     <button
             type="button"
+            class="backup-button"
             [disabled]="runningAction !== null"
-            (click)="exportWeddingDay()"
+            (click)="backupFirestore()"
     >
         {{
-            isRunning('weddingDay')
-                ? 'Se generează PDF...'
-                : 'Descarcă programul PDF'
+            isRunning('backup')
+                ? 'Se citește Firestore...'
+                : 'Descarcă backup complet'
         }}
     </button>
-</article>
+
+</section>
