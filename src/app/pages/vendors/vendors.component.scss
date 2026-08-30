@@ -170,45 +170,110 @@
   background: #f7fff7;
 }
 
-@media (max-width: 800px) {
-  .vendors-grid {
-    grid-template-columns: 1fr;
-  }
 
-  .money-row,
-  .unit-info {
-    grid-template-columns: 1fr;
-  }
+/* ==========================================
+   CONTRACT DOCUMENTS
+========================================== */
 
-  .money-row div {
-    border-right: none;
-    border-bottom: 1px solid #dfd0bd;
-  }
-
-  .money-row div:last-child {
-    border-bottom: none;
-  }
+.vendor-documents {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-top: 2px;
 }
 
 .contract-link {
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  gap: 7px;
+
+  width: fit-content;
+
+  padding: 8px 15px;
+
+  border: 1px solid rgba(120, 76, 53, 0.18);
   border-radius: 999px;
-  padding: 8px 14px;
-  background: #3f352c;
-  color: #fffaf3;
-  font-size: 12px;
+
+  background:
+          linear-gradient(
+                  135deg,
+                  #9b5f48 0%,
+                  #854b39 100%
+          );
+
+  color: #fffaf5;
+
+  font-size: 11px;
   font-weight: 800;
+  line-height: 1;
+
+  letter-spacing: 0.055em;
   text-transform: uppercase;
-  letter-spacing: 0.04em;
   text-decoration: none;
-  box-shadow: 0 8px 18px rgba(63, 53, 44, 0.18);
+
+  box-shadow:
+          0 5px 12px rgba(108, 66, 47, 0.14);
+
+  transition:
+          transform 0.18s ease,
+          box-shadow 0.18s ease,
+          background 0.18s ease;
+}
+
+.contract-link::before {
+  content: '↗';
+
+  display: inline-grid;
+  place-items: center;
+
+  width: 17px;
+  height: 17px;
+
+  flex: 0 0 17px;
+
+  border-radius: 50%;
+
+  background: rgba(255, 255, 255, 0.14);
+
+  color: #fff;
+
+  font-size: 10px;
+  font-weight: 900;
+  line-height: 1;
 }
 
 .contract-link:hover {
-  background: #2f261f;
+  transform: translateY(-1px);
+
+  background:
+          linear-gradient(
+                  135deg,
+                  #8f533f 0%,
+                  #75402f 100%
+          );
+
+  box-shadow:
+          0 8px 18px rgba(108, 66, 47, 0.2);
 }
+
+.contract-link:active {
+  transform: translateY(0);
+
+  box-shadow:
+          0 3px 8px rgba(108, 66, 47, 0.15);
+}
+
+.contract-link:focus-visible {
+  outline: 2px solid rgba(133, 75, 57, 0.35);
+  outline-offset: 3px;
+}
+
+
+/* ==========================================
+   MISSING CONTRACT
+========================================== */
 
 .missing-contract {
   display: inline-flex;
@@ -223,6 +288,12 @@
   text-transform: uppercase;
   letter-spacing: 0.03em;
 }
+
+
+/* ==========================================
+   PAGE / TOOLBAR / ACTIONS
+========================================== */
+
 .page-title-actions,
 .toolbar,
 .form-header,
@@ -240,6 +311,11 @@
   flex-wrap: wrap;
 }
 
+
+/* ==========================================
+   BUTTONS
+========================================== */
+
 button {
   border: 0;
   cursor: pointer;
@@ -255,21 +331,59 @@ button {
   font-weight: 700;
 }
 
-.primary-button { background: #3f352c; color: #fff; }
-.secondary-button { background: #f3eadf; color: #3f352c; }
-.danger-button { background: #fff0ee; color: #a23327; }
-.icon-button { background: transparent; font-size: 24px; padding: 4px 10px; }
-button:disabled { opacity: 0.55; cursor: wait; }
+.primary-button {
+  background: #3f352c;
+  color: #fff;
+}
 
-.vendor-form { margin-bottom: 22px; }
-.vendor-form h3 { margin: 5px 0 0; }
+.secondary-button {
+  background: #f3eadf;
+  color: #3f352c;
+}
+
+.danger-button {
+  background: #fff0ee;
+  color: #a23327;
+}
+
+.icon-button {
+  background: transparent;
+  font-size: 24px;
+  padding: 4px 10px;
+}
+
+button:disabled {
+  opacity: 0.55;
+  cursor: wait;
+}
+
+
+/* ==========================================
+   VENDOR FORM
+========================================== */
+
+.vendor-form {
+  margin-bottom: 22px;
+}
+
+.vendor-form h3 {
+  margin: 5px 0 0;
+}
+
 .form-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 14px;
   margin: 18px 0;
 }
-.form-grid label { display: grid; gap: 7px; font-weight: 700; font-size: 13px; }
+
+.form-grid label {
+  display: grid;
+  gap: 7px;
+  font-weight: 700;
+  font-size: 13px;
+}
+
 .form-grid input,
 .form-grid select,
 .form-grid textarea {
@@ -282,16 +396,94 @@ button:disabled { opacity: 0.55; cursor: wait; }
   font: inherit;
   color: #3f352c;
 }
-.form-grid textarea { resize: vertical; }
-.wide-field { grid-column: 1 / -1; }
-.feedback { margin: 0 0 18px; border-radius: 12px; padding: 12px 14px; font-weight: 700; }
-.feedback.success { background: #edf8ed; color: #245c32; }
-.feedback.error { background: #fff0ee; color: #a23327; }
-.empty-state { text-align: center; padding: 30px; }
-.card-actions { margin-top: auto; padding-top: 6px; justify-content: flex-end; }
+
+.form-grid textarea {
+  resize: vertical;
+}
+
+.wide-field {
+  grid-column: 1 / -1;
+}
+
+
+/* ==========================================
+   FEEDBACK
+========================================== */
+
+.feedback {
+  margin: 0 0 18px;
+  border-radius: 12px;
+  padding: 12px 14px;
+  font-weight: 700;
+}
+
+.feedback.success {
+  background: #edf8ed;
+  color: #245c32;
+}
+
+.feedback.error {
+  background: #fff0ee;
+  color: #a23327;
+}
+
+
+/* ==========================================
+   EMPTY STATE
+========================================== */
+
+.empty-state {
+  text-align: center;
+  padding: 30px;
+}
+
+
+/* ==========================================
+   CARD ACTIONS
+========================================== */
+
+.card-actions {
+  margin-top: auto;
+  padding-top: 6px;
+  justify-content: flex-end;
+}
+
+
+/* ==========================================
+   RESPONSIVE
+========================================== */
 
 @media (max-width: 800px) {
-  .page-title-actions { align-items: flex-start; flex-direction: column; }
-  .form-grid { grid-template-columns: 1fr; }
-  .wide-field { grid-column: auto; }
+
+  .vendors-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .money-row,
+  .unit-info {
+    grid-template-columns: 1fr;
+  }
+
+  .money-row div {
+    border-right: none;
+    border-bottom: 1px solid #dfd0bd;
+  }
+
+  .money-row div:last-child {
+    border-bottom: none;
+  }
+
+  .page-title-actions {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .wide-field {
+    grid-column: auto;
+  }
+
 }

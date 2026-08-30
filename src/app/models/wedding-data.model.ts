@@ -56,7 +56,6 @@ export type GuestAttendanceStatus =
     | 'declined'
     | 'maybe';
 
-
 export type GuestAccommodationStatus =
     | 'unknown'
     | 'needed'
@@ -81,7 +80,9 @@ export type WeddingTaskPriority =
     | 'high'
     | 'very high';
 
-export type WeddingTaskKind = 'task' | 'checklist';
+export type WeddingTaskKind =
+    | 'task'
+    | 'checklist';
 
 export type WeddingTimelineStage =
     | 'now'
@@ -181,22 +182,34 @@ export interface WeddingGuest {
 
   adults: number;
   children: number;
+
   childrenUnder5?: number;
   children5To8?: number;
   children8To12?: number;
   children13To17?: number;
 
   groupName?: string;
-  tableNumber?: number;
+
+  tableNumber?: number | null;
+
+  /*
+   * Ordinea manuala a invitatului la masa.
+   * 0 = primul, 1 = al doilea etc.
+   */
+  tableOrder?: number | null;
+
   phone?: string;
   email?: string;
 
   accommodationStatus?: GuestAccommodationStatus;
   menuType?: GuestMenuType;
+
   allergies?: string;
+
   transportNeeded?: boolean;
 
   notes?: string;
+
   isManual?: boolean;
 }
 
@@ -206,15 +219,21 @@ export interface WeddingTask {
   category: string;
 
   dueDate?: string;
+
   status: WeddingTaskStatus;
   priority: WeddingTaskPriority;
+
   kind?: WeddingTaskKind;
 
   vendorId?: string;
   vendorName?: string;
+
   assignee?: string;
+
   timingLabel?: string;
+
   timelineStage?: WeddingTimelineStage;
+
   checklist?: WeddingTaskChecklistItem[];
 
   notes?: string;
@@ -245,20 +264,29 @@ export type AccommodationStatus =
 export interface WeddingAccommodation {
   id: string;
   name: string;
+
   location?: string;
+
   checkIn?: string;
   checkOut?: string;
+
   nights?: number;
   rooms?: number;
   guests?: number;
+
   pricePerRoom?: number;
   totalPrice?: number;
+
   currency?: Currency;
+
   advancePaid?: number;
   remainingPayment?: number;
+
   contactPerson?: string;
   phone?: string;
+
   notes?: string;
+
   status: AccommodationStatus;
 }
 
@@ -272,16 +300,30 @@ export type WeddingPreparationStatus =
 
 export interface WeddingPreparationItem {
   id: string;
+
   name: string;
-  category: 'Mireasa' | 'Mire' | 'Beauty' | 'Accesorii' | 'Other';
+
+  category:
+      | 'Mireasa'
+      | 'Mire'
+      | 'Beauty'
+      | 'Accesorii'
+      | 'Other';
+
   provider?: string;
+
   appointmentTime?: string;
   appointmentDate?: string;
+
   totalPrice?: number;
+
   currency?: Currency;
+
   advancePaid?: number;
   remainingPayment?: number;
+
   notes?: string;
+
   status: WeddingPreparationStatus;
 }
 
@@ -295,17 +337,27 @@ export type WeddingRingStatus =
 
 export interface WeddingRingItem {
   id: string;
+
   name: string;
+
   shop?: string;
+
   material?: string;
+
   sizeDiana?: string;
   sizeDan?: string;
+
   totalPrice?: number;
+
   currency?: Currency;
+
   advancePaid?: number;
   remainingPayment?: number;
+
   orderDate?: string;
   pickupDate?: string;
+
   notes?: string;
+
   status: WeddingRingStatus;
 }

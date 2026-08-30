@@ -55,7 +55,8 @@
 
             <strong>
                 {{
-                    getTotalCapacity() -
+                    getTotalCapacity()
+                    -
                     getAssignedPeople(guests)
                 }}
             </strong>
@@ -81,8 +82,8 @@
                 </div>
 
                 <span class="count-badge">
-          {{ getUnassignedGuests(guests).length }}
-        </span>
+                    {{ getUnassignedGuests(guests).length }}
+                </span>
 
             </div>
 
@@ -112,27 +113,27 @@
                             <strong>{{ guest.name }}</strong>
 
                             <span>
-                {{ guest.side }}
+                                {{ guest.side }}
                                 ·
                                 {{ getPeopleCount(guest) }}
                                 pers.
-              </span>
+                            </span>
                         </div>
 
                         <span
                                 class="status"
                                 [class.confirmed]="
-                guest.attendanceStatus === 'confirmed'
-              "
+                                    guest.attendanceStatus === 'confirmed'
+                                "
                         >
-              {{
+                            {{
                                 guest.attendanceStatus === 'confirmed'
                                     ? 'Confirmat'
                                     : guest.attendanceStatus === 'maybe'
                                         ? 'Poate'
                                         : 'În așteptare'
                             }}
-            </span>
+                        </span>
 
                     </article>
 
@@ -163,8 +164,8 @@
                     </div>
 
                     <span class="toolbar-hint">
-            Adaugă elemente și mută-le liber
-          </span>
+                        Adaugă elemente și mută-le liber
+                    </span>
 
                 </div>
 
@@ -296,10 +297,10 @@
                                 <input
                                         type="number"
                                         [min]="
-                    selected.type === 'table'
-                      ? 190
-                      : 60
-                  "
+                                            selected.type === 'table'
+                                                ? 190
+                                                : 60
+                                        "
                                         [(ngModel)]="selected.width"
                                 />
                             </label>
@@ -310,10 +311,10 @@
                                 <input
                                         type="number"
                                         [min]="
-                    selected.type === 'table'
-                      ? 150
-                      : 40
-                  "
+                                            selected.type === 'table'
+                                                ? 150
+                                                : 40
+                                        "
                                         [(ngModel)]="selected.height"
                                 />
                             </label>
@@ -325,9 +326,9 @@
                                 type="button"
                                 (mousedown)="$event.stopPropagation()"
                                 (click)="
-    $event.stopPropagation();
-    saveSelectedElement()
-  "
+                                    $event.stopPropagation();
+                                    saveSelectedElement()
+                                "
                         >
                             Salvează modificările
                         </button>
@@ -360,17 +361,17 @@
                             </strong>
 
                             <span>
-                Începe prin a adăuga mesele,
-                apoi DJ-ul, bufetul, intrarea
-                sau orice alt element al sălii.
-              </span>
+                                Începe prin a adăuga mesele,
+                                apoi DJ-ul, bufetul, intrarea
+                                sau orice alt element al sălii.
+                            </span>
 
                             <button
                                     type="button"
                                     (click)="
-                  addTable();
-                  $event.stopPropagation()
-                "
+                                        addTable();
+                                        $event.stopPropagation()
+                                    "
                             >
                                 + Adaugă prima masă
                             </button>
@@ -392,44 +393,44 @@
                                     class="canvas-element table-element"
                                     [class.selected]="isSelected(element)"
                                     [class.over-capacity]="
-                  getRemainingSeats(
-                    guests,
-                    element
-                  ) < 0
-                "
+                                        getRemainingSeats(
+                                            guests,
+                                            element
+                                        ) < 0
+                                    "
                                     [style.left.px]="element.x"
                                     [style.top.px]="element.y"
                                     [style.width.px]="element.width"
                                     [style.height.px]="element.height"
                                     (mousedown)="
-                  startElementDrag(
-                    $event,
-                    element
-                  )
-                "
+                                        startElementDrag(
+                                            $event,
+                                            element
+                                        )
+                                    "
                                     (click)="
-                  selectElement(
-                    $event,
-                    element
-                  )
-                "
+                                        selectElement(
+                                            $event,
+                                            element
+                                        )
+                                    "
                                     (dragover)="allowDrop($event)"
                                     (drop)="
-                  dropOnTable(
-                    $event,
-                    element,
-                    guests
-                  )
-                "
+                                        dropOnTable(
+                                            $event,
+                                            element,
+                                            guests
+                                        )
+                                    "
                             >
 
                                 <header class="table-header">
 
                                     <div class="table-title">
 
-                    <span class="table-number">
-                      {{ element.tableNumber }}
-                    </span>
+                                        <span class="table-number">
+                                            {{ element.tableNumber }}
+                                        </span>
 
                                         <strong>
                                             {{ element.label }}
@@ -440,12 +441,13 @@
                                     <div
                                             class="capacity"
                                             [class.full]="
-                      getRemainingSeats(
-                        guests,
-                        element
-                      ) === 0
-                    "
+                                                getRemainingSeats(
+                                                    guests,
+                                                    element
+                                                ) === 0
+                                            "
                                     >
+
                                         <strong>
                                             {{
                                                 getOccupiedSeats(
@@ -456,14 +458,15 @@
                                         </strong>
 
                                         <span>
-                      {{
+                                            {{
                                                 getRemainingSeats(
                                                     guests,
                                                     element
                                                 )
                                             }}
                                             libere
-                    </span>
+                                        </span>
+
                                     </div>
 
                                 </header>
@@ -481,18 +484,19 @@
                                         <article
                                                 class="guest-card compact"
                                                 draggable="true"
-                                                (mousedown)="
-                        $event.stopPropagation()
-                      "
-                                                (dragstart)="
-                        dragStart(guest)
-                      "
-                                                (dragend)="
-                        dragEnd()
-                      "
-                                                [class.saving]="
-                        savingGuestId === guest.id
-                      "
+                                                (mousedown)="$event.stopPropagation()"
+                                                (dragstart)="dragStart(guest)"
+                                                (dragend)="dragEnd()"
+                                                (dragover)="allowDrop($event)"
+                                                (drop)="
+                    dropOnGuest(
+                        $event,
+                        guest,
+                        element,
+                        guests
+                    )
+                "
+                                                [class.saving]="savingGuestId === guest.id"
                                         >
 
                                             <div>
@@ -501,25 +505,23 @@
                                                 </strong>
 
                                                 <span>
-                          {{
-                                                        getPeopleCount(guest)
-                                                    }}
+                    {{ getPeopleCount(guest) }}
                                                     pers.
-                          ·
+                    ·
                                                     {{ guest.side }}
-                        </span>
+                </span>
                                             </div>
 
                                             <button
                                                     type="button"
                                                     title="Scoate de la masă"
                                                     (click)="
-                          moveGuest(
+                        moveGuest(
                             guest,
                             undefined
-                          );
-                          $event.stopPropagation()
-                        "
+                        );
+                        $event.stopPropagation()
+                    "
                                             >
                                                 ×
                                             </button>
@@ -540,11 +542,11 @@
                                         class="resize-handle"
                                         title="Redimensionează"
                                         (mousedown)="
-                    startResize(
-                      $event,
-                      element
-                    )
-                  "
+                                            startResize(
+                                                $event,
+                                                element
+                                            )
+                                        "
                                 ></span>
 
                             </article>
@@ -563,29 +565,31 @@
                                     [style.width.px]="element.width"
                                     [style.height.px]="element.height"
                                     (mousedown)="
-                  startElementDrag(
-                    $event,
-                    element
-                  )
-                "
+                                        startElementDrag(
+                                            $event,
+                                            element
+                                        )
+                                    "
                                     (click)="
-                  selectElement(
-                    $event,
-                    element
-                  )
-                "
+                                        selectElement(
+                                            $event,
+                                            element
+                                        )
+                                    "
                             >
 
-                                <span>{{ element.label }}</span>
+                                <span>
+                                    {{ element.label }}
+                                </span>
 
                                 <span
                                         class="resize-handle"
                                         (mousedown)="
-                    startResize(
-                      $event,
-                      element
-                    )
-                  "
+                                            startResize(
+                                                $event,
+                                                element
+                                            )
+                                        "
                                 ></span>
 
                             </div>
@@ -604,31 +608,31 @@
                                     [style.width.px]="element.width"
                                     [style.height.px]="element.height"
                                     (mousedown)="
-                  startElementDrag(
-                    $event,
-                    element
-                  )
-                "
+                                        startElementDrag(
+                                            $event,
+                                            element
+                                        )
+                                    "
                                     (click)="
-                  selectElement(
-                    $event,
-                    element
-                  )
-                "
+                                        selectElement(
+                                            $event,
+                                            element
+                                        )
+                                    "
                             >
 
-                <span>
-                  {{ element.label }}
-                </span>
+                                <span>
+                                    {{ element.label }}
+                                </span>
 
                                 <span
                                         class="resize-handle"
                                         (mousedown)="
-                    startResize(
-                      $event,
-                      element
-                    )
-                  "
+                                            startResize(
+                                                $event,
+                                                element
+                                            )
+                                        "
                                 ></span>
 
                             </div>
@@ -647,17 +651,17 @@
                                     [style.width.px]="element.width"
                                     [style.height.px]="element.height"
                                     (mousedown)="
-                  startElementDrag(
-                    $event,
-                    element
-                  )
-                "
+                                        startElementDrag(
+                                            $event,
+                                            element
+                                        )
+                                    "
                                     (click)="
-                  selectElement(
-                    $event,
-                    element
-                  )
-                "
+                                        selectElement(
+                                            $event,
+                                            element
+                                        )
+                                    "
                             >
 
                                 <div class="arrow-label">
@@ -672,11 +676,11 @@
                                 <span
                                         class="resize-handle"
                                         (mousedown)="
-                    startResize(
-                      $event,
-                      element
-                    )
-                  "
+                                            startResize(
+                                                $event,
+                                                element
+                                            )
+                                        "
                                 ></span>
 
                             </div>
@@ -695,17 +699,17 @@
                                     [style.width.px]="element.width"
                                     [style.height.px]="element.height"
                                     (mousedown)="
-                  startElementDrag(
-                    $event,
-                    element
-                  )
-                "
+                                        startElementDrag(
+                                            $event,
+                                            element
+                                        )
+                                    "
                                     (click)="
-                  selectElement(
-                    $event,
-                    element
-                  )
-                "
+                                        selectElement(
+                                            $event,
+                                            element
+                                        )
+                                    "
                             >
 
                                 {{ element.label }}
@@ -713,11 +717,11 @@
                                 <span
                                         class="resize-handle"
                                         (mousedown)="
-                    startResize(
-                      $event,
-                      element
-                    )
-                  "
+                                            startResize(
+                                                $event,
+                                                element
+                                            )
+                                        "
                                 ></span>
 
                             </div>
@@ -732,10 +736,10 @@
 
             <div class="editor-footer">
 
-        <span>
-          Planul se salvează automat
-          în browser.
-        </span>
+                <span>
+                    Planul se salvează automat
+                    în browser.
+                </span>
 
                 <button
                         type="button"
