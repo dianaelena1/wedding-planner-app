@@ -17,9 +17,7 @@ import {
 } from '../models/wedding-data.model';
 
 
-interface ExtendedWeddingGuest
-    extends WeddingGuest {
-
+interface ExtendedWeddingGuest extends WeddingGuest {
   email?: string;
 
   groupName?: string;
@@ -36,6 +34,11 @@ interface ExtendedWeddingGuest
 
   transport?: string;
   transportation?: string;
+
+  /*
+   * Ordinea manuala din Seating Planner.
+   */
+  tableOrder?: number | null;
 }
 
 
@@ -59,15 +62,10 @@ interface WeddingDayTimelineExportItem {
 
 
 interface BackupFile {
-
   metadata: {
-
     app: string;
-
     exportedAt: string;
-
     formatVersion: number;
-
     collections: string[];
   };
 
@@ -76,17 +74,13 @@ interface BackupFile {
 
 
 interface WorkbookSheet {
-
   name: string;
-
   rows: Record<string, unknown>[];
-
   widths: number[];
 }
 
 
 interface SeatingFloorElement {
-
   id: string;
 
   type:
@@ -105,7 +99,6 @@ interface SeatingFloorElement {
   height: number;
 
   tableNumber?: number;
-
   capacity?: number;
 }
 
@@ -124,40 +117,26 @@ export class ExportBackupService {
   // ============================================================
 
   readonly backupCollections = [
-
     'weddingGuests',
-
     'weddingVendors',
-
     'weddingExpenses',
-
     'weddingDrinks',
-
     'weddingDocuments',
-
     'weddingTasks',
-
     'weddingDayTimeline',
-
     'weddingAccommodations',
-
     'weddingPreparations',
-
     'weddingRings',
-
     'guestUpdates',
-
     'appAccess'
-
   ];
 
 
   // ============================================================
-  // INVITAȚI
+  // INVITATI - EXCEL
   // ============================================================
 
-  async exportGuestsExcel():
-      Promise<void> {
+  async exportGuestsExcel(): Promise<void> {
 
     const guests =
         await this.readCollection<ExtendedWeddingGuest>(
@@ -200,12 +179,8 @@ export class ExportBackupService {
 
 
   // ============================================================
-  // PROGRAM ZIUA NUNȚII
+  // PROGRAM ZIUA NUNTII - PDF
   // ============================================================
-
-  // ============================================================
-// PROGRAM ZIUA NUNȚII - PDF
-// ============================================================
 
   async exportWeddingDayTimelinePdf(): Promise<void> {
 
@@ -217,29 +192,32 @@ export class ExportBackupService {
     const items =
         timeline
             .slice()
-            .sort((a, b) => {
+            .sort(
+                (a, b) => {
 
-              const orderA =
-                  Number(a.sortOrder);
+                  const orderA =
+                      Number(a.sortOrder);
 
-              const orderB =
-                  Number(b.sortOrder);
+                  const orderB =
+                      Number(b.sortOrder);
 
-              if (
-                  Number.isFinite(orderA) &&
-                  Number.isFinite(orderB) &&
-                  orderA !== orderB
-              ) {
-                return orderA - orderB;
-              }
+                  if (
+                      Number.isFinite(orderA) &&
+                      Number.isFinite(orderB) &&
+                      orderA !== orderB
+                  ) {
 
-              return (
-                  a.time ?? ''
-              ).localeCompare(
-                  b.time ?? '',
-                  'ro'
-              );
-            });
+                    return orderA - orderB;
+                  }
+
+                  return (
+                      a.time ?? ''
+                  ).localeCompare(
+                      b.time ?? '',
+                      'ro'
+                  );
+                }
+            );
 
 
     const pdf =
@@ -256,11 +234,12 @@ export class ExportBackupService {
     const pageHeight =
         pdf.internal.pageSize.getHeight();
 
-
-    const marginX = 16;
+    const marginX =
+        16;
 
     const contentWidth =
-        pageWidth - marginX * 2;
+        pageWidth -
+        marginX * 2;
 
 
     // ==========================================================
@@ -322,13 +301,13 @@ export class ExportBackupService {
     );
 
     pdf.text(
-        `Generat la ${new Date().toLocaleString('ro-RO')}`,
+        this.pdfSafeText(
+            `Generat la ${new Date().toLocaleString('ro-RO')}`
+        ),
         marginX,
         33
     );
 
-
-    // decorative line
 
     pdf.setDrawColor(
         199,
@@ -399,13 +378,16 @@ export class ExportBackupService {
         ) {
 
       const time =
-          item.time ||
-          '--:--';
-
+          this.pdfSafeText(
+              item.time ||
+              '--:--'
+          );
 
       const title =
-          item.title ||
-          'Moment';
+          this.pdfSafeText(
+              item.title ||
+              'Moment'
+          );
 
 
       const metaParts: string[] =
@@ -417,9 +399,8 @@ export class ExportBackupService {
       ) {
 
         metaParts.push(
-            `Responsabil: ${item.owner}`
+            `Responsabil: ${this.pdfSafeText(item.owner)}`
         );
-
       }
 
 
@@ -428,9 +409,8 @@ export class ExportBackupService {
       ) {
 
         metaParts.push(
-            `Locatie: ${item.location}`
+            `Locatie: ${this.pdfSafeText(item.location)}`
         );
-
       }
 
 
@@ -439,9 +419,8 @@ export class ExportBackupService {
       ) {
 
         metaParts.push(
-            `Telefon: ${item.phone}`
+            `Telefon: ${this.pdfSafeText(item.phone)}`
         );
-
       }
 
 
@@ -452,17 +431,16 @@ export class ExportBackupService {
 
 
       const notes =
-          item.notes?.trim() ||
-          '';
+          this.pdfSafeText(
+              item.notes?.trim() ||
+              ''
+          );
 
-
-      // ----------------------------------------------------------
-      // Calculate required height
-      // ----------------------------------------------------------
 
       pdf.setFontSize(
           9
       );
+
 
       const titleLines =
           pdf.splitTextToSize(
@@ -473,19 +451,23 @@ export class ExportBackupService {
 
       const metaLines =
           metaText
+
               ? pdf.splitTextToSize(
                   metaText,
                   contentWidth - 38
               )
+
               : [];
 
 
       const noteLines =
           notes
+
               ? pdf.splitTextToSize(
                   notes,
                   contentWidth - 38
               )
+
               : [];
 
 
@@ -513,7 +495,6 @@ export class ExportBackupService {
             noteLines.length *
             4 +
             4;
-
       }
 
 
@@ -524,27 +505,19 @@ export class ExportBackupService {
           );
 
 
-      // ----------------------------------------------------------
-      // New page if needed
-      // ----------------------------------------------------------
-
       if (
           y +
           cardHeight >
-          pageHeight - 18
+          pageHeight -
+          18
       ) {
 
         pdf.addPage();
 
         y =
             20;
-
       }
 
-
-      // ----------------------------------------------------------
-      // Timeline line
-      // ----------------------------------------------------------
 
       pdf.setDrawColor(
           214,
@@ -564,10 +537,6 @@ export class ExportBackupService {
       );
 
 
-      // ----------------------------------------------------------
-      // Timeline dot
-      // ----------------------------------------------------------
-
       pdf.setFillColor(
           185,
           155,
@@ -581,10 +550,6 @@ export class ExportBackupService {
           'F'
       );
 
-
-      // ----------------------------------------------------------
-      // Time
-      // ----------------------------------------------------------
 
       pdf.setFont(
           'helvetica',
@@ -604,16 +569,9 @@ export class ExportBackupService {
       pdf.text(
           time,
           marginX,
-          y + 10,
-          {
-            align: 'left'
-          }
+          y + 10
       );
 
-
-      // ----------------------------------------------------------
-      // Card
-      // ----------------------------------------------------------
 
       const cardX =
           marginX + 23;
@@ -650,10 +608,6 @@ export class ExportBackupService {
           y + 8;
 
 
-      // ----------------------------------------------------------
-      // Title
-      // ----------------------------------------------------------
-
       pdf.setFont(
           'helvetica',
           'bold'
@@ -681,10 +635,6 @@ export class ExportBackupService {
           titleLines.length *
           4.5;
 
-
-      // ----------------------------------------------------------
-      // Meta information
-      // ----------------------------------------------------------
 
       if (
           metaLines.length
@@ -720,13 +670,8 @@ export class ExportBackupService {
         textY +=
             metaLines.length *
             4;
-
       }
 
-
-      // ----------------------------------------------------------
-      // Notes
-      // ----------------------------------------------------------
 
       if (
           noteLines.length
@@ -757,7 +702,6 @@ export class ExportBackupService {
             cardX + 6,
             textY
         );
-
       }
 
 
@@ -767,10 +711,6 @@ export class ExportBackupService {
     }
 
 
-    // ==========================================================
-    // SAVE
-    // ==========================================================
-
     pdf.save(
         `program-ziua-nuntii-${this.fileDate()}.pdf`
     );
@@ -778,14 +718,10 @@ export class ExportBackupService {
 
 
   // ============================================================
-  // PLĂȚI
-  //
-  // Îl păstrăm deoarece este folosit de exportul complet.
-  // Nu mai are card separat în UI.
+  // PLATI - EXCEL
   // ============================================================
 
-  async exportPaymentsExcel():
-      Promise<void> {
+  async exportPaymentsExcel(): Promise<void> {
 
     const [
       expenses,
@@ -802,6 +738,7 @@ export class ExportBackupService {
           )
 
         ]);
+
 
     this.downloadWorkbook(
         [
@@ -859,34 +796,38 @@ export class ExportBackupService {
 
 
   // ============================================================
-  // PLAN MESE PDF
+  // PLAN MESE - PDF
   // ============================================================
 
-  async exportSeatingPdf():
-      Promise<void> {
+  async exportSeatingPdf(): Promise<void> {
 
     const guests =
         await this.readCollection<ExtendedWeddingGuest>(
             'weddingGuests'
         );
 
+
     const rawLayout =
         localStorage.getItem(
             'wedding-seating-floor-plan-v1'
         );
 
-    if (!rawLayout) {
+
+    if (
+        !rawLayout
+    ) {
 
       throw new Error(
           'no-seating-layout'
       );
-
     }
+
 
     const elements =
         JSON.parse(
             rawLayout
         ) as SeatingFloorElement[];
+
 
     if (
         !Array.isArray(elements) ||
@@ -896,7 +837,6 @@ export class ExportBackupService {
       throw new Error(
           'no-seating-layout'
       );
-
     }
 
 
@@ -1022,7 +962,9 @@ export class ExportBackupService {
     );
 
     pdf.text(
-        `Generat la ${new Date().toLocaleString('ro-RO')}`,
+        this.pdfSafeText(
+            `Generat la ${new Date().toLocaleString('ro-RO')}`
+        ),
         marginX,
         15
     );
@@ -1367,28 +1309,37 @@ export class ExportBackupService {
         );
 
 
-    const capacity =
-        Number(
-            table.capacity
-        ) || 0;
-
-
+    /*
+     * IMPORTANT:
+     *
+     * Nu mai sortam alfabetic.
+     *
+     * Folosim tableOrder salvat de Seating Planner.
+     */
     const tableGuests =
         guests
 
             .filter(
                 guest =>
                     guest.attendanceStatus !==
-                    'declined' &&
-                    guest.tableNumber ===
+                    'declined'
+                    &&
+                    Number(
+                        guest.tableNumber
+                    ) ===
                     tableNumber
             )
 
+            .slice()
+
             .sort(
-                (a, b) =>
-                    a.name.localeCompare(
-                        b.name,
-                        'ro'
+                (
+                    a,
+                    b
+                ) =>
+                    this.compareGuestsAtTable(
+                        a,
+                        b
                     )
             );
 
@@ -1515,6 +1466,11 @@ export class ExportBackupService {
         43
     );
 
+    pdf.setFont(
+        'helvetica',
+        'bold'
+    );
+
     pdf.setFontSize(
         7
     );
@@ -1523,7 +1479,7 @@ export class ExportBackupService {
     const titleWidth =
         Math.max(
             5,
-            width - 20
+            width - 28
         );
 
 
@@ -1541,42 +1497,30 @@ export class ExportBackupService {
     );
 
 
+    /*
+     * Doar numarul de persoane.
+     *
+     * Nu mai afisam:
+     * 16/8
+     * -8 locuri libere
+     *
+     * Capacitatea nu este limita.
+     */
     pdf.setFontSize(
-        6
-    );
-
-
-    pdf.text(
-        `${occupied}/${capacity}`,
-        x + width - 3,
-        y + 5,
-        {
-          align:
-              'right'
-        }
-    );
-
-
-    pdf.setFont(
-        'helvetica',
-        'normal'
+        5.5
     );
 
     pdf.setTextColor(
-        135,
-        115,
-        95
-    );
-
-    pdf.setFontSize(
-        4.7
+        111,
+        82,
+        58
     );
 
 
     pdf.text(
-        `${capacity - occupied} locuri libere`,
+        `${occupied} pers.`,
         x + width - 3,
-        y + 8,
+        y + 5,
         {
           align:
               'right'
@@ -1589,35 +1533,62 @@ export class ExportBackupService {
     // ==========================================================
 
     const contentTop =
-        y + 12;
+        y + 11;
 
     const contentBottom =
         y +
         height -
         3;
 
-    const lineHeight =
-        4.2;
 
-
-    const maxLines =
+    const availableHeight =
         Math.max(
-
-            0,
-
-            Math.floor(
-                (
-                    contentBottom -
-                    contentTop
-                ) /
-                lineHeight
-            )
-
+            1,
+            contentBottom -
+            contentTop
         );
 
 
+    /*
+     * Nu limitam artificial numarul de invitati.
+     *
+     * Daca sunt mai multe grupuri la masa,
+     * micsoram distanta dintre randuri astfel incat
+     * sa incercam sa le afisam pe toate.
+     */
+    const lineHeight =
+        tableGuests.length > 0
+
+            ? Math.max(
+                2.3,
+                Math.min(
+                    4.2,
+                    availableHeight /
+                    tableGuests.length
+                )
+            )
+
+            : 4.2;
+
+
+    const fontSize =
+        Math.max(
+            3.2,
+            Math.min(
+                5,
+                lineHeight +
+                0.6
+            )
+        );
+
+
+    pdf.setFont(
+        'helvetica',
+        'normal'
+    );
+
     pdf.setFontSize(
-        5
+        fontSize
     );
 
     pdf.setTextColor(
@@ -1636,14 +1607,6 @@ export class ExportBackupService {
         of tableGuests
         ) {
 
-      if (
-          lineIndex >=
-          maxLines
-      ) {
-        break;
-      }
-
-
       const people =
           this.number(
               guest.adults
@@ -1653,8 +1616,32 @@ export class ExportBackupService {
           );
 
 
+      /*
+       * Diacriticele sunt normalizate in pdfShortText()
+       * pentru fonturile standard jsPDF.
+       */
       const text =
           `${guest.name} · ${people} pers.`;
+
+
+      const lineY =
+          contentTop +
+          lineIndex *
+          lineHeight;
+
+
+      /*
+       * Daca s-ar depasi fizic chenarul,
+       * nu dam eroare si nu afectam seating-ul.
+       */
+      if (
+          lineY >
+          contentBottom +
+          0.5
+      ) {
+
+        break;
+      }
 
 
       pdf.text(
@@ -1670,9 +1657,7 @@ export class ExportBackupService {
 
           x + 3,
 
-          contentTop +
-          lineIndex *
-          lineHeight
+          lineY
       );
 
 
@@ -1680,34 +1665,34 @@ export class ExportBackupService {
     }
 
 
+    /*
+     * In situatii extreme in care fizic nu incap toate
+     * randurile in casuta din PDF, spunem cate grupuri
+     * continua, dar seating-ul ramane nelimitat.
+     */
     const hidden =
         tableGuests.length -
         lineIndex;
 
 
     if (
-        hidden > 0 &&
-        maxLines > 0
+        hidden > 0
     ) {
-
-      const lastY =
-          contentTop +
-          (
-              maxLines - 1
-          ) *
-          lineHeight;
-
 
       pdf.setFont(
           'helvetica',
           'bold'
       );
 
+      pdf.setFontSize(
+          3
+      );
+
 
       pdf.text(
           `+ ${hidden} grupuri`,
           x + 3,
-          lastY
+          contentBottom
       );
 
 
@@ -1716,6 +1701,227 @@ export class ExportBackupService {
           'normal'
       );
     }
+  }
+
+
+  // ============================================================
+  // COMPARE GUESTS AT TABLE
+  // ============================================================
+
+  private compareGuestsAtTable(
+      a: ExtendedWeddingGuest,
+      b: ExtendedWeddingGuest
+  ): number {
+
+    const orderA =
+        this.tableOrder(
+            a
+        );
+
+    const orderB =
+        this.tableOrder(
+            b
+        );
+
+
+    /*
+     * Ambii au ordine manuala.
+     */
+    if (
+        orderA !== null &&
+        orderB !== null
+    ) {
+
+      if (
+          orderA !==
+          orderB
+      ) {
+
+        return (
+            orderA -
+            orderB
+        );
+      }
+
+
+      return 0;
+    }
+
+
+    /*
+     * Doar A are ordine manuala.
+     */
+    if (
+        orderA !== null
+    ) {
+
+      return -1;
+    }
+
+
+    /*
+     * Doar B are ordine manuala.
+     */
+    if (
+        orderB !== null
+    ) {
+
+      return 1;
+    }
+
+
+    /*
+     * Legacy:
+     *
+     * Daca sunt invitati vechi fara tableOrder,
+     * folosim numele doar pentru o ordine stabila.
+     *
+     * Dupa ce ii reordonezi prin drag & drop,
+     * tableOrder va fi salvat.
+     */
+    return (
+        a.name ??
+        ''
+    ).localeCompare(
+        b.name ??
+        '',
+        'ro'
+    );
+  }
+
+
+  // ============================================================
+  // TABLE ORDER
+  // ============================================================
+
+  private tableOrder(
+      guest: ExtendedWeddingGuest
+  ): number | null {
+
+    if (
+        guest.tableOrder ===
+        null
+        ||
+        guest.tableOrder ===
+        undefined
+    ) {
+
+      return null;
+    }
+
+
+    const order =
+        Number(
+            guest.tableOrder
+        );
+
+
+    return Number.isFinite(
+        order
+    )
+
+        ? order
+
+        : null;
+  }
+
+
+  // ============================================================
+  // PDF SAFE TEXT
+  // ============================================================
+
+  /*
+   * Fonturile standard din jsPDF nu suporta corect toate
+   * caracterele romanesti.
+   *
+   * De aceea:
+   *
+   * Pucă       -> Puca
+   * Răchișan   -> Rachisan
+   * Ștefan     -> Stefan
+   * Țurcanu    -> Turcanu
+   *
+   * Datele originale din Firestore NU sunt modificate.
+   * Modificarea este doar pentru textul desenat in PDF.
+   */
+  private pdfSafeText(
+      text: string | null | undefined
+  ): string {
+
+    return String(
+        text ??
+        ''
+    )
+
+        .replace(
+            /ă/g,
+            'a'
+        )
+
+        .replace(
+            /Ă/g,
+            'A'
+        )
+
+        .replace(
+            /â/g,
+            'a'
+        )
+
+        .replace(
+            /Â/g,
+            'A'
+        )
+
+        .replace(
+            /î/g,
+            'i'
+        )
+
+        .replace(
+            /Î/g,
+            'I'
+        )
+
+        .replace(
+            /ș/g,
+            's'
+        )
+
+        .replace(
+            /Ș/g,
+            'S'
+        )
+
+        .replace(
+            /ş/g,
+            's'
+        )
+
+        .replace(
+            /Ş/g,
+            'S'
+        )
+
+        .replace(
+            /ț/g,
+            't'
+        )
+
+        .replace(
+            /Ț/g,
+            'T'
+        )
+
+        .replace(
+            /ţ/g,
+            't'
+        )
+
+        .replace(
+            /Ţ/g,
+            'T'
+        );
   }
 
 
@@ -1730,19 +1936,19 @@ export class ExportBackupService {
   ): string {
 
     const clean =
-        String(
-            text ?? ''
+        this.pdfSafeText(
+            text
         );
 
 
     if (
         pdf.getTextWidth(
             clean
-        ) <= maxWidth
+        ) <=
+        maxWidth
     ) {
 
       return clean;
-
     }
 
 
@@ -1751,10 +1957,13 @@ export class ExportBackupService {
 
 
     while (
-        result.length > 1 &&
+        result.length >
+        1
+        &&
         pdf.getTextWidth(
             `${result}...`
-        ) > maxWidth
+        ) >
+        maxWidth
         ) {
 
       result =
@@ -1762,11 +1971,12 @@ export class ExportBackupService {
               0,
               -1
           );
-
     }
 
 
-    return `${result}...`;
+    return (
+        `${result}...`
+    );
   }
 
 
@@ -1774,8 +1984,7 @@ export class ExportBackupService {
   // CHECKLIST
   // ============================================================
 
-  async exportChecklistExcel():
-      Promise<void> {
+  async exportChecklistExcel(): Promise<void> {
 
     const tasks =
         await this.readCollection<WeddingTask>(
@@ -1814,8 +2023,7 @@ export class ExportBackupService {
   // EXPORT COMPLET
   // ============================================================
 
-  async exportAllExcel():
-      Promise<void> {
+  async exportAllExcel(): Promise<void> {
 
     const [
       guests,
@@ -1839,7 +2047,7 @@ export class ExportBackupService {
 
           this.readCollection<WeddingTask>(
               'weddingTasks'
-          ),
+          )
 
         ]);
 
@@ -1847,9 +2055,9 @@ export class ExportBackupService {
     this.downloadWorkbook(
         [
 
-          // -------------------------------------------------------
-          // INVITAȚI
-          // -------------------------------------------------------
+          // ------------------------------------------------------
+          // INVITATI
+          // ------------------------------------------------------
 
           {
             name:
@@ -1880,9 +2088,9 @@ export class ExportBackupService {
           },
 
 
-          // -------------------------------------------------------
+          // ------------------------------------------------------
           // CHELTUIELI
-          // -------------------------------------------------------
+          // ------------------------------------------------------
 
           {
             name:
@@ -1909,9 +2117,9 @@ export class ExportBackupService {
           },
 
 
-          // -------------------------------------------------------
+          // ------------------------------------------------------
           // FURNIZORI
-          // -------------------------------------------------------
+          // ------------------------------------------------------
 
           {
             name:
@@ -1937,9 +2145,9 @@ export class ExportBackupService {
           },
 
 
-          // -------------------------------------------------------
+          // ------------------------------------------------------
           // PLAN MESE
-          // -------------------------------------------------------
+          // ------------------------------------------------------
 
           {
             name:
@@ -1964,9 +2172,9 @@ export class ExportBackupService {
           },
 
 
-          // -------------------------------------------------------
+          // ------------------------------------------------------
           // SUMAR MESE
-          // -------------------------------------------------------
+          // ------------------------------------------------------
 
           {
             name:
@@ -1981,14 +2189,14 @@ export class ExportBackupService {
               14,
               18,
               18,
-              18
+              30
             ]
           },
 
 
-          // -------------------------------------------------------
+          // ------------------------------------------------------
           // CHECKLIST
-          // -------------------------------------------------------
+          // ------------------------------------------------------
 
           {
             name:
@@ -2020,11 +2228,10 @@ export class ExportBackupService {
   // FIRESTORE BACKUP
   // ============================================================
 
-  async exportFirestoreBackup():
-      Promise<{
-        collections: number;
-        documents: number;
-      }> {
+  async exportFirestoreBackup(): Promise<{
+    collections: number;
+    documents: number;
+  }> {
 
     const data:
         Record<string, unknown[]> =
@@ -2046,18 +2253,19 @@ export class ExportBackupService {
           );
 
 
-      data[collectionName] =
+      data[
+          collectionName
+          ] =
           rows.map(
               row =>
                   this.toJsonSafe(
                       row
                   )
-          );
+          ) as unknown[];
 
 
       documents +=
           rows.length;
-
     }
 
 
@@ -2080,7 +2288,6 @@ export class ExportBackupService {
       },
 
       data
-
     };
 
 
@@ -2099,12 +2306,10 @@ export class ExportBackupService {
 
 
     return {
-
       collections:
       this.backupCollections.length,
 
       documents
-
     };
   }
 
@@ -2176,98 +2381,19 @@ export class ExportBackupService {
 
 
   // ============================================================
-  // PROGRAM ZIUA NUNȚII -> EXCEL ROWS
-  // ============================================================
-
-  private weddingDayTimelineRows(
-      timeline: WeddingDayTimelineExportItem[]
-  ): Record<string, unknown>[] {
-
-    return timeline
-
-        .slice()
-
-        .sort(
-            (
-                a,
-                b
-            ) => {
-
-              const orderA =
-                  Number(
-                      a.sortOrder
-                  );
-
-              const orderB =
-                  Number(
-                      b.sortOrder
-                  );
-
-
-              if (
-                  Number.isFinite(orderA) &&
-                  Number.isFinite(orderB) &&
-                  orderA !== orderB
-              ) {
-
-                return orderA - orderB;
-
-              }
-
-
-              return (
-                  a.time ?? ''
-              ).localeCompare(
-                  b.time ?? '',
-                  'ro'
-              );
-            }
-        )
-
-        .map(
-            item => ({
-
-              'Ora':
-                  item.time ?? '',
-
-              'Moment':
-                  item.title ?? '',
-
-              'Responsabil':
-                  item.owner ?? '',
-
-              'Locație':
-                  item.location ?? '',
-
-              'Telefon':
-                  item.phone ?? '',
-
-              'Status':
-                  item.status === 'done'
-                      ? 'Finalizat'
-                      : 'De făcut',
-
-              'Sursă':
-                  item.source === 'vendor'
-                      ? 'Furnizor'
-                      : 'Manual',
-
-              'Observații':
-                  item.notes ?? ''
-
-            })
-        );
-  }
-
-
-  // ============================================================
-  // INVITAȚI -> EXCEL ROWS
+  // INVITATI -> EXCEL ROWS
   // ============================================================
 
   private guestRows(
       guests: ExtendedWeddingGuest[]
   ): Record<string, unknown>[] {
 
+    /*
+     * Lista generala de invitati ramane alfabetica.
+     *
+     * Ordinea manuala conteaza pentru Plan mese,
+     * nu pentru lista generala Invitati.
+     */
     return guests
 
         .slice()
@@ -2312,13 +2438,16 @@ export class ExportBackupService {
                   ),
 
               'Masa':
-                  guest.tableNumber ?? '',
+                  guest.tableNumber ??
+                  '',
 
               'Telefon':
-                  guest.phone ?? '',
+                  guest.phone ??
+                  '',
 
               'Email':
-                  guest.email ?? '',
+                  guest.email ??
+                  '',
 
               'Grup / familie':
 
@@ -2328,7 +2457,8 @@ export class ExportBackupService {
                   '',
 
               'Tip meniu':
-                  guest.menuType ?? '',
+                  guest.menuType ??
+                  '',
 
               'Alergii':
 
@@ -2352,7 +2482,8 @@ export class ExportBackupService {
                   '',
 
               'Observații':
-                  guest.notes ?? ''
+                  guest.notes ??
+                  ''
 
             })
         );
@@ -2392,31 +2523,39 @@ export class ExportBackupService {
               expense.name,
 
               'Monedă':
-                  expense.currency ?? '',
+                  expense.currency ??
+                  '',
 
               'Cantitate':
-                  expense.quantity ?? '',
+                  expense.quantity ??
+                  '',
 
               'Preț unitar':
-                  expense.unitPrice ?? '',
+                  expense.unitPrice ??
+                  '',
 
               'Total':
-                  expense.total ?? '',
+                  expense.total ??
+                  '',
 
               'Avans plătit':
-                  expense.advancePaid ?? '',
+                  expense.advancePaid ??
+                  '',
 
               'Rest':
-                  expense.remainingPayment ?? '',
+                  expense.remainingPayment ??
+                  '',
 
               'Scadență':
-                  expense.dueDate ?? '',
+                  expense.dueDate ??
+                  '',
 
               'Status':
               expense.status,
 
               'Observații':
-                  expense.notes ?? ''
+                  expense.notes ??
+                  ''
 
             })
         );
@@ -2459,19 +2598,24 @@ export class ExportBackupService {
               vendor.status,
 
               'Monedă':
-                  vendor.currency ?? '',
+                  vendor.currency ??
+                  '',
 
               'Total':
-                  vendor.totalPrice ?? '',
+                  vendor.totalPrice ??
+                  '',
 
               'Avans plătit':
-                  vendor.advancePaid ?? '',
+                  vendor.advancePaid ??
+                  '',
 
               'Rest':
-                  vendor.remainingPayment ?? '',
+                  vendor.remainingPayment ??
+                  '',
 
               'Scadență':
-                  vendor.paymentDeadline ?? '',
+                  vendor.paymentDeadline ??
+                  '',
 
               'Contact':
 
@@ -2480,7 +2624,8 @@ export class ExportBackupService {
                   '',
 
               'Observații':
-                  vendor.notes ?? ''
+                  vendor.notes ??
+                  ''
 
             })
         );
@@ -2505,6 +2650,16 @@ export class ExportBackupService {
 
         .slice()
 
+        /*
+         * IMPORTANT:
+         *
+         * Sortare:
+         *
+         * 1. Masa
+         * 2. tableOrder
+         *
+         * NU numele.
+         */
         .sort(
             (
                 a,
@@ -2513,21 +2668,46 @@ export class ExportBackupService {
 
               const tableA =
                   a.tableNumber ??
-                  999;
+                  Number.MAX_SAFE_INTEGER;
 
               const tableB =
                   b.tableNumber ??
-                  999;
+                  Number.MAX_SAFE_INTEGER;
 
 
-              return (
-                      tableA -
-                      tableB
-                  ) ||
-                  a.name.localeCompare(
-                      b.name,
-                      'ro'
+              if (
+                  Number(tableA) !==
+                  Number(tableB)
+              ) {
+
+                return (
+                    Number(tableA) -
+                    Number(tableB)
+                );
+              }
+
+
+              /*
+               * Aceeasi masa:
+               * respectam drag & drop-ul.
+               */
+              const orderComparison =
+                  this.compareGuestsAtTable(
+                      a,
+                      b
                   );
+
+
+              if (
+                  orderComparison !==
+                  0
+              ) {
+
+                return orderComparison;
+              }
+
+
+              return 0;
             }
         )
 
@@ -2589,7 +2769,8 @@ export class ExportBackupService {
                       ),
 
               'Observații':
-                  guest.notes ?? ''
+                  guest.notes ??
+                  ''
 
             })
         );
@@ -2604,75 +2785,92 @@ export class ExportBackupService {
       guests: ExtendedWeddingGuest[]
   ): Record<string, unknown>[] {
 
-    const capacities:
-        Record<number, number> = {
+    /*
+     * Nu mai avem capacitati hardcodate de
+     * 8 / 16 / 24 etc.
+     *
+     * Masa poate contine oricate persoane doresti.
+     */
 
-      1: 16,
+    const activeGuests =
+        guests.filter(
+            guest =>
+                guest.attendanceStatus !==
+                'declined'
+        );
 
-      2: 16,
 
-      3: 16,
+    const tableNumbers =
+        Array.from(
+            new Set(
+                activeGuests
 
-      4: 16,
+                    .map(
+                        guest =>
+                            guest.tableNumber
+                    )
 
-      5: 16,
+                    .filter(
+                        (
+                            value
+                        ): value is number =>
+                            value !==
+                            null
+                            &&
+                            value !==
+                            undefined
+                    )
 
-      6: 24,
+                    .map(
+                        value =>
+                            Number(
+                                value
+                            )
+                    )
+            )
+        )
 
-      7: 16,
-
-      8: 24
-    };
+            .sort(
+                (
+                    a,
+                    b
+                ) =>
+                    a - b
+            );
 
 
     const rows:
         Record<string, unknown>[] =
+        tableNumbers.map(
+            tableNumber => {
 
-        Object.entries(
-            capacities
-        ).map(
-
-            (
-                [
-                  table,
-                  capacity
-                ]
-            ) => {
-
-              const tableNumber =
-                  Number(
-                      table
+              const tableGuests =
+                  activeGuests.filter(
+                      guest =>
+                          Number(
+                              guest.tableNumber
+                          ) ===
+                          tableNumber
                   );
 
 
               const people =
-                  guests
+                  tableGuests.reduce(
 
-                      .filter(
-                          guest =>
-                              guest.tableNumber ===
-                              tableNumber &&
-                              guest.attendanceStatus !==
-                              'declined'
-                      )
+                      (
+                          sum,
+                          guest
+                      ) =>
+                          sum +
+                          this.number(
+                              guest.adults
+                          ) +
+                          this.number(
+                              guest.children
+                          ),
 
-                      .reduce(
-
-                          (
-                              sum,
-                              guest
-                          ) =>
-                              sum +
-                              this.number(
-                                  guest.adults
-                              ) +
-                              this.number(
-                                  guest.children
-                              ),
-
-                          0
-
-                      );
+                      0
+                  );
 
 
               return {
@@ -2683,45 +2881,45 @@ export class ExportBackupService {
                 'Persoane așezate':
                 people,
 
-                'Capacitate':
-                capacity,
+                'Grupuri':
+                tableGuests.length,
 
-                'Locuri libere':
-                    capacity -
-                    people
+                'Observații':
+                    ''
 
               };
             }
         );
 
 
-    const unassigned =
-        guests
+    const unassignedGuests =
+        activeGuests.filter(
+            guest =>
+                guest.tableNumber ===
+                null
+                ||
+                guest.tableNumber ===
+                undefined
+        );
 
-            .filter(
-                guest =>
-                    guest.tableNumber == null &&
-                    guest.attendanceStatus !==
-                    'declined'
-            )
 
-            .reduce(
+    const unassignedPeople =
+        unassignedGuests.reduce(
 
-                (
-                    sum,
-                    guest
-                ) =>
-                    sum +
-                    this.number(
-                        guest.adults
-                    ) +
-                    this.number(
-                        guest.children
-                    ),
+            (
+                sum,
+                guest
+            ) =>
+                sum +
+                this.number(
+                    guest.adults
+                ) +
+                this.number(
+                    guest.children
+                ),
 
-                0
-
-            );
+            0
+        );
 
 
     rows.push({
@@ -2730,12 +2928,12 @@ export class ExportBackupService {
           'Fără masă',
 
       'Persoane așezate':
-      unassigned,
+      unassignedPeople,
 
-      'Capacitate':
-          '',
+      'Grupuri':
+      unassignedGuests.length,
 
-      'Locuri libere':
+      'Observații':
           ''
 
     });
@@ -2784,10 +2982,12 @@ export class ExportBackupService {
               task.priority,
 
               'Termen':
-                  task.dueDate ?? '',
+                  task.dueDate ??
+                  '',
 
               'Observații':
-                  task.notes ?? ''
+                  task.notes ??
+                  ''
 
             })
         );
@@ -2911,7 +3111,6 @@ export class ExportBackupService {
     ) {
 
       return value;
-
     }
 
 
@@ -2947,7 +3146,6 @@ export class ExportBackupService {
                   item
               )
       );
-
     }
 
 
@@ -3016,6 +3214,7 @@ export class ExportBackupService {
     anchor.download =
         fileName;
 
+
     anchor.click();
 
 
@@ -3036,7 +3235,8 @@ export class ExportBackupService {
     return (
         Number(
             value
-        ) || 0
+        ) ||
+        0
     );
   }
 
@@ -3063,8 +3263,7 @@ export class ExportBackupService {
   // ============================================================
 
   private invitationLabel(
-      value:
-      WeddingGuest['invitationStatus']
+      value: WeddingGuest['invitationStatus']
   ): string {
 
     const labels:
@@ -3095,8 +3294,7 @@ export class ExportBackupService {
   // ============================================================
 
   private attendanceLabel(
-      value:
-      WeddingGuest['attendanceStatus']
+      value: WeddingGuest['attendanceStatus']
   ): string {
 
     const labels:
@@ -3140,7 +3338,6 @@ export class ExportBackupService {
     ) {
 
       return 'Da';
-
     }
 
 
@@ -3151,7 +3348,6 @@ export class ExportBackupService {
     ) {
 
       return 'Nu';
-
     }
 
 
@@ -3206,7 +3402,6 @@ export class ExportBackupService {
     ) {
 
       return date;
-
     }
 
 
