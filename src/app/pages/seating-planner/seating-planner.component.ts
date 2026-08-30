@@ -693,66 +693,10 @@ export class SeatingPlannerComponent {
       guests: WeddingGuest[]
   ): boolean {
 
-    if (
-        table.tableNumber ===
-        undefined
-    ) {
-
-      return false;
-    }
-
-
-    const occupied =
-        this.getOccupiedSeats(
-            guests,
-            table.tableNumber
-        );
-
-
-    const people =
-        this.getPeopleCount(
-            guest
-        );
-
-
-    const alreadyAtTable =
-        Number(
-            guest.tableNumber
-        ) ===
-        table.tableNumber
-            ? people
-            : 0;
-
-
-    const newOccupied =
-        occupied
-        -
-        alreadyAtTable
-        +
-        people;
-
-
-    const capacity =
-        Number(
-            table.capacity
-        ) || 0;
-
-
-    if (
-        newOccupied >
-        capacity
-    ) {
-
-      this.errorMessage =
-          `${table.label} ar depăși capacitatea cu `
-          +
-          `${newOccupied - capacity} persoane.`;
-
-      return false;
-    }
-
-
-    return true;
+    return (
+        table.type === 'table' &&
+        table.tableNumber !== undefined
+    );
   }
 
 

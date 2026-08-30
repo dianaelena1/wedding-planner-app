@@ -390,14 +390,8 @@
                         @if (element.type === 'table') {
 
                             <article
-                                    class="canvas-element table-element"
-                                    [class.selected]="isSelected(element)"
-                                    [class.over-capacity]="
-                                        getRemainingSeats(
-                                            guests,
-                                            element
-                                        ) < 0
-                                    "
+                                class="canvas-element table-element"
+                                [class.selected]="isSelected(element)"
                                     [style.left.px]="element.x"
                                     [style.top.px]="element.y"
                                     [style.width.px]="element.width"
